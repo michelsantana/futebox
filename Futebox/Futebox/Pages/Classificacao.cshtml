@@ -1,0 +1,60 @@
+﻿@page
+@model ClassificacaoModel
+@{
+    ViewData["Title"] = "Classificação";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Gerador de Classificação</h1>
+
+</div>
+<div id="classificacao"></div>
+
+<div>
+    <hr class="col-3 col-md-2 mb-5">
+
+    <div class="row g-5">
+        <div class="col-md-6">
+            <h1>Serie A</h1>
+            <button class="btn btn-primary" onclick="Ver('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieA)')">Ver</button>
+            <button class="btn btn-primary" onclick="GerarVideo('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieA)')">Gerar Processo</button>
+        </div>
+        <div class="col-md-6">
+            <h1>Serie B</h1>
+            <button class="btn btn-primary" onclick="Ver('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieB)')">Ver</button>
+            <button class="btn btn-primary" onclick="GerarVideo('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieB)')">Gerar Processo</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        function Ver(camp) {
+            fetch(`/classificacao?handler=Campeonato&campeonato=${camp}`)
+                .then((response) => {
+                    return response.text();
+                })
+                .then((result) => {
+                    document.getElementById('classificacao').innerHTML = result;
+                });
+        }
+
+        function GerarVideo(camp) {
+            $.post(`/api/processo/classificacao/${camp}`, (response) => {
+                alert('gerando vídeo');
+            });
+        }
+
+
+        $('#classificacao').click(() => {
+            $('#classificacao').toggleClass('focus');
+        })
+    </script>
+    @if ((Model.campeonatoFoco.HasValue))
+    {
+        <script>
+            Ver('@((int)Model.campeonatoFoco)');
+            $('#classificacao').addClass('focus');
+        </script>
+    }
+}

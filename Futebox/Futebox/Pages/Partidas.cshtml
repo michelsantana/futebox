@@ -1,0 +1,76 @@
+﻿@page
+@model Futebox.Pages.PartidasModel
+@{
+    ViewData["Title"] = "Partidas";
+}
+<div class="row">
+    <div class="col-12">
+        <table id='tabela' class="table">
+            <thead>
+                <tr class="align-middle">
+                    <th scope="col">#</th>
+                    <th scope="col">Mandante</th>
+                    <th scope="col"></th>
+                    <th scope="col">X</th>
+                    <th scope="col"></th>
+                    <th scope="col">Visitante</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Campeonato</th>
+                    <th scope="col">acao</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var partida in Model.partidas)
+                {
+
+                <tr class="align-middle">
+                    <td>@partida.idExterno</td>
+                    <td class="text-end">@partida.timeMandante.nome - (@partida.timeMandante.sigla)</td>
+                    <td class="text-end"><img width="64" src='data:image/png;base64, @partida.timeMandante.logoBin' /></td>
+                    <td>X</td>
+                    <td class="text-start"><img width="64" src='data:image/png;base64, @partida.timeVisitante.logoBin' /></td>
+                    <td class="text-start">(@partida.timeVisitante.sigla) - @partida.timeVisitante.nome</td>
+                    <td>@partida.dataHoraDaPartida</td>
+                    <td>@partida.campeonato</td>
+                    <td>
+                        <button class="btn btn-link" onclick="Foco('@partida.idExterno')">Foco</button>
+                        <button class="btn btn-link" onclick="GerarVideo('@partida.idExterno')">Gerar vídeo</button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="card"></div>
+@section Scripts{
+    <script>
+        function Foco(partida) {
+            fetch(`/partidas?handler=FocoPartida&p=${partida}`)
+                .then((response) => {
+                    return response.text();
+                })
+                .then((result) => {
+                    document.getElementById('card').innerHTML = result;
+                });
+        }
+
+        function GerarVideo(partida) {
+            $.post(`/api/processo/partida/${partida}`, (response) => {
+                alert('gerando vídeo');
+                debugger;
+            });
+        }
+
+        $('#card').click(() => {
+            $('#card').html('');
+        });
+    </script>
+    @if (Model.partidaFoco != null)
+    {
+        <script>
+            Foco('@Model.partidaFoco.idExterno');
+        </script>
+    }
+}

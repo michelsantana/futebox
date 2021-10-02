@@ -1,0 +1,180 @@
+﻿@model ClassificacaoModel
+@{
+    Dictionary<string, string> classes = new Dictionary<string, string>()
+{
+        {"azul", "badge bg-info"},
+        {"laranja", "badge bg-warning"},
+        {"verde", "badge bg-success"},
+        {"branco", ""},
+        {"vermelho", "badge bg-danger"},
+    };
+}
+<style>
+
+    .wm {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        opacity: .1;
+        display: none;
+        position: fixed;
+        z-index: 99999;
+        text-align: center;
+    }
+
+        .wm > img {
+            height: 100%;
+            width: auto !important;
+        }
+
+        .focus .wm {
+            display: block;
+        }
+
+    .focus {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: rgb(53,173,41);
+        background: linear-gradient(45deg, rgba(53,173,41,1) 0%, rgba(176,255,169,1) 48%, rgba(69,217,54,1) 100%);
+        /*width: 1920px;
+        height: 1080px;*/
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+    }
+
+        .focus img {
+            width: 48px;
+        }
+
+        .focus td {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+            .focus td.fw-bold {
+                font-size: 28px;
+                font-weight: 900;
+            }
+
+        .focus .titulo {
+            font-size: 72px;
+        }
+
+        .focus .sub {
+            font-size: 64px;
+        }
+
+        .focus .legenda {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .focus .data {
+            font-size: 84px;
+        }
+</style>
+<div class="wm">
+    <img src="~/img/logo-1.png" />
+</div>
+<h1 class="fs-sport text-center sub">Classificação Atualizada!</h1>
+<h1 class="fs-sport text-center titulo">@Model.nomeCampeonato</h1>
+<div class="row">
+    <div class="col-6">
+        <table id='tabela' class="table table-borderless">
+            <thead>
+                <tr class="align-middle">
+                    <th scope="col" colspan="4">Clube</th>
+                    <th scope="col">Pontos</th>
+                    <th scope="col">PJ</th>
+                    <th scope="col">VIT</th>
+                    <th scope="col">E</th>
+                    <th scope="col">DER</th>
+                    <th scope="col">GP</th>
+                    <th scope="col">GC</th>
+                    <th scope="col">SG</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var time in Model.classificacao.Take(10))
+                {
+
+                    <tr class="align-middle">
+                        <td>
+                            <span class="badge @classes[time.corDestaque]">&nbsp;</span>
+                        </td>
+                        <td class="fw-bold">@time.posicao</td>
+                        <td><img width="32" src='data:image/png;base64, @time.brasao' /></td>
+                        <td class="fw-bold">@time.clube</td>
+                        <td class="fw-bold">@time.pontos</td>
+                        <td class="fw-bold">@time.partidasJogadas</td>
+                        <td>@time.vitorias</td>
+                        <td>@time.empates</td>
+                        <td>@time.derrotas</td>
+                        <td>@time.golsPro</td>
+                        <td>@time.golsContra</td>
+                        <td>@time.saldoGols</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-6">
+        <table id='tabela' class="table table-borderless">
+            <thead>
+                <tr class="align-middle">
+                    <th scope="col" colspan="4">Clube</th>
+                    <th scope="col">Pontos</th>
+                    <th scope="col">PJ</th>
+                    <th scope="col">VIT</th>
+                    <th scope="col">E</th>
+                    <th scope="col">DER</th>
+                    <th scope="col">GP</th>
+                    <th scope="col">GC</th>
+                    <th scope="col">SG</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var time in Model.classificacao.Skip(10))
+                {
+
+                    <tr class="align-middle">
+                        <td>
+                            <span class="@classes[time.corDestaque]">&nbsp;</span>
+                        </td>
+                        <td class="fw-bold">@time.posicao</td>
+                        <td><img width="32" src='data:image/png;base64, @time.brasao' /></td>
+                        <td class="fw-bold">@time.clube</td>
+                        <td class="fw-bold">@time.pontos</td>
+                        <td class="fw-bold">@time.partidasJogadas</td>
+                        <td>@time.vitorias</td>
+                        <td>@time.empates</td>
+                        <td>@time.derrotas</td>
+                        <td>@time.golsPro</td>
+                        <td>@time.golsContra</td>
+                        <td>@time.saldoGols</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-4">
+        <div class="legenda" role="alert">
+            @foreach (var l in Model.legenda)
+            {
+                @Html.Raw(l)<br />
+            }
+        </div>
+    </div>
+    <div class="col-4 text-center">
+        <div class="data fs-sport">
+            @DateTime.Now.ToString("dd/MM/yyyy")
+        </div>
+    </div>
+    <div class="col-4">
+    </div>
+</div>
+
+

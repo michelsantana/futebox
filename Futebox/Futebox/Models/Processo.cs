@@ -1,0 +1,42 @@
+﻿using Futebox.DB;
+using System;
+
+namespace Futebox.Models
+{
+    public class Processo : BaseEntity
+    {
+        public Tipo tipo { get; set; }
+        public String idExterno { get; set; }
+        public String nome { get; set; }
+
+        public String link { get; set; }
+        public TipoLink tipoLink { get; set; }
+
+        public String roteiro { get; set; }
+        public String attrTitulo { get; set; }
+        public String attrDescricao { get; set; }
+        public int status { get; set; }
+        public bool processado { get; set; }
+        public String json { get; set; }
+
+        public enum Tipo
+        {
+            partida,
+            classificacao,
+            rodada,
+        }
+
+        public enum TipoLink
+        {
+            print,
+            image
+        }
+
+        public enum Status
+        {
+            Pendente = 8,
+            Sucesso = 16,
+            Erro = 32,
+        }
+    }
+}

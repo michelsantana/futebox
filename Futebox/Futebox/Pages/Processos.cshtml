@@ -1,0 +1,57 @@
+﻿@page
+@model Futebox.Pages.ProcessosModel
+@{
+    ViewData["Title"] = "Processos";
+}
+<div class="row">
+    <div class="col-12">
+        <table id='tabela' class="table">
+            <thead>
+                <tr class="align-middle">
+                    <th scope="col"></th>
+                    <th scope="col">#/#</th>
+                    <th scope="col">nome</th>
+                    <th scope="col">tipo</th>
+                    <th scope="col">link</th>
+                    <th scope="col">status</th>
+                    <th scope="col">processado</th>
+                    <th scope="col">acao</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var processo in Model.processos)
+                {
+
+                <tr data-row-id="@processo.id" class="align-middle">
+                    <td>
+                        <span class="badge @(Model.cores[processo.status])">&nbsp;</span>
+                    </td>
+                    <td title="@processo.id">@processo.idExterno</td>
+                    <td>@processo.nome</td>
+                    <td>@processo.tipo</td>
+                    <td>@processo.link</td>
+                    <td>@processo.status</td>
+                    <td>@processo.processado</td>
+                    <td>
+                        <button class="btn btn-link" onclick="Play('@processo.id');">Play</button>
+                        <button class="btn btn-link" onclick="Delete('@processo.id');">Delete</button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="card"></div>
+@section Scripts{
+    <script>
+        function Play(processo) {
+            $.get(`/api/processo/executar/${processo}`, s => alert('Rodando'));
+        }
+        function Delete(processo) {
+            $.post(`/api/processo/${processo}/deletar`, {}, s => {
+                $(`[data-row-id="${processo}"]`).remove();
+            });
+        }
+    </script>
+}

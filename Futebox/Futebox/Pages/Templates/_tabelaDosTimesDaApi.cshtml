@@ -1,0 +1,28 @@
+﻿@model GerenciamentoTimesModel
+<h1>@(Model.api?.Count) Times da API do Footstats (Brasileirão Séries A e B)</h1>
+
+<table id='tb-api' class="table table-dark">
+    <thead>
+        <tr class="align-middle">
+            <th>id</th>
+            <th>logo</th>
+            <th>sigla</th>
+            <th>nome</th>
+            <th>ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var time in Model.api)
+        {
+            <tr id='tr-api-@(time.id)' class="align-middle">
+                <td>@time.id</td>
+                <td><img width="64" src='@time.urlLogo' /></td>
+                <td>@time.sigla</td>
+                <td>@time.nome</td>
+                <td>
+                    <button type="button" class="btn btn-link" onclick="SalvarTime('@time.id')">Salvar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,16 @@
+{
+    "name": "futebox-bot",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+        "integration": "node ./src/integration"
+    },
+    "dependencies": {
+        "axios": "^0.21.1",
+        "dotenv": "^10.0.0",
+        "fw": "^0.1.2",
+        "moment": "^2.29.1",
+        "puppeteer": "^10.0.0"
+    }
+}

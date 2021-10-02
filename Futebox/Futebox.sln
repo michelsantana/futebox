@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31702.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Futebox", "Futebox\Futebox.csproj", "{6873FB66-3EEF-4CF5-B933-19D139A38007}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Futebox.Teste", "Futebox.Teste\Futebox.Teste.csproj", "{A7B09560-6806-4334-BE46-1944D684A56C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6873FB66-3EEF-4CF5-B933-19D139A38007}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6873FB66-3EEF-4CF5-B933-19D139A38007}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6873FB66-3EEF-4CF5-B933-19D139A38007}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6873FB66-3EEF-4CF5-B933-19D139A38007}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7B09560-6806-4334-BE46-1944D684A56C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7B09560-6806-4334-BE46-1944D684A56C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7B09560-6806-4334-BE46-1944D684A56C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7B09560-6806-4334-BE46-1944D684A56C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7685BC53-32B2-4C4F-A6FA-A8E1DE63B839}
+	EndGlobalSection
+EndGlobal

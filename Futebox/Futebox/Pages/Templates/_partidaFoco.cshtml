@@ -1,0 +1,109 @@
+﻿@model Futebox.Models.PartidaVM
+@{
+}
+<style>
+
+
+    .score .fs-score {
+        font-size: 430px !important;
+        /*text-shadow:
+            2px 2px 0 #fff,
+            2px -2px 0 #fff,
+            -2px 2px 0 #fff,
+            -2px -2px 0 #fff,
+            2px 0px 0 #fff,
+            0px 2px 0 #fff,
+            -2px 0px 0 #fff,
+            0px -2px 0 #fff;*/
+    }
+
+    .score > .x {
+        font-size: 90px !important;
+        text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;
+    }
+
+    .h {
+        font-size: 120px;
+    }
+
+    .f {
+        font-size: 50px;
+    }
+
+    .name-l,
+    .name-r {
+        font-size: 112px;
+        text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;
+    }
+
+    .logo-l > img,
+    .logo-r > img {
+        width: 580px;
+    }
+
+    .h-100 {
+        height: 100%;
+    }
+
+    #bg {
+        background: url('img/bg.png');
+        background-size: cover;
+        background-position: 0 -380px;
+    }
+
+    #content {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+    }
+
+    .wm {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        opacity: .1;
+    }
+
+        .wm > img {
+            height: 100%;
+        }
+</style>
+<div id="content" class="card text-center">
+    <div class="wm">
+        <img src="~/img/logo-1.png" />
+    </div>
+    <div class="card-header h fs-sport">
+        @Model.campeonato
+    </div>
+    <div class="card-body" id="bg">
+        <div class="d-flex justify-content-around align-items-stretch">
+            <div class="d-flex justify-content-between align-items-center fs-sport">
+                <div class="logo-l">
+                    <img src="img/HD/_@(Model.timeMandante.sigla).png" />
+                    <div class="name-l">
+                        @(Model.timeMandante.sigla)
+                    </div>
+                </div>
+            </div>
+            <div class="score d-flex justify-content-between align-items-center">
+                <div class="fs-score fs-2">@(string.IsNullOrEmpty(Model.golsMandante) ? "0" : Model.golsMandante)</div>
+                <div class="x">x</div>
+                <div class="fs-score fs-2">@(string.IsNullOrEmpty(Model.golsVisitante) ? "0" : Model.golsVisitante)</div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center fs-sport">
+                <div class="logo-r">
+                    <img src="img/HD/_@(Model.timeVisitante.sigla).png" />
+                    <div class="name-r">
+                        @(Model.timeVisitante.sigla)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer text-muted fs-sport f">
+        @Model.dataHoraDaPartida no estádio @Model.estadio
+    </div>
+</div>

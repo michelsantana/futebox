@@ -1,0 +1,26 @@
+﻿@model GerenciamentoTimesModel
+<h1>@(Model.db?.Count) Times salvos no Banco de Dados</h1>
+
+<table id='tr-db' class="table table-dark">
+    <thead>
+        <tr class="align-middle">
+            <th>id</th>
+            <th>logo</th>
+            <th>sigla</th>
+            <th>nome</th>
+            <th>ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var time in Model.db)
+        {
+            <tr id="tr-db-@time.id" class="align-middle">
+                <td>@time.id</td>
+                <td><img width="64" src='data:image/png;base64, @time.logoBin' /></td>
+                <td>@time.sigla</td>
+                <td>@time.nome</td>
+                <td><button type="button" class="btn btn-link" onclick="RemoverTime('@time.id')">Remover</button></td>
+            </tr>
+        }
+    </tbody>
+</table>

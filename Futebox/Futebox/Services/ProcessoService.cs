@@ -35,11 +35,11 @@ namespace Futebox.Services
 
         public Processo SalvarProcessoPartida(int idPartida)
         {
-            var partidas = _partidasService.ObterPartidasHoje();
+            var partidas = _partidasService.ObterPartidasHoje(true);
             return SalvarProcessoPartida(partidas.First(_ => _.idExterno == idPartida));
         }
 
-        public Processo SalvarProcessoPartida(PartidaVM partida)
+        private Processo SalvarProcessoPartida(PartidaVM partida)
         {
             var roteiro = _partidasService.ObterRoteiroDaPartida(partida);
             var atributos = _partidasService.ObterAtributosDoVideo(partida);
@@ -50,9 +50,11 @@ namespace Futebox.Services
                 nome = $"{partida.timeMandante.nome} x {partida.timeMandante.nome} - {partida.dataHoraDaPartida}",
                 link = $"{Settings.ApplicationHttpBaseUrl}partidas?partida={partida.idExterno}&printMode=1",
                 tipoLink = Processo.TipoLink.print,
+                imgAltura = 1920,
+                imgLargura = 1080,
                 json = JsonConvert.SerializeObject(partida),
                 roteiro = roteiro,
-                status = 1,
+                status = (int)Processo.Status.Pendente,
                 processado = false,
                 attrTitulo = atributos.Item1,
                 attrDescricao = atributos.Item2
@@ -63,11 +65,11 @@ namespace Futebox.Services
 
         public Processo SalvarProcessoClassificacao(Campeonatos campeonato)
         {
-            var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(campeonato);
+            var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(campeonato, true);
             return SalvarProcessoClassificacao(classificacao, campeonato);
         }
 
-        public Processo SalvarProcessoClassificacao(IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
+        private Processo SalvarProcessoClassificacao(IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
         {
             var roteiro = _classificacaoService.ObterRoteiroDaClassificacao(classificacao, campeonato);
             var atributos = _classificacaoService.ObterAtributosDoVideo(classificacao, campeonato);
@@ -78,6 +80,8 @@ namespace Futebox.Services
                 nome = $"{atributos.Item1}",
                 link = $"{Settings.ApplicationHttpBaseUrl}classificacao?foco={(int)campeonato}&printMode=1",
                 tipoLink = Processo.TipoLink.print,
+                imgAltura = 1080,
+                imgLargura = 1920,
                 json = JsonConvert.SerializeObject(classificacao),
                 roteiro = roteiro,
                 status = (int)Processo.Status.Pendente,

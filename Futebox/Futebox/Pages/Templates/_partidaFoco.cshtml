@@ -6,7 +6,8 @@
 
     .score .fs-score {
         font-size: 430px !important;
-        /*text-shadow:
+        line-height: 1;
+        text-shadow:
             2px 2px 0 #fff,
             2px -2px 0 #fff,
             -2px 2px 0 #fff,
@@ -14,7 +15,7 @@
             2px 0px 0 #fff,
             0px 2px 0 #fff,
             -2px 0px 0 #fff,
-            0px -2px 0 #fff;*/
+            0px -2px 0 #fff;
     }
 
     .score > .x {
@@ -32,13 +33,13 @@
 
     .name-l,
     .name-r {
-        font-size: 112px;
+        font-size: 72px;
         text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;
     }
 
     .logo-l > img,
     .logo-r > img {
-        width: 580px;
+        width: 432px;
     }
 
     .h-100 {
@@ -48,7 +49,6 @@
     #bg {
         background: url('img/bg.png');
         background-size: cover;
-        background-position: 0 -380px;
     }
 
     #content {
@@ -68,7 +68,8 @@
     }
 
         .wm > img {
-            height: 100%;
+            width: 100%;
+            margin-top: 33%;
         }
 </style>
 <div id="content" class="card text-center">
@@ -79,7 +80,7 @@
         @Model.campeonato
     </div>
     <div class="card-body" id="bg">
-        <div class="d-flex justify-content-around align-items-stretch">
+        <div class="d-flex justify-content-between flex-column align-items-center">
             <div class="d-flex justify-content-between align-items-center fs-sport">
                 <div class="logo-l">
                     <img src="img/HD/_@(Model.timeMandante.sigla).png" />
@@ -95,10 +96,11 @@
             </div>
             <div class="d-flex justify-content-between align-items-center fs-sport">
                 <div class="logo-r">
-                    <img src="img/HD/_@(Model.timeVisitante.sigla).png" />
                     <div class="name-r">
                         @(Model.timeVisitante.sigla)
                     </div>
+                    <img src="img/HD/_@(Model.timeVisitante.sigla).png" />
+
                 </div>
             </div>
         </div>

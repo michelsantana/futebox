@@ -40,8 +40,9 @@ namespace Futebox.Services
         {
 
             var serie = campeonato == Campeonatos.BrasileiraoSerieA ? "A" : "B";
-            var msg = $"{RoteiroDefaults.ObterSaudacao()} Espero que estejam bem: "
-                + $"Vamos ver a classificação do Brasileirão 2021 série \"{serie}\": "
+            var msg = $"{RoteiroDefaults.ObterSaudacao()} "
+                //+ $"Veja agora a classificação do Brasileirão 2021 série \"{serie}\": "
+                + $"Veja agora a classificação do \"{CampeonatoNome(campeonato)}\": "
                 + $"Lembrando que essa, é a classificação no dia de hoje, {RoteiroDefaults.TraduzirDiaDoMes(DateTime.Now)}: "
                 + $"Bora: "
                 + "Ô ";
@@ -52,7 +53,7 @@ namespace Futebox.Services
             classificacao.ToList().ForEach(_ =>
             {
 
-                msg += $"{_.posicao}º colocado é, {_.time.ObterNomeWatson}, "
+                msg += $"{_.posicao}º colocado é, {_.time.ObterNomeWatson()}, "
                 + $"com {_.pontos} pontos, em { _.partidasJogadas} jogos: ";
 
                 if (~~_.posicao == indicePedirLike)

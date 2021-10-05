@@ -50,6 +50,8 @@ namespace Futebox.DB
                 Map(x => x.nome).ToColumn("nome");
                 Map(x => x.link).ToColumn("link");
                 Map(x => x.tipoLink).ToColumn("tipoLink");
+                Map(x => x.imgLargura).ToColumn("imgLargura");
+                Map(x => x.imgAltura).ToColumn("imgAltura");
                 Map(x => x.roteiro).ToColumn("roteiro");
                 Map(x => x.attrTitulo).ToColumn("attrTitulo");
                 Map(x => x.attrDescricao).ToColumn("attrDescricao");

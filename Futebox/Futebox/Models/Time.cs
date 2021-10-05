@@ -31,13 +31,8 @@ namespace Futebox.Models
         public Int32 idTecnico { get; set; }
         public String tecnico { get; set; }
 
-        public string ObterNomeWatson
-        {
-            get
-            {
-                return string.IsNullOrEmpty(this.nomeAdaptadoWatson) ? this.nome : this.nomeAdaptadoWatson;
-            }
-        }
+        public string ObterNomeWatson ()=> string.IsNullOrEmpty(this.nomeAdaptadoWatson) ? this.nome : this.nomeAdaptadoWatson;
+
         public Time()
         {
 

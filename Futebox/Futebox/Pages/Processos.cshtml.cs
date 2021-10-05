@@ -15,6 +15,7 @@ namespace Futebox.Pages
             { (int)Processo.Status.Pendente, "badge bg-warning" },
             { (int)Processo.Status.Sucesso, "badge bg-success" },
             { (int)Processo.Status.Erro, "badge bg-danger" },
+            { 1, "badge bg-warning" },
         };
 
         public ProcessosModel(IProcessoService processoService)

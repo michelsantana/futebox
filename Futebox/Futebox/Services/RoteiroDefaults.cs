@@ -28,12 +28,12 @@ namespace Futebox.Services
             var dia = dt.ToString("dd");
             var diaInt = int.Parse(dia);
             if (diaInt == 1) dia = "primeiro";
-            return $"{dia} de { dt.ToString("MMMM") } de { dt.ToString("yyyy") }";
+            return $"{diaInt} de { dt.ToString("MMMM") } de { dt.ToString("yyyy") }";
         }
 
         public static string ObterTrechoEmpate(PartidaVM partida)
         {
-            return $"Hoje: {partida.timeMandante.ObterNomeWatson} e {partida.timeVisitante.ObterNomeWatson}: " +
+            return $"Hoje: {partida.timeMandante.ObterNomeWatson()} e {partida.timeVisitante.ObterNomeWatson()}, " +
                     $"empataram por {partida.golsMandante} a {partida.golsMandante} no estádio, {partida.estadio}. " +
                     $"Esse foi um jogo do campeonato, {partida.campeonato}: " +
                     $"e iniciou por volta das {RoteiroDefaults.TraduzirHoras(partida.dataPartida)}. " +
@@ -45,7 +45,7 @@ namespace Futebox.Services
             var golsVencedor = partida.timeMandante.sigla == vencedor.sigla ? partida.golsMandante : partida.golsVisitante;
             var golsPerdedor = partida.timeMandante.sigla == perdedor.sigla ? partida.golsMandante : partida.golsVisitante;
 
-            return $"Hoje: {vencedor.ObterNomeWatson} venceu o {perdedor.ObterNomeWatson}: " +
+            return $"Hoje: {vencedor.ObterNomeWatson()} venceu o {perdedor.ObterNomeWatson()}: " +
                     $"por {golsVencedor} a {golsPerdedor}. " +
                     $"O jogo aconteceu no estádio {partida.estadio} por volta das {RoteiroDefaults.TraduzirHoras(partida.dataPartida)}. " +
                     $"Esse foi um jogo do campeonato, {partida.campeonato}: " +

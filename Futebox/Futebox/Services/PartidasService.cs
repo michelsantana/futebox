@@ -38,6 +38,23 @@ namespace Futebox.Services
             return resultado.Select(_ => ConverterEmPartidaVM(_));
         }
 
+        public IEnumerable<PartidaVM> ObterPartidasDaRodada(Campeonatos campeonato, int rodada, bool skipCache = false)
+        {
+            var hoje = DateTime.Now.ToString("yyyyMMdd");
+            var cacheName = $"{nameof(FootstatsPartida)}{hoje}";
+            var resultado = _cache.ObterConteudo<List<FootstatsPartida>>(cacheName);
+            if (resultado == null || resultado?.Count == 0 || skipCache)
+            {
+                resultado = _footstatsService.ObterPartidasDaRodada(campeonato, rodada);
+                _cache.DefinirConteudo(cacheName, resultado, 24);
+            }
+
+            var campeonatos = new int[] { (int)Campeonatos.BrasileiraoSerieA, (int)Campeonatos.BrasileiraoSerieB };
+            resultado = resultado.FindAll(_ => campeonatos.Contains(_.idCampeonato));
+
+            return resultado.Select(_ => ConverterEmPartidaVM(_));
+        }
+
         public string ObterRoteiroDaPartida(int idPartida)
         {
             var partidas = ObterPartidasHoje();

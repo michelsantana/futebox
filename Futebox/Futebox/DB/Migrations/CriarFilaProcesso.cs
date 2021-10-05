@@ -28,7 +28,9 @@ namespace Futebox.DB.Migrations
 
             .WithColumn("link").AsString().Nullable() // http
             .WithColumn("tipoLink").AsString().Nullable() // print ou png
-            
+            .WithColumn("imgLargura").AsString().Nullable() // tamanho do print 1920 outros 
+            .WithColumn("imgAltura").AsString().Nullable() // tamanho do print 1080 outros 
+
             .WithColumn("roteiro").AsString().Nullable() // blábláblá
 
             .WithColumn("attrTitulo").AsString().Nullable() // titulo do vdo no yt

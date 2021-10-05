@@ -11,6 +11,8 @@ namespace Futebox.Models
 
         public String link { get; set; }
         public TipoLink tipoLink { get; set; }
+        public int imgLargura { get; set; }
+        public int imgAltura { get; set; }
 
         public String roteiro { get; set; }
         public String attrTitulo { get; set; }

@@ -23,6 +23,8 @@ function Processo(processo) {
   this.nome = processo.nome;
   this.link = processo.link;
   this.tipoLink = enumTipoLink[processo.tipoLink];
+  this.imgLargura = processo.imgLargura;
+  this.imgAltura = processo.imgAltura;
   this.roteiro = processo.roteiro;
   this.attrTitulo = processo.attrTitulo;
   this.attrDescricao = processo.attrDescricao;
@@ -60,10 +62,10 @@ module.exports = function (processo, datasourceUrl) {
     return (await axios.get(`${datasourceUrl}/sucesso`)).data;
   };
 
-  this.GerarImagem = async (urlPrint) => {
+  this.GerarImagem = async (urlPrint, w, h) => {
     const browser = await pptr.launch({ headless: false });
     const page = await browser.newPage();
-    await page.setViewport({ width: 1920, height: 1080 });
+    await page.setViewport({ width: ~~w , height: ~~h });
     await page.goto(urlPrint, { waitUntil: "networkidle2" });
     await utils.sleep(2);
     await page.screenshot({ path: this.obterArquivoPrint() });
@@ -75,7 +77,7 @@ module.exports = function (processo, datasourceUrl) {
       salvarEm: this.obterPastaDoProcesso(),
       nomeArquivo: this.obterNomeArquivo("mp3"),
       roteiro: texto,
-      usarArquivosExistentes: false,
+      usarArquivosExistentes: true,
     }).Executar();
     if (resultado.status !== statusCodes.ok)
       throw new Error(resultado.mensagem);
@@ -102,9 +104,10 @@ module.exports = function (processo, datasourceUrl) {
   this.Executar = async () => {
     try {
       var processo = new Processo(await this.ObterProcesso());
+      console.log(processo);
       utils.criarPastaSeNaoExistir(this.obterPastaDoProcesso());
 
-      if (processo.tipoLink == "print") await this.GerarImagem(processo.link);
+      if (processo.tipoLink == "print") await this.GerarImagem(processo.link, processo.imgLargura, processo.imgAltura);
       else
         throw new Erro(
           "processos com link tipo image ainda não foram implementados"

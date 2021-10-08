@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Futebox.Models.Enums;
 
 namespace Futebox.Services
 {
@@ -40,12 +41,16 @@ namespace Futebox.Services
                     $"Pra quem você estava torcendo? deixa aqui nos comentários junto com aquela deedáda no laique. Até a próxima.";
         }
 
+        public static string ObterNomeDoCampeonato(Enums.Campeonatos campeonato) => campeonato == Campeonatos.BrasileiraoSerieA? "Brasileirão Série A" : "Brasileirão Série B";
+        public static string ObterSerieDoCampeonato(Campeonatos campeonato) => campeonato == Campeonatos.BrasileiraoSerieA ? "A" : "B";
+
+
         public static string ObterTrechoVencedor(PartidaVM partida, Time vencedor, Time perdedor)
         {
             var golsVencedor = partida.timeMandante.sigla == vencedor.sigla ? partida.golsMandante : partida.golsVisitante;
             var golsPerdedor = partida.timeMandante.sigla == perdedor.sigla ? partida.golsMandante : partida.golsVisitante;
 
-            return $"Hoje: {vencedor.ObterNomeWatson()} venceu o {perdedor.ObterNomeWatson()}: " +
+            return $"Hoje {vencedor.ObterNomeWatson()} venceu o {perdedor.ObterNomeWatson()}: " +
                     $"por {golsVencedor} a {golsPerdedor}. " +
                     $"O jogo aconteceu no estádio {partida.estadio} por volta das {RoteiroDefaults.TraduzirHoras(partida.dataPartida)}. " +
                     $"Esse foi um jogo do campeonato, {partida.campeonato}: " +

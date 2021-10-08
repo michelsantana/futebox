@@ -15,12 +15,14 @@ namespace Futebox.Services
         IProcessoRepositorio _processoRepositorio;
         IPartidasService _partidasService;
         IClassificacaoService _classificacaoService;
+        IRodadaService _rodadaService;
 
-        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService)
+        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService)
         {
             _processoRepositorio = processoRepositorio;
             _partidasService = partidasService;
             _classificacaoService = classificacaoService;
+            _rodadaService = rodadaService;
         }
 
         public List<Processo> ObterProcessos()
@@ -47,7 +49,7 @@ namespace Futebox.Services
             {
                 idExterno = partida.idExterno.ToString(),
                 tipo = Processo.Tipo.partida,
-                nome = $"{partida.timeMandante.nome} x {partida.timeMandante.nome} - {partida.dataHoraDaPartida}",
+                nome = $"{atributos.Item1}",
                 link = $"{Settings.ApplicationHttpBaseUrl}partidas?partida={partida.idExterno}&printMode=1",
                 tipoLink = Processo.TipoLink.print,
                 imgAltura = 1920,
@@ -93,6 +95,36 @@ namespace Futebox.Services
             return processo;
         }
 
+        public Processo SalvarProcessoRodada(Campeonatos campeonato, int rodada)
+        {
+            var partidas = _rodadaService.ObterPartidasDaRodada(campeonato, rodada);
+            return SalvarProcessoRodada(partidas, campeonato, rodada);
+
+        }
+        public Processo SalvarProcessoRodada(IEnumerable<PartidaVM> partidas, Campeonatos campeonato, int rodada)
+        {
+            var roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, campeonato, rodada);
+            var atributos = _rodadaService.ObterAtributosDoVideo(partidas, campeonato, rodada);
+            var processo = new Processo()
+            {
+                idExterno = DateTime.Now.ToString("yyyyMMddhhmmss"),
+                tipo = Processo.Tipo.rodada,
+                nome = $"{atributos.Item1}",
+                link = $"{Settings.ApplicationHttpBaseUrl}rodadas?foco={(int)campeonato}&rodada={rodada}&printMode=1",
+                tipoLink = Processo.TipoLink.print,
+                imgAltura = 1080,
+                imgLargura = 1920,
+                json = JsonConvert.SerializeObject(partidas),
+                roteiro = roteiro,
+                status = (int)Processo.Status.Pendente,
+                processado = false,
+                attrTitulo = atributos.Item1,
+                attrDescricao = atributos.Item2
+            };
+            _processoRepositorio.Insert(ref processo);
+            return processo;
+        }
+
         public bool ExecutarProcesso(string processo)
         {
             string botFolder = $"{Settings.ApplicationsRoot}/Robot";
@@ -119,7 +151,8 @@ namespace Futebox.Services
             p.processado = processado;
             p.status = (int)Processo.Status.Sucesso;
 
-            if (!string.IsNullOrEmpty(erro)) {
+            if (!string.IsNullOrEmpty(erro))
+            {
                 p.nome = $"[Erro] - {p.nome}";
                 p.status = (int)Processo.Status.Erro;
                 p.attrDescricao = erro;

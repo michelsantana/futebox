@@ -12,5 +12,6 @@ namespace Futebox.Services.Interfaces
         string ObterRoteiroDaPartida(PartidaVM partida);
         string ObterRoteiroDaPartida(int idPartida);
         Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida);
+        PartidaVM ConverterEmPartidaVM(FootstatsPartida footstatsPartida);
     }
 }

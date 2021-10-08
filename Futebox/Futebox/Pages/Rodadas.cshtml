@@ -1,0 +1,72 @@
+﻿@page
+@model Futebox.Pages.RodadasModel
+@{
+    ViewData["Title"] = "Rodadas";
+}
+
+<div class="row g-5">
+
+    <div class="text-center">
+        <h1 class="display-4">Gerador de Rodadas</h1>
+        <div class="mb-3">
+            <label for="txtRodada" class="form-label">Rodada</label>
+            <input type="text" class="form-control" id="txtRodada" placeholder="">
+        </div>
+    </div>
+</div>
+
+<div id="rodada">
+
+</div>
+
+<div>
+
+    <div class="row g-5">
+        <div class="col-md-6">
+            <h1>Serie A</h1>
+            <button class="btn btn-primary" onclick="Ver('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieA)')">Ver</button>
+            <button class="btn btn-primary" onclick="GerarVideo('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieA)')">Gerar Processo</button>
+        </div>
+        <div class="col-md-6">
+            <h1>Serie B</h1>
+            <button class="btn btn-primary" onclick="Ver('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieB)')">Ver</button>
+            <button class="btn btn-primary" onclick="GerarVideo('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieB)')">Gerar Processo</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        function Ver(camp, r) {
+            debugger;
+            r = r || $('#txtRodada').val();
+            fetch(`/rodadas?handler=Rodada&campeonato=${camp}&rodada=${r}`)
+                .then((response) => {
+                    return response.text();
+                })
+                .then((result) => {
+                    document.getElementById('rodada').innerHTML = result;
+                });
+        }
+
+        function GerarVideo(camp, r) {
+            r = r || $('#txtRodada').val();
+            $.post(`/api/processo/rodada/${camp}/${r}`, (response) => {
+                alert('gerando vídeo');
+            });
+        }
+
+
+        $('#rodada').click(() => {
+            $('#rodada').toggleClass('focus');
+        });
+    </script>
+    @if ((Model.campeonatoFoco.HasValue && Model.rodadaFoco.HasValue))
+    {
+        <script>
+            Ver('@((int)Model.campeonatoFoco)', '@((int)Model.rodadaFoco)');
+            $('#rodada').addClass('focus');
+            $('#txtRodada').val('@((int)Model.rodadaFoco)')
+        </script>
+    }
+}

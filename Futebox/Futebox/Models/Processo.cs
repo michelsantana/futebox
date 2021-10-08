@@ -17,7 +17,10 @@ namespace Futebox.Models
         public String roteiro { get; set; }
         public String attrTitulo { get; set; }
         public String attrDescricao { get; set; }
+
         public int status { get; set; }
+        public string statusMensagem { get; set; }
+
         public bool processado { get; set; }
         public String json { get; set; }
 
@@ -37,8 +40,9 @@ namespace Futebox.Models
         public enum Status
         {
             Pendente = 8,
-            Sucesso = 16,
-            Erro = 32,
+            Executando = 16,
+            Sucesso = 32,
+            Erro = 64
         }
     }
 }

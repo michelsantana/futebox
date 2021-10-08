@@ -56,6 +56,7 @@ namespace Futebox.DB
                 Map(x => x.attrTitulo).ToColumn("attrTitulo");
                 Map(x => x.attrDescricao).ToColumn("attrDescricao");
                 Map(x => x.status).ToColumn("status");
+                Map(x => x.statusMensagem).ToColumn("statusMensagem");
                 Map(x => x.processado).ToColumn("processado");
                 Map(x => x.json).ToColumn("json");
             }

@@ -16,6 +16,7 @@
                     <th scope="col">Visitante</th>
                     <th scope="col">Data</th>
                     <th scope="col">Campeonato</th>
+                    <th scope="col">Rodada</th>
                     <th scope="col">acao</th>
 
                 </tr>
@@ -33,6 +34,7 @@
                     <td class="text-start">(@partida.timeVisitante.sigla) - @partida.timeVisitante.nome</td>
                     <td>@partida.dataHoraDaPartida</td>
                     <td>@partida.campeonato</td>
+                    <td>@partida.rodada</td>
                     <td>
                         <button class="btn btn-link" onclick="Foco('@partida.idExterno')">Foco</button>
                         <button class="btn btn-link" onclick="GerarVideo('@partida.idExterno')">Gerar vídeo</button>

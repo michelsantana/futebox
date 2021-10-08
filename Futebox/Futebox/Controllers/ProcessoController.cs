@@ -66,6 +66,12 @@ namespace Futebox.Controllers
             return _processoService.SalvarProcessoClassificacao((Campeonatos)int.Parse(id));
         }
 
+        [HttpPost("rodada/{id}/{rodada}")]
+        public Processo AddProcessoRodada(string id, string rodada)
+        {
+            return _processoService.SalvarProcessoRodada((Campeonatos)int.Parse(id), int.Parse(rodada));
+        }
+
         [HttpGet("executar/{id}")]
         public bool ExecutarProcesso(string id)
         {

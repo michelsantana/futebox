@@ -49,7 +49,7 @@ namespace Futebox.DB
 
         public virtual void Insert(ref TEntity entity)
         {
-            entity.id = Guid.NewGuid().ToString();
+            entity.id = Guid.NewGuid().ToString().Substring(0, 5);
             entity.criacao = DateTime.Now;
             _dbContext.Insert(entity, _transaction);
             entity = GetById(entity.id);

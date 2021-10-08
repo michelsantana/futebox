@@ -20,5 +20,6 @@ namespace Futebox.Models
         public string dataHoraDaPartida { get; set; }
         public string estadio { get; set; }
         public string campeonato { get; set; }
+        public int rodada { get; set; }
     }
 }

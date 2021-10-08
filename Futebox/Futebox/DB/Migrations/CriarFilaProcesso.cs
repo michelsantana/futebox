@@ -37,6 +37,8 @@ namespace Futebox.DB.Migrations
             .WithColumn("attrDescricao").AsString().Nullable() // descrição do vdo no yt
 
             .WithColumn("status").AsInt32().NotNullable() // estado do processo
+            .WithColumn("statusMensagem").AsString().Nullable()
+
             .WithColumn("processado").AsBoolean().NotNullable() // finalizou processo
 
             .WithColumn("json").AsString().NotNullable(); // json com dados da entidade ou informações genéricas 

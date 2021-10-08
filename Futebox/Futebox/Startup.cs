@@ -48,6 +48,7 @@ namespace Futebox
             services.AddScoped<IPartidasService, PartidasService>();
             services.AddScoped<IFutebotService, FutebotService>();
             services.AddScoped<IProcessoService, ProcessoService>();
+            services.AddScoped<IRodadaService, RodadaService>();
 
             services.AddScoped<IProcessoRepositorio, ProcessoRepositorio>();
             services.AddScoped<ITimeRepositorio, TimeRepositorio>();

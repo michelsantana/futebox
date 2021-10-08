@@ -42,7 +42,7 @@ namespace Futebox.Services
             var serie = campeonato == Campeonatos.BrasileiraoSerieA ? "A" : "B";
             var msg = $"{RoteiroDefaults.ObterSaudacao()} "
                 //+ $"Veja agora a classificação do Brasileirão 2021 série \"{serie}\": "
-                + $"Veja agora a classificação do \"{CampeonatoNome(campeonato)}\": "
+                + $"Veja agora a classificação do \"{RoteiroDefaults.ObterNomeDoCampeonato(campeonato)}\": "
                 + $"Lembrando que essa, é a classificação no dia de hoje, {RoteiroDefaults.TraduzirDiaDoMes(DateTime.Now)}: "
                 + $"Bora: "
                 + "Ô ";
@@ -67,7 +67,7 @@ namespace Futebox.Services
 
         public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
         {
-            var camp = CampeonatoNome(campeonato);
+            var camp = RoteiroDefaults.ObterNomeDoCampeonato(campeonato);
             var data = DateTime.Now.ToString("dd/MM/yyyy");
             var ano = DateTime.Now.ToString("yyyy");
             var titulo = $"CLASSIFICAÇÃO {camp} {ano} - {data} - ATUALIZADA";
@@ -128,9 +128,5 @@ namespace Futebox.Services
             };
             return retorno;
         }
-
-        private string Serie(Campeonatos campeonato) => campeonato == Campeonatos.BrasileiraoSerieA ? "A" : "B";
-        private string CampeonatoNome(Campeonatos campeonato) => campeonato == Campeonatos.BrasileiraoSerieA ? "Brasileirão Série A" : "Brasileirão Série B";
-
     }
 }

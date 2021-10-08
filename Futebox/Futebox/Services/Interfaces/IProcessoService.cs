@@ -10,6 +10,7 @@ namespace Futebox.Services.Interfaces
         
         Processo SalvarProcessoPartida(int idPartida);
         Processo SalvarProcessoClassificacao(Enums.Campeonatos campeonato);
+        Processo SalvarProcessoRodada(Enums.Campeonatos campeonato, int rodada);
 
         bool ExecutarProcesso(string processo);
         Processo AtualizarProcesso(string id, bool processado, string erro = "");

@@ -7,4 +7,4 @@ set arg3=%3
 set arg4=%4
 cd /d %arg1%
 REM pause
-start integration.step2.bat %arg2% %arg3% %arg4%
+call integration.step2.bat %arg2% %arg3% %arg4%

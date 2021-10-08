@@ -1,4 +1,3 @@
-const fs = require('fs');
 const pptr = require('puppeteer');
 const utils = require('./../utils/utils');
 const statusCodes = require('./../utils/services-status-codes');

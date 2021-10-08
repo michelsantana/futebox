@@ -13,6 +13,7 @@ namespace Futebox.Pages
         public Dictionary<int, string> cores = new Dictionary<int, string>()
         {
             { (int)Processo.Status.Pendente, "badge bg-warning" },
+            { (int)Processo.Status.Executando, "badge bg-info" },
             { (int)Processo.Status.Sucesso, "badge bg-success" },
             { (int)Processo.Status.Erro, "badge bg-danger" },
             { 1, "badge bg-warning" },

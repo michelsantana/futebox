@@ -65,7 +65,7 @@ module.exports = function (processo, datasourceUrl) {
   this.GerarImagem = async (urlPrint, w, h) => {
     const browser = await pptr.launch({ headless: false });
     const page = await browser.newPage();
-    await page.setViewport({ width: ~~w , height: ~~h });
+    await page.setViewport({ width: ~~w, height: ~~h });
     await page.goto(urlPrint, { waitUntil: "networkidle2" });
     await utils.sleep(2);
     await page.screenshot({ path: this.obterArquivoPrint() });
@@ -107,7 +107,12 @@ module.exports = function (processo, datasourceUrl) {
       console.log(processo);
       utils.criarPastaSeNaoExistir(this.obterPastaDoProcesso());
 
-      if (processo.tipoLink == "print") await this.GerarImagem(processo.link, processo.imgLargura, processo.imgAltura);
+      if (processo.tipoLink == "print")
+        await this.GerarImagem(
+          processo.link,
+          processo.imgLargura,
+          processo.imgAltura
+        );
       else
         throw new Erro(
           "processos com link tipo image ainda não foram implementados"
@@ -116,7 +121,6 @@ module.exports = function (processo, datasourceUrl) {
       await this.GerarFala(processo.roteiro);
       await this.GerarVideo();
       await this.AtualizarProcessoSucesso();
-      ("");
     } catch (ex) {
       await this.AtualizarProcessoErro("Deu erro!");
       throw new Error(ex);

@@ -1,4 +1,5 @@
 ﻿using Futebox.DB;
+using Futebox.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -32,6 +33,7 @@ namespace Futebox.Models
         public String tecnico { get; set; }
 
         public string ObterNomeWatson ()=> string.IsNullOrEmpty(this.nomeAdaptadoWatson) ? this.nome : this.nomeAdaptadoWatson;
+        public string ObterLogoLocal() => $"./img/escudos/{pais.RemoverEspacos().RemoverAcentos().ToLower()}/-{sigla}.png";
 
         public Time()
         {

@@ -36,25 +36,27 @@ namespace Futebox.Pages
         public PartialViewResult OnGetCampeonato(int campeonato)
         {
             var enumCampeonato = (Campeonatos)campeonato;
+            nomeCampeonato = CampeonatoUtils.ObterNomeDoCampeonato(enumCampeonato);
+            classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(enumCampeonato, clearCache)?.ToList();
+            legenda.Clear();
+            var partial = "Templates/_tabelaDeClassificacao";
             switch (enumCampeonato)
             {
                 case Campeonatos.BrasileiraoSerieA:
-                    nomeCampeonato = "Brasileirão Série A";
-                    this.classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(Campeonatos.BrasileiraoSerieA, clearCache)?.ToList();
                     IdentificarCoresDestaqueBrasileiraoSerieA();
                     break;
                 case Campeonatos.BrasileiraoSerieB:
-                    nomeCampeonato = "Brasileirão Série B";
-                    this.classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(Campeonatos.BrasileiraoSerieB, clearCache)?.ToList();
                     IdentificarCoresDestaqueBrasileiraoSerieB();
                     break;
+                case Campeonatos.Libertadores2021:
+                    partial = "Templates/_tabelaDeClassificacaoLibertadores";
+                    break;
             }
-            return Partial("Templates/_tabelaDeClassificacao", this);
+            return Partial(partial, this);
         }
 
         private void IdentificarCoresDestaqueBrasileiraoSerieA()
         {
-            legenda.Clear();
             foreach (var time in this.classificacao)
             {
                 if (time.posicao < 5)
@@ -91,7 +93,6 @@ namespace Futebox.Pages
 
         private void IdentificarCoresDestaqueBrasileiraoSerieB()
         {
-            legenda.Clear();
             foreach (var time in this.classificacao)
             {
                 if (time.posicao < 5)

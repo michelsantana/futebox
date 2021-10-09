@@ -32,7 +32,7 @@ namespace Futebox.Services
                 _cache.DefinirConteudo(cacheName, resultado, 24);
             }
 
-            var campeonatos = new int[] { (int)Campeonatos.BrasileiraoSerieA, (int)Campeonatos.BrasileiraoSerieB };
+            var campeonatos = CampeonatoUtils.ObterCampeonatosAtivos().Select(_ => (int)_);
             resultado = resultado.FindAll(_ => campeonatos.Contains(_.idCampeonato));
 
             return resultado.Select(_ => ConverterEmPartidaVM(_));
@@ -107,19 +107,9 @@ namespace Futebox.Services
                 dataHoraDaPartida = dtPartida.ToString("dddd, dd MMMM yyyy - HH:mm"),
                 dataPartida = dtPartida,
                 estadio = footstatsPartida.estadio,
-                campeonato = ObterNomeDoCampeonato((Campeonatos)footstatsPartida.idCampeonato),
+                campeonato = CampeonatoUtils.ObterNomeDoCampeonato((Campeonatos)footstatsPartida.idCampeonato),
                 rodada = footstatsPartida.rodada
             };
-        }
-
-        private string ObterNomeDoCampeonato(Campeonatos camp)
-        {
-            switch (camp)
-            {
-                case Campeonatos.BrasileiraoSerieA: return "Brasileirão Série A";
-                case Campeonatos.BrasileiraoSerieB: return "Brasileirão Série B";
-            }
-            return null;
         }
     }
 }

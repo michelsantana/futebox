@@ -1,13 +1,14 @@
 ﻿@model ClassificacaoModel
 @{
     Dictionary<string, string> classes = new Dictionary<string, string>()
-{
+    {
         {"azul", "badge bg-info"},
         {"laranja", "badge bg-warning"},
         {"verde", "badge bg-success"},
         {"branco", ""},
         {"vermelho", "badge bg-danger"},
     };
+    var ObterDestaque = new Func<string , string>((s) => string.IsNullOrEmpty(s) ? "" : classes.ContainsKey(s) ? classes[s] : classes["branco"]);
 }
 <style>
 
@@ -108,7 +109,7 @@
 
                     <tr class="align-middle">
                         <td>
-                            <span class="badge @classes[time.corDestaque]">&nbsp;</span>
+                            <span class="badge @ObterDestaque(time.corDestaque)">&nbsp;</span>
                         </td>
                         <td class="fw-bold text-center">@(time.posicao)º</td>
                         <td class="text-center"><img width="32" src='~/img/LOGO_@(time.time.sigla).png' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" /></td>
@@ -147,7 +148,7 @@
 
                     <tr class="align-middle">
                         <td>
-                            <span class="@classes[time.corDestaque]">&nbsp;</span>
+                            <span class="@ObterDestaque(time.corDestaque)">&nbsp;</span>
                         </td>
                         <td class="fw-bold text-center">@(time.posicao)º</td>
                         <td class="text-center"><img width="32" src='~/img/LOGO_@(time.time.sigla).png' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" /></td>

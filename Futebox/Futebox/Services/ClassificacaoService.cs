@@ -39,10 +39,8 @@ namespace Futebox.Services
         public string ObterRoteiroDaClassificacao(IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
         {
 
-            var serie = campeonato == Campeonatos.BrasileiraoSerieA ? "A" : "B";
             var msg = $"{RoteiroDefaults.ObterSaudacao()} "
-                //+ $"Veja agora a classificação do Brasileirão 2021 série \"{serie}\": "
-                + $"Veja agora a classificação do \"{RoteiroDefaults.ObterNomeDoCampeonato(campeonato)}\": "
+                + $"Veja agora a classificação do \"{CampeonatoUtils.ObterNomeDoCampeonato(campeonato)}\": "
                 + $"Lembrando que essa, é a classificação no dia de hoje, {RoteiroDefaults.TraduzirDiaDoMes(DateTime.Now)}: "
                 + $"Bora: "
                 + "Ô ";
@@ -67,7 +65,7 @@ namespace Futebox.Services
 
         public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
         {
-            var camp = RoteiroDefaults.ObterNomeDoCampeonato(campeonato);
+            var camp = CampeonatoUtils.ObterNomeDoCampeonato(campeonato);
             var data = DateTime.Now.ToString("dd/MM/yyyy");
             var ano = DateTime.Now.ToString("yyyy");
             var titulo = $"CLASSIFICAÇÃO {camp} {ano} - {data} - ATUALIZADA";
@@ -124,7 +122,8 @@ namespace Futebox.Services
                 posicao = classificacao.posicao,
                 saldoGols = classificacao.saldoDeGols,
                 vitorias = classificacao.vitorias,
-                time = time
+                time = time,
+                grupo = classificacao.grupo
             };
             return retorno;
         }

@@ -35,7 +35,7 @@ namespace Futebox.Services
         public string ObterRoteiroDaRodada(IEnumerable<PartidaVM> partidas, Enums.Campeonatos campeonato, int rodada)
         {
             var roteiro = RoteiroDefaults.ObterSaudacao();
-            roteiro += $"Veja agora a programação dos jogos da {rodada}ª rodada do {RoteiroDefaults.ObterNomeDoCampeonato(campeonato)}: ";
+            roteiro += $"Veja agora a programação dos jogos da {rodada}ª rodada do {CampeonatoUtils.ObterNomeDoCampeonato(campeonato)}: ";
 
             partidas
                 .OrderBy(_ => _.dataPartida)
@@ -68,7 +68,7 @@ namespace Futebox.Services
 
         public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<PartidaVM> partidas, Enums.Campeonatos campeonato, int rodada)
         {
-            var camp = RoteiroDefaults.ObterNomeDoCampeonato(campeonato);
+            var camp = CampeonatoUtils.ObterNomeDoCampeonato(campeonato);
             var data = DateTime.Now.ToString("dd/MM/yyyy");
             var ano = DateTime.Now.ToString("yyyy");
             var titulo = $"PROGRAMAÇÃO - {rodada}ª RODADA - {camp} {ano} - {data} - ATUALIZADA";

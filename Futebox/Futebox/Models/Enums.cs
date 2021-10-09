@@ -9,7 +9,8 @@ namespace Futebox.Models
     {
         public enum Campeonatos { 
             BrasileiraoSerieA = 767, 
-            BrasileiraoSerieB = 769 
+            BrasileiraoSerieB = 769,
+            Libertadores2021 = 771
         }
 
         public enum OrigemDado

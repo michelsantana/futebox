@@ -26,10 +26,7 @@ namespace Futebox.Services
         public List<FootstatsTime> ObterTimesServico()
         {
             var retorno = new List<FootstatsTime>();
-            var campeonatos = new Campeonatos[] {
-                Campeonatos.BrasileiraoSerieA,
-                Campeonatos.BrasileiraoSerieB
-            };
+            var campeonatos = CampeonatoUtils.ObterCampeonatosAtivos();
             foreach (var campeonato in campeonatos)
             {
                 var rota = $"3.1/campeonatos/{(int)campeonato}/equipes";

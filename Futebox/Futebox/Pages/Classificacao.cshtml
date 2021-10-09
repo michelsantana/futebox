@@ -14,16 +14,14 @@
     <hr class="col-3 col-md-2 mb-5">
 
     <div class="row g-5">
-        <div class="col-md-6">
-            <h1>Serie A</h1>
-            <button class="btn btn-primary" onclick="Ver('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieA)')">Ver</button>
-            <button class="btn btn-primary" onclick="GerarVideo('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieA)')">Gerar Processo</button>
+        @foreach (var camp in Models.CampeonatoUtils.ObterCampeonatosAtivos())
+        {
+        <div class="co d-flex flex-column">
+            <h1>@($"{camp}")</h1>
+            <button class="btn btn-primary" onclick="Ver('@((int)camp)')">Ver</button>
+            <button class="btn btn-primary" onclick="GerarVideo('@((int)camp)')">Gerar Processo</button>
         </div>
-        <div class="col-md-6">
-            <h1>Serie B</h1>
-            <button class="btn btn-primary" onclick="Ver('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieB)')">Ver</button>
-            <button class="btn btn-primary" onclick="GerarVideo('@((int)Futebox.Models.Enums.Campeonatos.BrasileiraoSerieB)')">Gerar Processo</button>
-        </div>
+        }
     </div>
 </div>
 

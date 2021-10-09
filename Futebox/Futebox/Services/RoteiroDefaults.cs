@@ -41,10 +41,6 @@ namespace Futebox.Services
                     $"Pra quem você estava torcendo? deixa aqui nos comentários junto com aquela deedáda no laique. Até a próxima.";
         }
 
-        public static string ObterNomeDoCampeonato(Enums.Campeonatos campeonato) => campeonato == Campeonatos.BrasileiraoSerieA? "Brasileirão Série A" : "Brasileirão Série B";
-        public static string ObterSerieDoCampeonato(Campeonatos campeonato) => campeonato == Campeonatos.BrasileiraoSerieA ? "A" : "B";
-
-
         public static string ObterTrechoVencedor(PartidaVM partida, Time vencedor, Time perdedor)
         {
             var golsVencedor = partida.timeMandante.sigla == vencedor.sigla ? partida.golsMandante : partida.golsVisitante;

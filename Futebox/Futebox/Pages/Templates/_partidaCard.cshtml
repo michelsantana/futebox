@@ -109,7 +109,7 @@
                     <div class="d-flex justify-content-around flex-row align-items-left">
                         <div class="d-flex justify-content-between align-items-center fs-sport">
                             <div class="logo-l d-flex flex-column align-items-center">
-                                <img src="img/HD/_@(p.timeMandante.sigla).png" />
+                                <img src="@(p.timeMandante.ObterLogoLocal())" />
                                 <div class="name name-l ml-5">
                                     @(p.timeMandante.nome)
                                 </div>
@@ -118,7 +118,7 @@
                         @*<div class="fs-sport">x</div>*@
                         <div class="d-flex justify-content-between align-items-center fs-sport">
                             <div class="logo-r d-flex flex-column align-items-center">
-                                <img src="img/HD/_@(p.timeVisitante.sigla).png" />
+                                <img src="@(p.timeVisitante.ObterLogoLocal())" />
                                 <div class="name name-r ml-5">
                                     @(p.timeVisitante.nome)
                                 </div>
@@ -147,7 +147,7 @@
                     <div class="d-flex justify-content-between flex-column align-items-left">
                         <div class="d-flex justify-content-between align-items-center fs-sport">
                             <div class="logo-l d-flex flex-row align-items-center">
-                                <img src="img/HD/_@(p.timeMandante.sigla).png" />
+                                <img src="@(p.timeMandante.ObterLogoLocal())" />
                                 <div class="name-l ml-5">
                                     @(p.timeMandante.nome)
                                 </div>
@@ -155,7 +155,7 @@
                         </div>
                         <div class="d-flex justify-content-between align-items-center fs-sport">
                             <div class="logo-r d-flex flex-row align-items-center">
-                                <img src="img/HD/_@(p.timeVisitante.sigla).png" />
+                                <img src="@(p.timeVisitante.ObterLogoLocal())" />
                                 <div class="name-r ml-5">
                                     @(p.timeVisitante.nome)
                                 </div>
@@ -216,7 +216,7 @@
                     <tr>
                         <td class="">
                             <div class="logo-l d-flex flex-row align-items-center justify-content-start">
-                                <img src="img/HD/_@(p.timeMandante.sigla).png" />
+                                <img src="@(p.timeMandante.ObterLogoLocal())" />
                                 <div class="name-r ml-5">
                                     @(p.timeMandante.nome)
                                 </div>
@@ -227,7 +227,7 @@
                                 <div class="name-r ml-5">
                                     @(p.timeVisitante.nome)
                                 </div>
-                                <img src="img/HD/_@(p.timeVisitante.sigla).png" />
+                                <img src="@(p.timeVisitante.ObterLogoLocal())" />
                             </div>
                         </td>
                         <td>

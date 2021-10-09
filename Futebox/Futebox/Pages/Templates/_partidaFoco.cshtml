@@ -83,7 +83,7 @@
         <div class="d-flex justify-content-between flex-column align-items-center">
             <div class="d-flex justify-content-between align-items-center fs-sport">
                 <div class="logo-l">
-                    <img src="img/HD/_@(Model.timeMandante.sigla).png" />
+                    <img src="@(Model.timeMandante.ObterLogoLocal())" />
                     <div class="name-l">
                         @(Model.timeMandante.sigla)
                     </div>
@@ -99,7 +99,7 @@
                     <div class="name-r">
                         @(Model.timeVisitante.sigla)
                     </div>
-                    <img src="img/HD/_@(Model.timeVisitante.sigla).png" />
+                    <img src="@(Model.timeVisitante.ObterLogoLocal())" />
 
                 </div>
             </div>

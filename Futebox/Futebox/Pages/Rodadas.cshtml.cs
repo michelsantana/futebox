@@ -37,18 +37,8 @@ namespace Futebox.Pages
         public PartialViewResult OnGetRodada(int campeonato, int rodada)
         {
             var enumCampeonato = (Campeonatos)campeonato;
-            var partials = new List<PartialViewResult>();
-            switch (enumCampeonato)
-            {
-                case Campeonatos.BrasileiraoSerieA:
-                    nomeCampeonato = "Brasileirão Série A";
-                    this.partidas = _service.ObterPartidasDaRodada(Campeonatos.BrasileiraoSerieA, rodada, clearCache)?.ToList();
-                    break;
-                case Campeonatos.BrasileiraoSerieB:
-                    nomeCampeonato = "Brasileirão Série B";
-                    this.partidas = _service.ObterPartidasDaRodada(Campeonatos.BrasileiraoSerieB, rodada, clearCache)?.ToList();
-                    break;
-            }
+            nomeCampeonato = CampeonatoUtils.ObterNomeDoCampeonato(enumCampeonato);
+            partidas = _service.ObterPartidasDaRodada(enumCampeonato, rodada, clearCache)?.ToList();
             rodadaFoco = rodada;
             partidas = partidas.OrderBy(_ => _.dataPartida).ToList();
 

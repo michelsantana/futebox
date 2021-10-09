@@ -43,8 +43,6 @@ namespace Futebox.Teste
         [InlineData("[]", 0)]
         [InlineData("{}", 0)]
         [InlineData("{data:{}}", 0)]
-        [InlineData("{data:[{}]}", 2)] // O Serviço roda campeonato serie a e serie b, por isso o retorno está duplicado
-        [InlineData("{data:[{},{}]}", 4)] // O Serviço roda campeonato serie a e serie b, por isso o retorno está duplicado
         [InlineData("[{},{}]", 0)]
         [InlineData("", 0)]
         [InlineData(null, 0)]
@@ -102,7 +100,7 @@ namespace Futebox.Teste
             var _service = new FootstatsService(_http, _logger.Object);
 
             //Act
-            var resultado = _service.ObterClassificacaoServico(Enums.Campeonatos.BrasileiraoSerieA);
+            var resultado = _service.ObterClassificacaoServico(CampeonatoUtils.ObterCampeonatosAtivos()[0]);
 
             // Assert
             Assert.NotEmpty(resultado);

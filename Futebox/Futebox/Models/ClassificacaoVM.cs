@@ -7,7 +7,9 @@ namespace Futebox.Models
 {
     public class ClassificacaoVM
     {
+
         public int posicao { get; set; }
+        public string grupo { get; set; }
         public string brasao { get; set; }
         public string clube { get; set; }
         public int pontos { get; set; }

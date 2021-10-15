@@ -27,6 +27,7 @@ namespace Futebox.DB.Migrations
             .WithColumn("nome").AsString().NotNullable() // partida a vs b 
 
             .WithColumn("link").AsString().Nullable() // http
+            .WithColumn("linkThumb").AsString().Nullable() // http
             .WithColumn("tipoLink").AsString().Nullable() // print ou png
             .WithColumn("imgLargura").AsString().Nullable() // tamanho do print 1920 outros 
             .WithColumn("imgAltura").AsString().Nullable() // tamanho do print 1080 outros 

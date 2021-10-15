@@ -1,38 +1,46 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Futebox.Models;
+using Futebox.Models.Enums;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Futebox.Pages
 {
     public class PartidasModel : PageModel
     {
         IPartidasService _calendarioService;
+
         public List<PartidaVM> partidas = new List<PartidaVM>();
-        public PartidaVM partidaFoco = null;
+        public PartidaVM partida = null;
+        
+        public PageViewModes qsPageViewMode = PageViewModes.padrao;
+        public string qsPartidaId = null;
 
         public PartidasModel(IPartidasService calendarioService)
         {
             _calendarioService = calendarioService;
         }
 
-        public void OnGet(string partida, string printMode)
+        public void OnGet(string partidaId, PageViewModes viewMode)
         {
-            var isPrintMode = !string.IsNullOrEmpty(printMode);
-            this.partidas = _calendarioService.ObterPartidasHoje(isPrintMode)?.ToList();
-            if (!string.IsNullOrEmpty(partida))
-                this.partidaFoco = this.partidas.Find(_ => _.idExterno.ToString() == partida);
+            qsPageViewMode = viewMode;
+            qsPartidaId = partidaId;
+
+            partidas = _calendarioService.ObterPartidasHoje(viewMode == PageViewModes.print)?.ToList();
         }
 
-        public PartialViewResult OnGetFocoPartida(string p)
+        public PartialViewResult OnGetFocoPartida(string partidaId, PageViewModes viewMode)
         {
-            this.partidas = _calendarioService.ObterPartidasHoje()?.ToList();
-            this.partidaFoco = this.partidas.Find(_ => _.idExterno.ToString() == p);
-            return Partial("Templates/_partidaFoco", this.partidaFoco);
+            qsPartidaId = partidaId;
+            qsPageViewMode = viewMode;
+
+            partidas = _calendarioService.ObterPartidasHoje()?.ToList();
+            partida = partidas.Find(_ => _.idExterno.ToString() == partidaId);
+
+            return Partial("Templates/_partidaFoco", this);
         }
+
     }
 }

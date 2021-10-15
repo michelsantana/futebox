@@ -1,7 +1,7 @@
 ﻿using Futebox.Models;
 using System;
 using System.Collections.Generic;
-using static Futebox.Models.Enums;
+using Futebox.Models.Enums;
 
 namespace Futebox.Services.Interfaces
 {

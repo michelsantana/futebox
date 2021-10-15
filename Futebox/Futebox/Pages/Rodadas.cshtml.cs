@@ -6,7 +6,7 @@ using Futebox.Models;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using static Futebox.Models.Enums;
+using Futebox.Models.Enums;
 
 namespace Futebox.Pages
 {
@@ -24,14 +24,14 @@ namespace Futebox.Pages
             _service = service;
         }
 
-        public void OnGet(string foco, string rodada, string printMode)
+        public void OnGet(string campeonato, string rodada, PageViewModes viewMode)
         {
-            this.clearCache = !string.IsNullOrEmpty(printMode);
+            clearCache = viewMode == PageViewModes.print;
             partidas = new List<PartidaVM>();
-            if (!string.IsNullOrEmpty(foco))
-                this.campeonatoFoco = ((Campeonatos)int.Parse(foco));
+            if (!string.IsNullOrEmpty(campeonato))
+                campeonatoFoco = ((Campeonatos)int.Parse(campeonato));
             if (!string.IsNullOrEmpty(rodada))
-                this.rodadaFoco = (int.Parse(rodada));
+                rodadaFoco = (int.Parse(rodada));
         }
 
         public PartialViewResult OnGetRodada(int campeonato, int rodada)

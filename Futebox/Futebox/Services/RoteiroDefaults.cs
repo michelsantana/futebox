@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Futebox.Models.Enums;
+using Futebox.Models.Enums;
 
 namespace Futebox.Services
 {
@@ -34,11 +34,12 @@ namespace Futebox.Services
 
         public static string ObterTrechoEmpate(PartidaVM partida)
         {
-            return $"Hoje: {partida.timeMandante.ObterNomeWatson()} e {partida.timeVisitante.ObterNomeWatson()}, " +
+            return //$"Hoje: " +
+                    $"{partida.timeMandante.ObterNomeWatson()} e {partida.timeVisitante.ObterNomeWatson()}, " +
                     $"empataram por {partida.golsMandante} a {partida.golsMandante} no estádio, {partida.estadio}. " +
                     $"Esse foi um jogo do campeonato, {partida.campeonato}: " +
                     $"e iniciou por volta das {RoteiroDefaults.TraduzirHoras(partida.dataPartida)}. " +
-                    $"Pra quem você estava torcendo? deixa aqui nos comentários junto com aquela deedáda no laique. Até a próxima.";
+                    $"Pra quem você estava torcendo? deixa aqui nos comentários junto com aquela deedáda no laique.";
         }
 
         public static string ObterTrechoVencedor(PartidaVM partida, Time vencedor, Time perdedor)
@@ -46,11 +47,12 @@ namespace Futebox.Services
             var golsVencedor = partida.timeMandante.sigla == vencedor.sigla ? partida.golsMandante : partida.golsVisitante;
             var golsPerdedor = partida.timeMandante.sigla == perdedor.sigla ? partida.golsMandante : partida.golsVisitante;
 
-            return $"Hoje {vencedor.ObterNomeWatson()} venceu o {perdedor.ObterNomeWatson()}: " +
-                    $"por {golsVencedor} a {golsPerdedor}. " +
-                    $"O jogo aconteceu no estádio {partida.estadio} por volta das {RoteiroDefaults.TraduzirHoras(partida.dataPartida)}. " +
+            return //$"Hoje " +
+                    $"{vencedor.ObterNomeWatson()} venceu {perdedor.ObterNomeWatson()}: " +
+                    $"por {golsVencedor} a {golsPerdedor} no estádio {partida.estadio}. " +
                     $"Esse foi um jogo do campeonato, {partida.campeonato}: " +
-                    $"Pra quem você estava torcendo? deixa aqui nos comentários junto com aquela deedáda no laique. Até a próxima.";
+                    $"e iniciou por volta das {RoteiroDefaults.TraduzirHoras(partida.dataPartida)}. " +
+                    $"Pra quem você estava torcendo? deixa aqui nos comentários junto com aquela deedáda no laique.";
         }
         
         public static string RemoverAcentos(string text)

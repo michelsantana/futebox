@@ -12,7 +12,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using static Futebox.Models.Enums;
+using Futebox.Models.Enums;
 
 namespace Futebox.Services
 {

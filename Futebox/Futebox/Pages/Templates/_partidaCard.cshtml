@@ -85,6 +85,10 @@
         min-height: 164px;
     }
 
+    .focus .card {
+        background: #ffffff5c !important;
+    }
+
     .br {
         border-right: 1px solid #030303;
     }
@@ -95,7 +99,7 @@
 <div class="wm">
         <img src="~/img/logo-1.png" />
     </div>
-<h1 class="fs-sport text-center sub">@(Model.rodadaFoco)ª Rodada !</h1>
+<h1 class="fs-sport text-center sub">@(Model.rodadaFoco)<sup>a</sup> Rodada !</h1>
 <h1 class="fs-sport text-center titulo">@Model.nomeCampeonato</h1>
 <div class="row sp">
     @foreach (var p in Model.partidas)

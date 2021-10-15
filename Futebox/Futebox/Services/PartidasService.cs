@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Futebox.Models.Enums;
+using Futebox.Models.Enums;
 
 namespace Futebox.Services
 {
@@ -70,8 +70,8 @@ namespace Futebox.Services
                 empate ? RoteiroDefaults.ObterTrechoEmpate(partida)
                     : RoteiroDefaults.ObterTrechoVencedor(partida, vencedor, perdedor);
 
-            return $"{RoteiroDefaults.ObterSaudacao()}" +
-                $"\n{mensagem}";
+            return //$"{RoteiroDefaults.ObterSaudacao()}\n" +
+                $"{mensagem}";
         }
 
         public Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida)

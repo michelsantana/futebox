@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Futebox.Models;
-using Futebox.Services;
+﻿using Futebox.Models;
+using Futebox.Models.Enums;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using static Futebox.Models.Enums;
 
 namespace Futebox.Controllers
 {

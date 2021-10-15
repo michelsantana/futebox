@@ -2,54 +2,101 @@
 @model Futebox.Pages.PartidasModel
 @{
     ViewData["Title"] = "Partidas";
+    Func<DateTime, string> Calcular = (dt) =>
+    {
+
+        var start = dt;
+        var end = dt.AddHours(2);
+        var total = (end - start).TotalSeconds;
+        var percentage = (DateTime.Now - start).TotalSeconds * 100 / total;
+        return (percentage < 0 ? 0 : percentage > 100 ? 100 : percentage).ToString().Replace(",", ".");
+
+//var b = dt.Ticks;
+//var max = dt.AddHours(2).Ticks;
+//var p = ((DateTime.Now.Ticks - b) / max) * 2 * 100;
+};
 }
-<div class="row">
-    <div class="col-12">
-        <table id='tabela' class="table">
-            <thead>
-                <tr class="align-middle">
-                    <th scope="col">#</th>
-                    <th scope="col">Mandante</th>
-                    <th scope="col"></th>
-                    <th scope="col">X</th>
-                    <th scope="col"></th>
-                    <th scope="col">Visitante</th>
-                    <th scope="col">Data</th>
-                    <th scope="col">Campeonato</th>
-                    <th scope="col">Rodada</th>
-                    <th scope="col">acao</th>
 
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var partida in Model.partidas)
-                {
 
-                <tr class="align-middle">
-                    <td>@partida.idExterno</td>
-                    <td class="text-end">@partida.timeMandante.nome - (@partida.timeMandante.sigla)</td>
-                    <td class="text-end"><img width="64" src='data:image/png;base64, @partida.timeMandante.logoBin' /></td>
-                    <td>X</td>
-                    <td class="text-start"><img width="64" src='data:image/png;base64, @partida.timeVisitante.logoBin' /></td>
-                    <td class="text-start">(@partida.timeVisitante.sigla) - @partida.timeVisitante.nome</td>
-                    <td>@partida.dataHoraDaPartida</td>
-                    <td>@partida.campeonato</td>
-                    <td>@partida.rodada</td>
-                    <td>
-                        <button class="btn btn-link" onclick="Foco('@partida.idExterno')">Foco</button>
-                        <button class="btn btn-link" onclick="GerarVideo('@partida.idExterno')">Gerar vídeo</button>
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </table>
+<div class="row g-5">
+
+    <div class="text-center">
+        <h1 class="display-4">Partidas hoje!</h1>
     </div>
 </div>
+
+<div id="rodada">
+    <style>
+        img {
+            width: 48px;
+        }
+
+        .progress {
+            border-radius: 0;
+            height: 5px;
+        }
+    </style>
+
+    <div class="row sp">
+        @foreach (var p in Model.partidas.OrderBy(_ => _.dataPartida))
+        {
+            <div class="col-3 mb-2">
+                
+                <div id="content" class="card text-center">
+                    <div class="card-header fs-sport f">
+                        @(p.dataPartida.ToString("ddd, d MMM yyyy - HH:mm"))<br />
+                        @(p.campeonato) - @(p.rodada)<sup>a</sup> Rodada
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated @(p.dataPartida.AddHours(2) < DateTime.Now ? "bg-success" : "bg-danger")" role="progressbar"
+                                 data-start="@(p.dataPartida.ToString("yyyy-MM-dd HH:mm"))"
+                                 data-end="@(p.dataPartida.AddHours(2).ToString("yyyy-MM-dd HH:mm"))"
+                                 style="width:0"></div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="bg">
+                        <div class="d-flex justify-content-around flex-row align-items-left">
+                            <div class="d-flex justify-content-between align-items-center fs-sport">
+                                <div class="logo-l d-flex flex-column align-items-center">
+                                    <img src="data:image/png;base64, @(p.timeMandante.logoBin)" />
+                                    <div class="name name-l ml-5">
+                                        @(p.timeMandante.nome)
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="fs-sport">x</div>*@
+                            <div class="d-flex justify-content-between align-items-center fs-sport">
+                                <div class="logo-r d-flex flex-column align-items-center">
+                                    <img src="data:image/png;base64, @(p.timeVisitante.logoBin)" />
+                                    <div class="name name-r ml-5">
+                                        @(p.timeVisitante.nome)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer fs-sport f">
+                        estádio @p.estadio
+                    </div>
+                    <div class="card-footer">
+                        <button onclick="Foco('@p.idExterno')" class="btn btn-primary">Ver</button>
+                        <button onclick="GerarVideo('@p.idExterno')" class="btn btn-danger">Vídeo</button>
+                        
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
 <div id="card"></div>
+
 @section Scripts{
     <script>
         function Foco(partida) {
-            fetch(`/partidas?handler=FocoPartida&p=${partida}`)
+            var viewMode = '@Model.qsPageViewMode';
+            fetch(`/partidas?handler=FocoPartida&partidaId=${partida}&viewMode=${viewMode}`)
                 .then((response) => {
                     return response.text();
                 })
@@ -64,14 +111,43 @@
             });
         }
 
+        function EsconderPlacar() {
+            $('#card').find('')
+        }
+
         $('#card').click(() => {
             $('#card').html('');
         });
+
+        var percent = (start, end) => {
+            var today = new Date();
+            if (today < start) return 0;
+            //use Math.abs to avoid sign
+            var q = Math.abs(today - start);
+            var d = Math.abs(end - start);
+            //alert("Rounded: " + Math.round((q / d) * 100) + "%");
+            //alert("Fraction: " + ((q / d) * 100) + "%");
+            var porcentagem = ((q / d) * 100);
+            console.log(porcentagem);
+            return porcentagem > 100 ? 100 : porcentagem < 0 ? 0 : porcentagem;
+        }
+
+        setInterval(() => {
+            $('.progress-bar').each((i, e) => {
+                var start = $(e).attr('data-start');
+                var end = $(e).attr('data-end');
+                var dt1 = new Date(start);
+                var dt2 = new Date(end);
+                $(e).attr('style', `width:${percent(dt1, dt2)}%`);
+            })
+        }, 1000 //* 60 * 1.5
+        );
+
     </script>
-    @if (Model.partidaFoco != null)
+    @if (Model.qsPartidaId != null)
     {
         <script>
-            Foco('@Model.partidaFoco.idExterno');
+            Foco('@Model.qsPartidaId');
         </script>
     }
 }

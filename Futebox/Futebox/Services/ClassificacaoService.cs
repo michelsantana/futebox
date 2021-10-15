@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static Futebox.Models.Enums;
+using Futebox.Models.Enums;
 
 namespace Futebox.Services
 {
@@ -56,7 +56,7 @@ namespace Futebox.Services
 
                 if (~~_.posicao == indicePedirLike)
                 {
-                    msg += "Meus parças: Já deixa aquela deedáda no laique e se inscrévi no canal: Continuando: Ô";
+                    msg += "Meus parças: Já deixa aquela deedáda no laique e se inscrévi no canal: Continuando: Ô ";
                 }
             });
             msg += "Muitíssimo obrigada a todos que assistiram até aqui: Até o próximo vídeo: ";

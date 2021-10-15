@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using static Futebox.Models.Enums;
+using Futebox.Models.Enums;
 
 namespace Futebox.Services
 {
@@ -40,7 +40,6 @@ namespace Futebox.Services
             var partidas = _partidasService.ObterPartidasHoje(true);
             return SalvarProcessoPartida(partidas.First(_ => _.idExterno == idPartida));
         }
-
         private Processo SalvarProcessoPartida(PartidaVM partida)
         {
             var roteiro = _partidasService.ObterRoteiroDaPartida(partida);
@@ -50,7 +49,8 @@ namespace Futebox.Services
                 idExterno = partida.idExterno.ToString(),
                 tipo = Processo.Tipo.partida,
                 nome = $"{atributos.Item1}",
-                link = $"{Settings.ApplicationHttpBaseUrl}partidas?partida={partida.idExterno}&printMode=1",
+                link = $"{Settings.ApplicationHttpBaseUrl}partidas?partidaId={partida.idExterno}&viewMode=print",
+                linkThumb = $"{Settings.ApplicationHttpBaseUrl}partidas?partidaId={partida.idExterno}&viewMode=thumb",
                 tipoLink = Processo.TipoLink.print,
                 imgAltura = 1920,
                 imgLargura = 1080,
@@ -70,7 +70,6 @@ namespace Futebox.Services
             var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(campeonato, true);
             return SalvarProcessoClassificacao(classificacao, campeonato);
         }
-
         private Processo SalvarProcessoClassificacao(IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
         {
             var roteiro = _classificacaoService.ObterRoteiroDaClassificacao(classificacao, campeonato);
@@ -80,7 +79,8 @@ namespace Futebox.Services
                 idExterno = DateTime.Now.ToString("yyyyMMddhhmmss"),
                 tipo = Processo.Tipo.partida,
                 nome = $"{atributos.Item1}",
-                link = $"{Settings.ApplicationHttpBaseUrl}classificacao?foco={(int)campeonato}&printMode=1",
+                link = $"{Settings.ApplicationHttpBaseUrl}classificacao?campeonato={(int)campeonato}&viewMode=print",
+                //linkThumb = $"{Settings.ApplicationHttpBaseUrl}classificacao?foco={(int)campeonato}&viewMode=thumb",
                 tipoLink = Processo.TipoLink.print,
                 imgAltura = 1080,
                 imgLargura = 1920,
@@ -110,7 +110,8 @@ namespace Futebox.Services
                 idExterno = DateTime.Now.ToString("yyyyMMddhhmmss"),
                 tipo = Processo.Tipo.rodada,
                 nome = $"{atributos.Item1}",
-                link = $"{Settings.ApplicationHttpBaseUrl}rodadas?foco={(int)campeonato}&rodada={rodada}&printMode=1",
+                link = $"{Settings.ApplicationHttpBaseUrl}rodadas?campeonato={(int)campeonato}&rodada={rodada}&viewMode=print",
+                //linkThumb = $"{Settings.ApplicationHttpBaseUrl}rodadas?foco={(int)campeonato}&rodada={rodada}&viewMode=thumb",
                 tipoLink = Processo.TipoLink.print,
                 imgAltura = 1080,
                 imgLargura = 1920,
@@ -155,7 +156,7 @@ namespace Futebox.Services
             {
                 p.nome = $"[Erro] - {p.nome}";
                 p.status = (int)Processo.Status.Erro;
-                p.attrDescricao = erro;
+                p.statusMensagem = erro;
             }
             _processoRepositorio.OpenTransaction();
             _processoRepositorio.Update(p);

@@ -87,8 +87,12 @@ module.exports = function (uid, settings) {
         await page.click('#slider');
         await page.waitForTimeout(720);
 
-        await page.keyboard.press('ArrowLeft');
+        // await page.keyboard.press('ArrowLeft');
+        // await page.waitForTimeout(720);
+        await page.keyboard.press('ArrowRight');
         await page.waitForTimeout(720);
+        // await page.keyboard.press('ArrowRight');
+        // await page.waitForTimeout(720);
 
         await page.click('#downshift-3-toggle-button');
         await page.waitForTimeout(720);

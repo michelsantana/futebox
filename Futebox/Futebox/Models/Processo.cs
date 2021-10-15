@@ -10,7 +10,9 @@ namespace Futebox.Models
         public String nome { get; set; }
 
         public String link { get; set; }
+        public String linkThumb { get; set; }
         public TipoLink tipoLink { get; set; }
+
         public int imgLargura { get; set; }
         public int imgAltura { get; set; }
 

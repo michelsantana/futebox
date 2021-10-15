@@ -6,7 +6,7 @@ using Futebox.Models;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using static Futebox.Models.Enums;
+using Futebox.Models.Enums;
 
 namespace Futebox.Pages
 {
@@ -25,12 +25,12 @@ namespace Futebox.Pages
             _classificacaoService = classificacaoService;
         }
 
-        public void OnGet(string foco, string printMode)
+        public void OnGet(string campeonato, PageViewModes viewMode)
         {
-            this.clearCache = !string.IsNullOrEmpty(printMode);
+            clearCache = viewMode == PageViewModes.print;
             classificacao = new List<ClassificacaoVM>();
-            if (!string.IsNullOrEmpty(foco))
-                this.campeonatoFoco = ((Campeonatos)int.Parse(foco));
+            if (!string.IsNullOrEmpty(campeonato))
+                campeonatoFoco = ((Campeonatos)int.Parse(campeonato));
         }
 
         public PartialViewResult OnGetCampeonato(int campeonato)
@@ -57,7 +57,7 @@ namespace Futebox.Pages
 
         private void IdentificarCoresDestaqueBrasileiraoSerieA()
         {
-            foreach (var time in this.classificacao)
+            foreach (var time in classificacao)
             {
                 if (time.posicao < 5)
                 {
@@ -93,7 +93,7 @@ namespace Futebox.Pages
 
         private void IdentificarCoresDestaqueBrasileiraoSerieB()
         {
-            foreach (var time in this.classificacao)
+            foreach (var time in classificacao)
             {
                 if (time.posicao < 5)
                 {

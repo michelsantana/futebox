@@ -1,4 +1,4 @@
-﻿@model Futebox.Models.PartidaVM
+﻿@model Futebox.Pages.PartidasModel
 @{
 }
 <style>
@@ -7,15 +7,7 @@
     .score .fs-score {
         font-size: 430px !important;
         line-height: 1;
-        text-shadow:
-            2px 2px 0 #fff,
-            2px -2px 0 #fff,
-            -2px 2px 0 #fff,
-            -2px -2px 0 #fff,
-            2px 0px 0 #fff,
-            0px 2px 0 #fff,
-            -2px 0px 0 #fff,
-            0px -2px 0 #fff;
+        text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;
     }
 
     .score > .x {
@@ -72,40 +64,48 @@
             margin-top: 33%;
         }
 </style>
+@if (Model.qsPageViewMode == Models.Enums.PageViewModes.padrao)
+{
+    <style>
+        #card{
+            zoom: .5;
+        }
+    </style>
+}
 <div id="content" class="card text-center">
     <div class="wm">
         <img src="~/img/logo-1.png" />
     </div>
     <div class="card-header h fs-sport">
-        @Model.campeonato
+        @Model.partida.campeonato
     </div>
     <div class="card-body" id="bg">
         <div class="d-flex justify-content-between flex-column align-items-center">
             <div class="d-flex justify-content-between align-items-center fs-sport">
                 <div class="logo-l">
-                    <img src="@(Model.timeMandante.ObterLogoLocal())" />
+                    <img src="@(Model.partida.timeMandante.ObterLogoLocal())" />
                     <div class="name-l">
-                        @(Model.timeMandante.sigla)
+                        @(Model.partida.timeMandante.sigla)
                     </div>
                 </div>
             </div>
             <div class="score d-flex justify-content-between align-items-center">
-                <div class="fs-score fs-2">@(string.IsNullOrEmpty(Model.golsMandante) ? "0" : Model.golsMandante)</div>
+                <div id="placar-1" class="fs-score fs-2">@(Model.qsPageViewMode == Models.Enums.PageViewModes.thumb ? "?" : string.IsNullOrEmpty(Model.partida.golsMandante) ? "0" : Model.partida.golsMandante)</div>
                 <div class="x">x</div>
-                <div class="fs-score fs-2">@(string.IsNullOrEmpty(Model.golsVisitante) ? "0" : Model.golsVisitante)</div>
+                <div id="placar-2" class="fs-score fs-2">@(Model.qsPageViewMode == Models.Enums.PageViewModes.thumb ? "?" : string.IsNullOrEmpty(Model.partida.golsVisitante) ? "0" : Model.partida.golsVisitante)</div>
             </div>
             <div class="d-flex justify-content-between align-items-center fs-sport">
                 <div class="logo-r">
                     <div class="name-r">
-                        @(Model.timeVisitante.sigla)
+                        @(Model.partida.timeVisitante.sigla)
                     </div>
-                    <img src="@(Model.timeVisitante.ObterLogoLocal())" />
+                    <img src="@(Model.partida.timeVisitante.ObterLogoLocal())" />
 
                 </div>
             </div>
         </div>
     </div>
     <div class="card-footer text-muted fs-sport f">
-        @Model.dataHoraDaPartida no estádio @Model.estadio
+        @Model.partida.dataHoraDaPartida no estádio @Model.partida.estadio
     </div>
 </div>

@@ -31,6 +31,7 @@ function Processo(processo) {
   this.status = processo.status;
   this.processado = processo.processado;
   this.json = processo.json;
+  this.linkThumb = processo.linkThumb;
   return this;
 }
 
@@ -43,6 +44,8 @@ module.exports = function (processo, datasourceUrl) {
 
   this.obterArquivoPrint = () =>
     `${this.obterPastaDoProcesso()}/${obterNomeArquivo("png")}`;
+    this.obterArquivoThumb = () =>
+    `${this.obterPastaDoProcesso()}/${obterNomeArquivo("thumb.png")}`;
   this.obterArquivoAudio = () =>
     `${this.obterPastaDoProcesso()}/${obterNomeArquivo("mp3")}`;
   this.obterArquivoBat = () =>
@@ -62,13 +65,20 @@ module.exports = function (processo, datasourceUrl) {
     return (await axios.get(`${datasourceUrl}/sucesso`)).data;
   };
 
-  this.GerarImagem = async (urlPrint, w, h) => {
+  this.GerarImagem = async (urlPrint, w, h, urlThumb = null) => {
     const browser = await pptr.launch({ headless: false });
     const page = await browser.newPage();
     await page.setViewport({ width: ~~w, height: ~~h });
     await page.goto(urlPrint, { waitUntil: "networkidle2" });
-    await utils.sleep(2);
+    await utils.sleep(8);
     await page.screenshot({ path: this.obterArquivoPrint() });
+
+    if (urlThumb) {
+      await page.goto(urlThumb, { waitUntil: "networkidle2" });
+      await utils.sleep(8);
+      await page.screenshot({ path: this.obterArquivoThumb() });
+    }
+
     await browser.close();
   };
 
@@ -111,7 +121,8 @@ module.exports = function (processo, datasourceUrl) {
         await this.GerarImagem(
           processo.link,
           processo.imgLargura,
-          processo.imgAltura
+          processo.imgAltura,
+          processo.linkThumb
         );
       else
         throw new Erro(

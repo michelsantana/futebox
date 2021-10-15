@@ -1,6 +1,7 @@
 
 # FuteBox 
 Esse repositório e a evolução do [futebot (v1)](https://github.com/michelsantana/futebot/)
+<br>
 <img src="https://github.com/michelsantana/futebox/blob/main/Futebox/Futebox/wwwroot/img/logo-1.png?raw=true" width="250">
 <div style="display: inline_block"><br>
   <img align="center" alt="michel-csharp" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/csharp/csharp-original.svg">
@@ -9,7 +10,6 @@ Esse repositório e a evolução do [futebot (v1)](https://github.com/michelsant
   <img align="center" alt="michel-nodejs" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-plain.svg">
   <img align="center" alt="michel-html5" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original.svg">
   <img align="center" alt="michel-css3" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg">
-  <img align="center" alt="michel-css3" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/bootstrap/bootstrap-original.svg">
   <img align="center" alt="michel-css3" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/msdos/msdos-original.svg">
   <!--<img align="right" alt="Mchl-pic" height="150" style="border-radius:50px;" src="">-->
 </div>

@@ -34,11 +34,10 @@ abandonaram seus conteúdos iniciais e passaram a gerar conteúdo apenas falando
 sobre as classificações dos campeonatos de futebol no Brasil.
 
 ### O bot
-Vendo que os vídeos ~~apesar de feitos por **pessoas** ainda pareciam **robôs**~~
+Vendo que os vídeos apesar de feitos por **pessoas** ainda pareciam **robôs**
 Então decidimos criar o futebox; um Robô que gera conteúdo sobre classificações, partidas e rodadas de futebol.
 
 🚧  Em construção...  🚧
-
 
 
 ### Features adicionadas na V2

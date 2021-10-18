@@ -62,9 +62,15 @@ namespace Futebox.Controllers
         }
 
         [HttpGet("executar/{id}")]
-        public bool ExecutarProcesso(string id)
+        public Processo ExecutarProcesso(string id)
         {
             return _processoService.ExecutarProcesso(id);
+        }
+
+        [HttpGet("arquivos/{id}")]
+        public bool ArquivosProcesso(string id)
+        {
+            return _processoService.ArquivosProcesso(id);
         }
     }
 }

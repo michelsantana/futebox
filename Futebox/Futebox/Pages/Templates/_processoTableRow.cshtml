@@ -1,0 +1,21 @@
+﻿@model Tuple<Futebox.Pages.ProcessosModel, Futebox.Models.Processo>
+@{
+    var processo = Model.Item2;
+    var model = Model.Item1;
+}
+<tr data-row-id="@processo.id" class="align-middle">
+    <td>
+        <span class="badge @(model.cores[processo.status])">&nbsp;</span>
+    </td>
+    <td>@processo.id</td>
+    <td>@processo.nome</td>
+    <td>@processo.tipo</td>
+    <td>@processo.link</td>
+    <td>@processo.status</td>
+    <td>@processo.processado</td>
+    <td>
+        <button class="btn btn-link" onclick="Play('@processo.id');">Play</button>
+        <button class="btn btn-link" onclick="Delete('@processo.id');">Delete</button>
+        <button class="btn btn-link" onclick="Abrir('@processo.id');">Pasta</button>
+    </td>
+</tr>

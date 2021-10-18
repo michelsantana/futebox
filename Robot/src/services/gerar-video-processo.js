@@ -1,5 +1,7 @@
-const { default: axios } = require("axios");
+const axios = require("axios").default;
 const fs = require("fs");
+const path = require("path");
+var child_process = require("child_process");
 const pptr = require("puppeteer");
 const pastas = require("./../utils/gerenciador-pastas");
 const utils = require("./../utils/utils");
@@ -44,12 +46,18 @@ module.exports = function (processo, datasourceUrl) {
 
   this.obterArquivoPrint = () =>
     `${this.obterPastaDoProcesso()}/${obterNomeArquivo("png")}`;
-    this.obterArquivoThumb = () =>
+  this.obterArquivoThumb = () =>
     `${this.obterPastaDoProcesso()}/${obterNomeArquivo("thumb.png")}`;
   this.obterArquivoAudio = () =>
     `${this.obterPastaDoProcesso()}/${obterNomeArquivo("mp3")}`;
+  this.obterArquivoVideo = () =>
+    `${this.obterPastaDoProcesso()}/${obterNomeArquivo("mp4")}`;
   this.obterArquivoBat = () =>
     `${this.obterPastaDoProcesso()}/${obterNomeArquivo("bat")}`;
+  this.obterArquivoBatTituloClipboard = () =>
+    `${this.obterPastaDoProcesso()}/${obterNomeArquivo("title.bat")}`;
+  this.obterArquivoBatDescricaoClipboard = () =>
+    `${this.obterPastaDoProcesso()}/${obterNomeArquivo("description.bat")}`;
   this.obterArquivoAtributos = () =>
     `${this.obterPastaDoProcesso()}/${obterNomeArquivo("txt")}`;
 
@@ -66,7 +74,10 @@ module.exports = function (processo, datasourceUrl) {
   };
 
   this.GerarImagem = async (urlPrint, w, h, urlThumb = null) => {
-    const browser = await pptr.launch({ headless: false });
+    const browser = await pptr.launch({
+      headless: false,
+      ignoreDefaultArgs: ["--disable-extensions"],
+    });
     const page = await browser.newPage();
     await page.setViewport({ width: ~~w, height: ~~h });
     await page.goto(urlPrint, { waitUntil: "networkidle2" });
@@ -96,11 +107,7 @@ module.exports = function (processo, datasourceUrl) {
   this.GerarVideo = async () => {
     fs.writeFileSync(
       this.obterArquivoBat(),
-      `ffmpeg -loop 1 -i ${this.obterNomeArquivo(
-        "png"
-      )} -i ${this.obterNomeArquivo(
-        "mp3"
-      )} -c:v libx264 -c:a copy -shortest ${this.obterNomeArquivo("mp4")}`
+      `ffmpeg -loop 1 -i ${this.obterArquivoPrint()} -i ${this.obterArquivoAudio()} -c:v libx264 -c:a copy -shortest ${this.obterArquivoVideo()}`
     );
   };
 
@@ -109,33 +116,71 @@ module.exports = function (processo, datasourceUrl) {
       this.obterArquivoAtributos(),
       `[TITLE]\n${titulo}\n[DESCRIPTION]\n${descricao}`
     );
+    // fs.writeFileSync(
+    //   this.obterArquivoBatTituloClipboard(),
+    //   `echo ${titulo}|clip`
+    // );
+    // fs.writeFileSync(
+    //   this.obterArquivoBatDescricaoClipboard(),
+    //   `echo ${descricao}|clip`
+    // );
+  };
+
+  this.ExecutarBat = () => {
+    var bat = path.join(this.obterArquivoBat());
+    this.log(`start ${bat}`);
+    child_process.exec(`call ${bat}`, (error, stdout, stderr) =>
+      this.log(stdout)
+    );
+  };
+
+  this.log = (msg) => {
+    console.log(`${UID} - ${msg}`);
   };
 
   this.Executar = async () => {
     try {
+      this.log(`Obtendo dados do processo`);
       var processo = new Processo(await this.ObterProcesso());
-      console.log(processo);
       utils.criarPastaSeNaoExistir(this.obterPastaDoProcesso());
-
-      if (processo.tipoLink == "print")
+      if (processo.tipoLink == "print") {
+        this.log(`Imagem do processo é do tipo print`);
+        this.log(`Obtendo imagem do processo`);
         await this.GerarImagem(
           processo.link,
           processo.imgLargura,
           processo.imgAltura,
           processo.linkThumb
         );
-      else
+      } else {
+        this.log(`Imagem do processo é de um tipo não implementado`);
         throw new Erro(
           "processos com link tipo image ainda não foram implementados"
         );
+      }
+      this.log(`Gerando atributos do video`);
       this.GerarArquivoAtributos(processo.attrTitulo, processo.attrDescricao);
+      this.log(`Gerando fala do roteiro`);
       await this.GerarFala(processo.roteiro);
+      this.log(`Gerando bat de video`);
       await this.GerarVideo();
+      this.log(`Atualizando status do processo para sucesso`);
       await this.AtualizarProcessoSucesso();
+      this.log(`Gerando video`);
+      this.ExecutarBat();
     } catch (ex) {
-      await this.AtualizarProcessoErro("Deu erro!");
+      await this.AtualizarProcessoErro(JSON.stringify(ex));
       throw new Error(ex);
     }
   };
+
+  this.AbrirPasta = () => {
+    var pasta = path.resolve(this.obterPastaDoProcesso());
+    this.log(`explorer ${pasta}`);
+    child_process.exec(`explorer.exe "${pasta}"`, (error, stdout, stderr) =>
+      this.log(stdout)
+    );
+  };
+
   return this;
 };

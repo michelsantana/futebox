@@ -1,12 +1,14 @@
 using Futebox.Models;
+using Futebox.Pages.Shared;
 using Futebox.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Futebox.Pages
 {
-    public class ProcessosModel : PageModel
+    public class ProcessosModel : BaseViewModel
     {
         IProcessoService _processoService;
         public List<Processo> processos = new List<Processo>();
@@ -28,6 +30,12 @@ namespace Futebox.Pages
         {
             this.processos = _processoService.ObterProcessos()?.ToList();
             this.processos = this.processos.OrderBy(_ => (_.criacao.Ticks * _.status) * -1).ToList();
+        }
+
+        public PartialViewResult OnGetProcessoTableRow(string processoId)
+        {
+            var processo = _processoService.ObterProcesso(processoId);
+            return Partial("Templates/_processoTableRow", Tuple.Create(this, processo));
         }
     }
 }

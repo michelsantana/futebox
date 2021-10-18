@@ -21,37 +21,51 @@
             <tbody>
                 @foreach (var processo in Model.processos)
                 {
-
-                <tr data-row-id="@processo.id" class="align-middle">
-                    <td>
-                        <span class="badge @(Model.cores[processo.status])">&nbsp;</span>
-                    </td>
-                    <td>@processo.id</td>
-                    <td>@processo.nome</td>
-                    <td>@processo.tipo</td>
-                    <td>@processo.link</td>
-                    <td>@processo.status</td>
-                    <td>@processo.processado</td>
-                    <td>
-                        <button class="btn btn-link" onclick="Play('@processo.id');">Play</button>
-                        <button class="btn btn-link" onclick="Delete('@processo.id');">Delete</button>
-                    </td>
-                </tr>
+                    @Html.Partial("Templates/_processoTableRow", Tuple.Create(Model, processo))
                 }
             </tbody>
         </table>
     </div>
 </div>
 <div id="card"></div>
+
+<div class="toast-container">
+
+</div>
+
 @section Scripts{
     <script>
+
+        var processoStatus = {
+            '@((int)Futebox.Models.Processo.Status.Erro)': '@($"{Futebox.Models.Processo.Status.Erro}")',
+            '@((int)Futebox.Models.Processo.Status.Executando)': '@($"{Futebox.Models.Processo.Status.Executando}")',
+            '@((int)Futebox.Models.Processo.Status.Pendente)': '@($"{Futebox.Models.Processo.Status.Pendente}")',
+            '@((int)Futebox.Models.Processo.Status.Sucesso)': '@($"{Futebox.Models.Processo.Status.Sucesso}")',
+        }
+
+        function UpdateRow(id) {
+            $.get(`/processos?handler=ProcessoTableRow&processoId=${id}`, (r) => {
+                var remover = $(`[data-row-id="${id}"]`);
+                remover.after(r);
+                remover.remove();
+            })
+        }
+
         function Play(processo) {
-            $.get(`/api/processo/executar/${processo}`, s => alert('Rodando'));
+            $.get(`/api/processo/executar/${processo}`, s => {
+                UpdateRow(processo);
+                $.SendToast(s.id, processoStatus[s.status])
+            }).fail(function () {
+                UpdateRow(processo);
+            });;
         }
         function Delete(processo) {
             $.post(`/api/processo/${processo}/deletar`, {}, s => {
                 $(`[data-row-id="${processo}"]`).remove();
             });
+        }
+        function Abrir(processo) {
+            $.get(`/api/processo/arquivos/${processo}`);
         }
     </script>
 }

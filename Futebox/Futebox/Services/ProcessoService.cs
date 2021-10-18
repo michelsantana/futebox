@@ -77,7 +77,7 @@ namespace Futebox.Services
             var processo = new Processo()
             {
                 idExterno = DateTime.Now.ToString("yyyyMMddhhmmss"),
-                tipo = Processo.Tipo.partida,
+                tipo = Processo.Tipo.classificacao,
                 nome = $"{atributos.Item1}",
                 link = $"{Settings.ApplicationHttpBaseUrl}classificacao?campeonato={(int)campeonato}&viewMode=print",
                 //linkThumb = $"{Settings.ApplicationHttpBaseUrl}classificacao?foco={(int)campeonato}&viewMode=thumb",
@@ -126,7 +126,7 @@ namespace Futebox.Services
             return processo;
         }
 
-        public bool ExecutarProcesso(string processo)
+        public Processo ExecutarProcesso(string processo)
         {
             string botFolder = $"{Settings.ApplicationsRoot}/Robot";
             string botBatch = @"integration.bat";
@@ -142,7 +142,7 @@ namespace Futebox.Services
             batchProcess.StartInfo = processInfo;
             batchProcess.Start();
             batchProcess.WaitForExit();
-            return true;
+            return _processoRepositorio.GetById(processo);
         }
 
         public Processo AtualizarProcesso(string id, bool processado, string erro = "")
@@ -154,7 +154,7 @@ namespace Futebox.Services
 
             if (!string.IsNullOrEmpty(erro))
             {
-                p.nome = $"[Erro] - {p.nome}";
+                p.nome = $"{p.nome}";
                 p.status = (int)Processo.Status.Erro;
                 p.statusMensagem = erro;
             }
@@ -168,6 +168,24 @@ namespace Futebox.Services
         public bool Delete(string id)
         {
             _processoRepositorio.Delete(id);
+            return true;
+        }
+
+        public bool ArquivosProcesso(string processo)
+        {
+            string botFolder = $"{Settings.ApplicationsRoot}/Robot";
+            string botBatch = @"integration.bat";
+            string args(params object[] arg) => string.Join(" ", arg.Select(_ => $"\"{_}\""));
+
+            string idArgs = $"id={processo}";
+
+            string strCmdText = $"{botFolder}/{botBatch}";
+            ProcessStartInfo processInfo = new ProcessStartInfo(strCmdText, args(botFolder, "pasta", idArgs));
+            processInfo.UseShellExecute = true;
+            Process batchProcess = new Process();
+            batchProcess.StartInfo = processInfo;
+            batchProcess.Start();
+            batchProcess.WaitForExit();
             return true;
         }
     }

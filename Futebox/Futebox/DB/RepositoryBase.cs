@@ -31,6 +31,11 @@ namespace Futebox.DB
             _dbContext.Close();
         }
 
+        public virtual string GenerateID()
+        {
+            return Guid.NewGuid().ToString().Substring(0, 5);
+        }
+
         public virtual void OpenTransaction()
         {
             Rollback();
@@ -49,7 +54,7 @@ namespace Futebox.DB
 
         public virtual void Insert(ref TEntity entity)
         {
-            entity.id = Guid.NewGuid().ToString().Substring(0, 5);
+            entity.id = GenerateID();
             entity.criacao = DateTime.Now;
             _dbContext.Insert(entity, _transaction);
             entity = GetById(entity.id);

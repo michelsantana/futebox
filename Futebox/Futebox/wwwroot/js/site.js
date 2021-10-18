@@ -20,3 +20,16 @@ jQuery.each(["put", "delete"], function (i, method) {
         });
     };
 });
+
+jQuery.SendToast = (title, message) => {
+
+    $.get(`?handler=toast&title=${title}&message=${message}`, (t) => {
+        var toast = $(t);
+        $('#toast-container').append(toast);
+        toast.toast('show');
+        toast.addEventListener('hidden.bs.toast', function () {
+            toast.remove();
+        })
+    })
+
+}

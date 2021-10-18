@@ -1,6 +1,7 @@
 ﻿using Futebox.DB.Interfaces;
 using Futebox.Interfaces.DB;
 using Futebox.Models;
+using System;
 
 namespace Futebox.DB
 {
@@ -14,6 +15,11 @@ namespace Futebox.DB
         public ProcessoRepositorio() : base(null)
         {
 
+        }
+
+        public override string GenerateID()
+        {
+            return DateTime.Now.ToString("yyyyMMddHHmmss");
         }
     }
 }

@@ -85,10 +85,3 @@ Então decidimos criar o futebox; um Robô que gera conteúdo sobre classificaç
 - [ ] Compatibilidade com Instagram
 - [ ] Compatibilidade com Tiktok
 
-### Features removidas da v2 
-Algumas features foram removidas da v2 pois uma feature melhor foi disponiblizada 
-- [x] Extrator de JSON para brasileirão série A 
-- [x] Extrator de JSON para brasileirão série B 
-- [x] Extrator de tabela da Globo
-- [x] Extrator de tabela do Google
-- [x] Gerador de card (tabela+texto+marcadagua)

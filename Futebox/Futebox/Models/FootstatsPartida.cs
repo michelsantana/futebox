@@ -23,10 +23,10 @@ namespace Futebox.Models
         //public int quantidadeCartaoAmareloComissaoVisitante { get; set; }
         //public int quantidadeCartaoVermelhoComissaoVisitante { get; set; }
         public int idEquipeMandante { get; set; }
-        public int idTecnicoMandante { get; set; }
+        public int? idTecnicoMandante { get; set; }
         public string tecnicoMandante { get; set; }
         public int idEquipeVisitante { get; set; }
-        public int idTecnicoVisitante { get; set; }
+        public int? idTecnicoVisitante { get; set; }
         public string tecnicoVisitante { get; set; }
         public int idEstadio { get; set; }
         public string periodoJogo { get; set; }

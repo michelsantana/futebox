@@ -8,6 +8,8 @@ Esse repositório e a evolução do [futebot (v1)](https://github.com/michelsant
   <img align="center" alt="michel-dotnetcore" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/dotnetcore/dotnetcore-original.svg">
   <img align="center" alt="michel-javascript" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-plain.svg">
   <img align="center" alt="michel-nodejs" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-plain.svg">
+  <img align="center" alt="michel-css3" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/bootstrap/bootstrap-original.svg">
+  <img align="center" alt="michel-css3" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/jquery/jquery-original.svg">
   <img align="center" alt="michel-html5" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original.svg">
   <img align="center" alt="michel-css3" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg">
   <img align="center" alt="michel-css3" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/msdos/msdos-original.svg">
@@ -20,6 +22,7 @@ Esse repositório e a evolução do [futebot (v1)](https://github.com/michelsant
 ## Um gerador de vídeos para o [canal Futebox no youtube](https://www.youtube.com/channel/UCWs2h6plWKR8xCZM3ljNGRw)
 
 ### Como usar
+Logo instruções de utilização do projeto serão adicionadas
 🚧  Em construção...  🚧
 
 ## Motivações
@@ -85,10 +88,3 @@ Então decidimos criar o futebox; um Robô que gera conteúdo sobre classificaç
 - [ ] Compatibilidade com Instagram
 - [ ] Compatibilidade com Tiktok
 
-### Features removidas da v2 
-Algumas features foram removidas da v2 pois uma feature melhor foi disponiblizada 
-- [x] Extrator de JSON para brasileirão série A 
-- [x] Extrator de JSON para brasileirão série B 
-- [x] Extrator de tabela da Globo
-- [x] Extrator de tabela do Google
-- [x] Gerador de card (tabela+texto+marcadagua)

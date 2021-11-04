@@ -8,10 +8,6 @@
 
     <div class="text-center">
         <h1 class="display-4">Gerador de Rodadas</h1>
-        <div class="mb-3">
-            <label for="txtRodada" class="form-label">Rodada</label>
-            <input type="text" class="form-control" id="txtRodada" placeholder="">
-        </div>
     </div>
 </div>
 
@@ -26,8 +22,18 @@
         {
             <div class="co d-flex flex-column">
                 <h1>@($"{camp}")</h1>
-                <button class="btn btn-primary" onclick="Ver('@((int)camp)')">Ver</button>
-                <button class="btn btn-primary" onclick="GerarVideo('@((int)camp)')">Gerar Processo</button>
+                <div>
+                    @*<ul id="@($"ul-{(int)camp}")"></ul>*@
+                    @*<input id="@($"rodada-{(int)camp}")" type="number" />*@
+                    <div class="input-group">
+
+                        <select id="@($"rodada-{(int)camp}")" class="form-select">
+                            <option>Nenhum</option>
+                        </select>
+                        <button class="btn btn-outline-primary" onclick="Ver('@((int)camp)')">👁</button>
+                        <button class="btn btn-outline-primary" onclick="GerarVideo('@((int)camp)')">⚙</button>
+                    </div>
+                </div>
             </div>
         }
     </div>
@@ -35,9 +41,13 @@
 
 @section Scripts{
     <script>
-        function Ver(camp, r) {
-            
-            r = r || $('#txtRodada').val();
+
+        function Ver(camp) {
+            var rodada = $(`#rodada-${camp}`).val();
+            Focar(camp, rodada);
+        }
+
+        function Focar(camp, r) {
             fetch(`/rodadas?handler=Rodada&campeonato=${camp}&rodada=${r}`)
                 .then((response) => {
                     return response.text();
@@ -47,24 +57,44 @@
                 });
         }
 
-        function GerarVideo(camp, r) {
-            r = r || $('#txtRodada').val();
-            $.post(`/api/processo/rodada/${camp}/${r}`, (response) => {
-                alert('gerando vídeo');
+        function GerarVideo(camp) {
+            debugger;
+            var rodada = $(`#rodada-${camp}`).val();
+            $.post(`/api/processo/rodada/${camp}/${rodada}`, (response) => {
+                $.SendToast(response.id, 'Processo criado!');
             });
         }
-
 
         $('#rodada').click(() => {
             $('#rodada').toggleClass('focus');
         });
+
+
+
     </script>
     @if ((Model.campeonatoFoco.HasValue && Model.rodadaFoco.HasValue))
     {
         <script>
-            Ver('@((int)Model.campeonatoFoco)', '@((int)Model.rodadaFoco)');
+            Focar('@((int)Model.campeonatoFoco)', '@((int)Model.rodadaFoco)');
             $('#rodada').addClass('focus');
             $('#txtRodada').val('@((int)Model.rodadaFoco)')
+        </script>
+    }
+    @foreach (var camp in Models.CampeonatoUtils.ObterCampeonatosAtivos())
+    {
+        <script>
+            $(() => {
+                var camp = '@((int)camp)';
+                $.get(`/api/rodada/ultimarodada/${camp}`, (response) => {
+                    debugger;
+                    for (var r of response) {
+                        var s = r.split(',');
+                        var li = $(`<option value="${s[1]}">${s[0]} - ${s[1]}ª Rodada</option>`);
+                        $(`#rodada-${camp}`).append(li);
+                    }
+                    //$(`#rodada-${camp}`).val();
+                });
+            })
         </script>
     }
 }

@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Futebox.DB.Mappers;
+using System;
 
 namespace Futebox
 {
@@ -25,6 +26,8 @@ namespace Futebox
             Configuration = configuration;
             Settings.ApplicationsRoot = Configuration.GetValue<string>("ApplicationsRoot");
             Settings.ApplicationHttpBaseUrl = Configuration.GetValue<string>("ApplicationHttpBaseUrl");
+            Settings.TelegramBotToken = DotEnv.Get("TELEGRAM_BOT_TOKEN");
+            Settings.TelegramNotifyUserId = DotEnv.Get("TELEGRAM_NOTIFY_USERID");
         }
 
         public IConfiguration Configuration { get; }
@@ -38,6 +41,7 @@ namespace Futebox
             services.AddLogging(config => config.AddDebug().AddConsole());
 
             services.AddSingleton<IDatabaseConfig, DatabaseConfig>((_) => new DatabaseConfig(Configuration.GetValue<string>("DatabaseName")));
+            services.AddSingleton<SchedulerService>();
 
             services.AddScoped<IHttpHandler, HttpHandler>();
             services.AddScoped<ICacheHandler, CacheHandler>();
@@ -49,6 +53,8 @@ namespace Futebox
             services.AddScoped<IFutebotService, FutebotService>();
             services.AddScoped<IProcessoService, ProcessoService>();
             services.AddScoped<IRodadaService, RodadaService>();
+            services.AddScoped<IAgendamentoService, AgendamentoService>();
+            services.AddScoped<INotifyService, NotifyService>();
 
             services.AddScoped<IProcessoRepositorio, ProcessoRepositorio>();
             services.AddScoped<ITimeRepositorio, TimeRepositorio>();

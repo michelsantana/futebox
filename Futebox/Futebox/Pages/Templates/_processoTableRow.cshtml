@@ -5,17 +5,22 @@
 }
 <tr data-row-id="@processo.id" class="align-middle">
     <td>
-        <span class="badge @(model.cores[processo.status])">&nbsp;</span>
+        <span class="badge @(model.cores[(int)processo.status])">&nbsp;</span>
     </td>
     <td>@processo.id</td>
     <td>@processo.nome</td>
     <td>@processo.tipo</td>
-    <td>@processo.link</td>
-    <td>@processo.status</td>
-    <td>@processo.processado</td>
+    <td>@(processo.agendado ? "sim" : "não")</td>
     <td>
-        <button class="btn btn-link" onclick="Play('@processo.id');">Play</button>
-        <button class="btn btn-link" onclick="Delete('@processo.id');">Delete</button>
-        <button class="btn btn-link" onclick="Abrir('@processo.id');">Pasta</button>
+        <div class="input-group">
+            <input type="time" class="hora form-control form-control-sm" value="@(processo.agendamento?.ToString("HH:mm"))">
+            <button class="btn btn-sm btn-outline-info" onclick="Agendar('@processo.id');">⌚</button>
+        </div>
+    </td>
+    <td>
+        <button class="btn btn-sm btn-outline-info" onclick="Play('@processo.id');">▶</button>
+        <button class="btn btn-sm btn-outline-danger" onclick="Delete('@processo.id');">❌</button>
+        <button class="btn btn-sm btn-outline-dark" onclick="Abrir('@processo.id');">📂</button>
+        @*<button class="btn btn-sm btn-outline-dark" onclick="Notificar('@processo.id');">TESTAR</button>*@
     </td>
 </tr>

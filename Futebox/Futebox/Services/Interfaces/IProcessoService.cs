@@ -1,5 +1,6 @@
 ﻿using Futebox.Models;
 using Futebox.Models.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace Futebox.Services.Interfaces
@@ -14,9 +15,12 @@ namespace Futebox.Services.Interfaces
         Processo SalvarProcessoRodada(Campeonatos campeonato, int rodada);
 
         Processo ExecutarProcesso(string processo);
+        bool ArquivosProcesso(string id);
+
+        Processo AtualizarProcessoAgendamentoNotificacao(string id, DateTime horaNotificacao);
         Processo AtualizarProcesso(string id, bool processado, string erro = "");
 
         bool Delete(string id);
-        bool ArquivosProcesso(string id);
+        Processo AtualizarRoteiro(Processo processo);
     }
 }

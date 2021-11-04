@@ -35,7 +35,7 @@ namespace Futebox.Models
         public bool dataIndefinida { get; set; }
         public bool horaIndefinida { get; set; }
         public DataDaPartida dataDaPartida { get; set; }
-        public DateTime dataDaPartidaIso { get; set; }
+        public DateTime? dataDaPartidaIso { get; set; }
         //public int idArbitro { get; set; }
         //public string arbitro { get; set; }
         //public object publico { get; set; }

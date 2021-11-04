@@ -1,4 +1,5 @@
 using Futebox.Models;
+using Futebox.Models.Enums;
 using Futebox.Pages.Shared;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +15,10 @@ namespace Futebox.Pages
         public List<Processo> processos = new List<Processo>();
         public Dictionary<int, string> cores = new Dictionary<int, string>()
         {
-            { (int)Processo.Status.Pendente, "badge bg-warning" },
-            { (int)Processo.Status.Executando, "badge bg-info" },
-            { (int)Processo.Status.Sucesso, "badge bg-success" },
-            { (int)Processo.Status.Erro, "badge bg-danger" },
+            { (int)StatusProcesso.Pendente, "badge bg-warning" },
+            { (int)StatusProcesso.Executando, "badge bg-info" },
+            { (int)StatusProcesso.Sucesso, "badge bg-success" },
+            { (int)StatusProcesso.Erro, "badge bg-danger" },
             { 1, "badge bg-warning" },
         };
 
@@ -29,7 +30,7 @@ namespace Futebox.Pages
         public void OnGet()
         {
             this.processos = _processoService.ObterProcessos()?.ToList();
-            this.processos = this.processos.OrderBy(_ => (_.criacao.Ticks * _.status) * -1).ToList();
+            this.processos = this.processos.OrderBy(_ => (_.criacao.Ticks) * -1).ToList();
         }
 
         public PartialViewResult OnGetProcessoTableRow(string processoId)

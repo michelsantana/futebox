@@ -2,6 +2,7 @@
 using Futebox.Models.Enums;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Futebox.Controllers
 {
@@ -10,11 +11,15 @@ namespace Futebox.Controllers
     public class ProcessoController : ControllerBase
     {
         readonly IProcessoService _processoService;
+        readonly INotifyService _notifyService;
+        readonly IAgendamentoService _agendamentoService;
         readonly IFutebotService _futebotService;
 
-        public ProcessoController(IProcessoService processoService, IFutebotService futebotService)
+        public ProcessoController(IProcessoService processoService, INotifyService notifyService, IAgendamentoService agendamentoService, IFutebotService futebotService)
         {
             _processoService = processoService;
+            _agendamentoService = agendamentoService;
+            _notifyService = notifyService;
             _futebotService = futebotService;
         }
 
@@ -36,7 +41,7 @@ namespace Futebox.Controllers
         {
             return _processoService.AtualizarProcesso(id, true);
         }
-        
+
         [HttpPost("{id}/deletar")]
         public bool DeletarProcesso(string id)
         {
@@ -71,6 +76,22 @@ namespace Futebox.Controllers
         public bool ArquivosProcesso(string id)
         {
             return _processoService.ArquivosProcesso(id);
+        }
+
+        [HttpGet("notificar/{id}")]
+        public bool NotificarProcesso(string id)
+        {
+            var p = _processoService.ObterProcesso(id);
+            _notifyService.Notify(p.notificacao);
+            return true;
+        }
+
+        [HttpGet("agendar/{id}")]
+        public bool AgendarNotificacaoProcesso(string id, int hora, int minuto)
+        {
+            var p = _processoService.AtualizarProcessoAgendamentoNotificacao(id, DateTime.Today.AddHours(hora).AddMinutes(minuto));
+            _agendamentoService.AgendarNotificacao(p.id, p.agendamento ?? DateTime.Now);
+            return true;
         }
     }
 }

@@ -7,10 +7,11 @@ using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Futebox.Models.Enums;
+using Futebox.Pages.Shared;
 
 namespace Futebox.Pages
 {
-    public class RodadasModel : PageModel
+    public class RodadasModel : BaseViewModel
     {
         IRodadaService _service;
         public List<PartidaVM> partidas = new List<PartidaVM>();

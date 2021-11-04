@@ -4,4 +4,5 @@ REM PARAMETROS
 set arg2=%2
 set arg3=%3
 REM pause
-npm run integration command=%arg1% %arg2% %arg3%
+npm run integration %arg1% %arg2% %arg3%
+REM pause

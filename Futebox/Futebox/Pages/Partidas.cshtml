@@ -80,9 +80,8 @@
                         estádio @p.estadio
                     </div>
                     <div class="card-footer">
-                        <button onclick="Foco('@p.idExterno')" class="btn btn-primary">Ver</button>
-                        <button onclick="GerarVideo('@p.idExterno')" class="btn btn-danger">Vídeo</button>
-                        
+                        <button onclick="Foco('@p.idExterno')" class="btn btn-outline-primary">👁</button>
+                        <button onclick="GerarVideo('@p.idExterno')" class="btn btn-outline-danger">⚙</button>
                     </div>
                 </div>
             </div>
@@ -107,7 +106,7 @@
 
         function GerarVideo(partida) {
             $.post(`/api/processo/partida/${partida}`, (response) => {
-                alert('gerando vídeo');
+                $.SendToast(response.id, 'Processo criado!');
             });
         }
 

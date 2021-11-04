@@ -57,7 +57,11 @@ namespace Futebox.DB.Mappers
             Map(x => x.status).ToColumn("status");
             Map(x => x.statusMensagem).ToColumn("statusMensagem");
             Map(x => x.processado).ToColumn("processado");
-            Map(x => x.json).ToColumn("json");
+            Map(x => x.args).ToColumn("args");
+
+            Map(x => x.notificacao).ToColumn("notificacao");
+            Map(x => x.agendamento).ToColumn("agendamento");
+            Map(x => x.agendado).ToColumn("agendado");
         }
     }
 }

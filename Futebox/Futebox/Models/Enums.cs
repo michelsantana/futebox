@@ -23,4 +23,25 @@ namespace Futebox.Models.Enums
         print,
         thumb
     }
+
+    public enum TipoProcesso
+    {
+        partida,
+        classificacao,
+        rodada,
+    }
+
+    public enum TipoLink
+    {
+        print,
+        image
+    }
+
+    public enum StatusProcesso
+    {
+        Pendente = 8,
+        Executando = 16,
+        Sucesso = 32,
+        Erro = 64
+    }
 }

@@ -47,19 +47,25 @@ namespace Futebox.Services
             var processo = new Processo()
             {
                 idExterno = partida.idExterno.ToString(),
-                tipo = Processo.Tipo.partida,
+                tipo = TipoProcesso.partida,
                 nome = $"{atributos.Item1}",
                 link = $"{Settings.ApplicationHttpBaseUrl}partidas?partidaId={partida.idExterno}&viewMode=print",
                 linkThumb = $"{Settings.ApplicationHttpBaseUrl}partidas?partidaId={partida.idExterno}&viewMode=thumb",
-                tipoLink = Processo.TipoLink.print,
+                tipoLink = TipoLink.print,
                 imgAltura = 1920,
                 imgLargura = 1080,
-                json = JsonConvert.SerializeObject(partida),
+                args = JsonConvert.SerializeObject(new ProcessoPartidaArgs(partida.idExterno)),
                 roteiro = roteiro,
-                status = (int)Processo.Status.Pendente,
+                status = StatusProcesso.Pendente,
                 processado = false,
                 attrTitulo = atributos.Item1,
-                attrDescricao = atributos.Item2
+                attrDescricao = atributos.Item2,
+
+                agendado = false,
+                agendamento = partida.dataPartida.AddHours(2).AddMinutes(10),
+                notificacao =
+                $"processo: partida" +
+                $"\nnome: {atributos.Item1}",
             };
             _processoRepositorio.Insert(ref processo);
             return processo;
@@ -77,19 +83,25 @@ namespace Futebox.Services
             var processo = new Processo()
             {
                 idExterno = DateTime.Now.ToString("yyyyMMddhhmmss"),
-                tipo = Processo.Tipo.classificacao,
+                tipo = TipoProcesso.classificacao,
                 nome = $"{atributos.Item1}",
                 link = $"{Settings.ApplicationHttpBaseUrl}classificacao?campeonato={(int)campeonato}&viewMode=print",
                 //linkThumb = $"{Settings.ApplicationHttpBaseUrl}classificacao?foco={(int)campeonato}&viewMode=thumb",
-                tipoLink = Processo.TipoLink.print,
+                tipoLink = TipoLink.print,
                 imgAltura = 1080,
                 imgLargura = 1920,
-                json = JsonConvert.SerializeObject(classificacao),
+                args = JsonConvert.SerializeObject(new ProcessoClassificacaoArgs(campeonato)),
                 roteiro = roteiro,
-                status = (int)Processo.Status.Pendente,
+                status = StatusProcesso.Pendente,
                 processado = false,
                 attrTitulo = atributos.Item1,
-                attrDescricao = atributos.Item2
+                attrDescricao = atributos.Item2,
+
+                agendado = false,
+                agendamento = DateTime.Today.AddHours(23).AddMinutes(30),
+                notificacao =
+                $"processo: classificacao" +
+                $"\nnome: {atributos.Item1}",
             };
             _processoRepositorio.Insert(ref processo);
             return processo;
@@ -108,19 +120,25 @@ namespace Futebox.Services
             var processo = new Processo()
             {
                 idExterno = DateTime.Now.ToString("yyyyMMddhhmmss"),
-                tipo = Processo.Tipo.rodada,
+                tipo = TipoProcesso.rodada,
                 nome = $"{atributos.Item1}",
                 link = $"{Settings.ApplicationHttpBaseUrl}rodadas?campeonato={(int)campeonato}&rodada={rodada}&viewMode=print",
                 //linkThumb = $"{Settings.ApplicationHttpBaseUrl}rodadas?foco={(int)campeonato}&rodada={rodada}&viewMode=thumb",
-                tipoLink = Processo.TipoLink.print,
+                tipoLink = TipoLink.print,
                 imgAltura = 1080,
                 imgLargura = 1920,
-                json = JsonConvert.SerializeObject(partidas),
+                args = JsonConvert.SerializeObject(new ProcessoRodadaArgs(campeonato, rodada)),
                 roteiro = roteiro,
-                status = (int)Processo.Status.Pendente,
+                status = StatusProcesso.Pendente,
                 processado = false,
                 attrTitulo = atributos.Item1,
-                attrDescricao = atributos.Item2
+                attrDescricao = atributos.Item2,
+
+                agendado = false,
+                agendamento = DateTime.Now.AddMinutes(30),
+                notificacao =
+                $"processo: rodada" +
+                $"\nnome: {atributos.Item1}",
             };
             _processoRepositorio.Insert(ref processo);
             return processo;
@@ -128,21 +146,30 @@ namespace Futebox.Services
 
         public Processo ExecutarProcesso(string processo)
         {
-            string botFolder = $"{Settings.ApplicationsRoot}/Robot";
-            string botBatch = @"integration.bat";
-            string args(params object[] arg) => string.Join(" ", arg.Select(_ => $"\"{_}\""));
-
+            string commandArgs = $"command=executar";
             string idArgs = $"id={processo}";
             string datasourceArgs = $"datasource={Settings.ApplicationHttpBaseUrl}api/processo/{processo}";
 
-            string strCmdText = $"{botFolder}/{botBatch}";
-            ProcessStartInfo processInfo = new ProcessStartInfo(strCmdText, args(botFolder, "processo", idArgs, datasourceArgs));
-            processInfo.UseShellExecute = true;
-            Process batchProcess = new Process();
-            batchProcess.StartInfo = processInfo;
-            batchProcess.Start();
-            batchProcess.WaitForExit();
+            AtualizarRoteiro(processo);
+
+            ExecutarCMD(commandArgs, idArgs, datasourceArgs);
             return _processoRepositorio.GetById(processo);
+        }
+
+        public bool ArquivosProcesso(string processo)
+        {
+            return ExecutarCMD($"command=pasta", $"id={processo}");
+        }
+
+        public Processo AtualizarProcessoAgendamentoNotificacao(string id, DateTime horaNotificacao)
+        {
+            var p = _processoRepositorio.GetById(id);
+            p.agendamento = horaNotificacao;
+            p.agendado = true;
+            _processoRepositorio.OpenTransaction();
+            _processoRepositorio.Update(p);
+            _processoRepositorio.Commit();
+            return p;
         }
 
         public Processo AtualizarProcesso(string id, bool processado, string erro = "")
@@ -150,12 +177,12 @@ namespace Futebox.Services
             var p = _processoRepositorio.GetById(id);
             p.alteracao = DateTime.Now;
             p.processado = processado;
-            p.status = (int)Processo.Status.Sucesso;
+            p.status = StatusProcesso.Sucesso;
 
             if (!string.IsNullOrEmpty(erro))
             {
                 p.nome = $"{p.nome}";
-                p.status = (int)Processo.Status.Erro;
+                p.status = StatusProcesso.Erro;
                 p.statusMensagem = erro;
             }
             _processoRepositorio.OpenTransaction();
@@ -171,22 +198,65 @@ namespace Futebox.Services
             return true;
         }
 
-        public bool ArquivosProcesso(string processo)
+        private bool ExecutarCMD(params object[] args)
         {
             string botFolder = $"{Settings.ApplicationsRoot}/Robot";
             string botBatch = @"integration.bat";
-            string args(params object[] arg) => string.Join(" ", arg.Select(_ => $"\"{_}\""));
-
-            string idArgs = $"id={processo}";
+            string argsBuild(object[] arg) => string.Join(" ", arg.Select(_ => $"\"{_}\""));
 
             string strCmdText = $"{botFolder}/{botBatch}";
-            ProcessStartInfo processInfo = new ProcessStartInfo(strCmdText, args(botFolder, "pasta", idArgs));
+            ProcessStartInfo processInfo = new ProcessStartInfo(strCmdText, $"{botFolder} {argsBuild(args)}");
             processInfo.UseShellExecute = true;
             Process batchProcess = new Process();
             batchProcess.StartInfo = processInfo;
             batchProcess.Start();
             batchProcess.WaitForExit();
             return true;
+        }
+
+        private Processo AtualizarRoteiro(string processo)
+        {
+            return AtualizarRoteiro(ObterProcesso(processo));
+        }
+
+        public Processo AtualizarRoteiro(Processo processo)
+        {
+            switch (processo.tipo)
+            {
+                case TipoProcesso.partida:
+                    return AtualizarRoteiroPartida(processo);
+                case TipoProcesso.classificacao:
+                    return AtualizarRoteiroClassificacao(processo);
+                case TipoProcesso.rodada:
+                    return AtualizarRoteiroRodada(processo);
+            }
+            return processo;
+        }
+
+        private Processo AtualizarRoteiroPartida(Processo processo)
+        {
+            var args = JsonConvert.DeserializeObject<ProcessoPartidaArgs>(processo.args);
+            processo.roteiro = _partidasService.ObterRoteiroDaPartida(args.partidaId);
+            _processoRepositorio.Update(processo);
+            return processo;
+        }
+
+        private Processo AtualizarRoteiroClassificacao(Processo processo)
+        {
+            var args = JsonConvert.DeserializeObject<ProcessoClassificacaoArgs>(processo.args);
+            var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(args.campeonato, true);
+            processo.roteiro = _classificacaoService.ObterRoteiroDaClassificacao(classificacao, args.campeonato);
+            _processoRepositorio.Update(processo);
+            return processo;
+        }
+
+        private Processo AtualizarRoteiroRodada(Processo processo)
+        {
+            var args = JsonConvert.DeserializeObject<ProcessoRodadaArgs>(processo.args);
+            var partidas = _rodadaService.ObterPartidasDaRodada(args.campeonato, args.rodada, true);
+            processo.roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, args.campeonato, args.rodada);
+            _processoRepositorio.Update(processo);
+            return processo;
         }
     }
 }

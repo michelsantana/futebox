@@ -12,10 +12,9 @@
                     <th scope="col">#/#</th>
                     <th scope="col">nome</th>
                     <th scope="col">tipo</th>
-                    <th scope="col">link</th>
-                    <th scope="col">status</th>
-                    <th scope="col">processado</th>
-                    <th scope="col">acao</th>
+                    <th scope="col">agendado?</th>
+                    <th width="138px" scope="col">hora</th>
+                    <th width="138px" scope="col">acao</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,10 +36,10 @@
     <script>
 
         var processoStatus = {
-            '@((int)Futebox.Models.Processo.Status.Erro)': '@($"{Futebox.Models.Processo.Status.Erro}")',
-            '@((int)Futebox.Models.Processo.Status.Executando)': '@($"{Futebox.Models.Processo.Status.Executando}")',
-            '@((int)Futebox.Models.Processo.Status.Pendente)': '@($"{Futebox.Models.Processo.Status.Pendente}")',
-            '@((int)Futebox.Models.Processo.Status.Sucesso)': '@($"{Futebox.Models.Processo.Status.Sucesso}")',
+            '@((int)Futebox.Models.Enums.StatusProcesso.Erro)': '@($"{Futebox.Models.Enums.StatusProcesso.Erro}")',
+            '@((int)Futebox.Models.Enums.StatusProcesso.Executando)': '@($"{Futebox.Models.Enums.StatusProcesso.Executando}")',
+            '@((int)Futebox.Models.Enums.StatusProcesso.Pendente)': '@($"{Futebox.Models.Enums.StatusProcesso.Pendente}")',
+            '@((int)Futebox.Models.Enums.StatusProcesso.Sucesso)': '@($"{Futebox.Models.Enums.StatusProcesso.Sucesso}")',
         }
 
         function UpdateRow(id) {
@@ -66,6 +65,27 @@
         }
         function Abrir(processo) {
             $.get(`/api/processo/arquivos/${processo}`);
+        }
+        function Agendar(processo) {
+            var row = $(`[data-row-id="${processo}"]`);
+            var hora = row.find('.hora').val();
+            if (!hora) {
+                $.SendToast(processo, 'Não agendado, falta hora!')
+                return;
+            }
+            $.get(`/api/processo/agendar/${processo}?hora=${hora.split(':')[0]}&minuto=${hora.split(':')[1]}`).then(_ => {
+                $.SendToast(processo, 'Processo agendado!')
+            });
+        }
+
+        function Notificar(processo) {
+            var row = $(`[data-row-id="${processo}"]`);
+            var hora = row.find('.hora').val();
+            if (!hora) {
+                $.SendToast(processo, 'Não agendado, falta hora!')
+                return;
+            }
+            $.get(`/api/processo/notificar/${processo}`);
         }
     </script>
 }

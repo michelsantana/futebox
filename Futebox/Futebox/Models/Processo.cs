@@ -1,11 +1,13 @@
 ﻿using Futebox.DB;
+using Futebox.Models.Enums;
+using Newtonsoft.Json;
 using System;
 
 namespace Futebox.Models
 {
     public class Processo : BaseEntity
     {
-        public Tipo tipo { get; set; }
+        public TipoProcesso tipo { get; set; }
         public String idExterno { get; set; }
         public String nome { get; set; }
 
@@ -20,31 +22,30 @@ namespace Futebox.Models
         public String attrTitulo { get; set; }
         public String attrDescricao { get; set; }
 
-        public int status { get; set; }
+        public StatusProcesso status { get; set; }
         public string statusMensagem { get; set; }
 
         public bool processado { get; set; }
-        public String json { get; set; }
+        
+        public String args { get; set; }
 
-        public enum Tipo
-        {
-            partida,
-            classificacao,
-            rodada,
-        }
+        public string notificacao { get; set; }
+        public DateTime? agendamento { get; set; }
+        public bool agendado { get; set; }
 
-        public enum TipoLink
-        {
-            print,
-            image
-        }
-
-        public enum Status
-        {
-            Pendente = 8,
-            Executando = 16,
-            Sucesso = 32,
-            Erro = 64
-        }
+        //private object objectArgs;
+        //public T ObterArgumentosPartida<T>() where T : class
+        //{
+        //    if (objectArgs == null)
+        //    {
+        //        if (typeof(T) == typeof(ProcessoPartidaArgs))
+        //            objectArgs = JsonConvert.DeserializeObject<ProcessoPartidaArgs>(args);
+        //        if (typeof(T) == typeof(ProcessoClassificacaoArgs))
+        //            objectArgs = JsonConvert.DeserializeObject<ProcessoClassificacaoArgs>(args);
+        //        if (typeof(T) == typeof(ProcessoRodadaArgs))
+        //            objectArgs = JsonConvert.DeserializeObject<ProcessoRodadaArgs>(args);
+        //    }
+        //    return (T)objectArgs;
+        //}
     }
 }

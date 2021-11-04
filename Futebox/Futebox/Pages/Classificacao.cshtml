@@ -39,7 +39,7 @@
 
         function GerarVideo(camp) {
             $.post(`/api/processo/classificacao/${camp}`, (response) => {
-                alert('gerando vídeo');
+                $.SendToast(response.id, 'Processo criado!');
             });
         }
 

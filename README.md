@@ -74,6 +74,8 @@ Então decidimos criar o futebox; um Robô que gera conteúdo sobre classificaç
 - [x] Dashboard/Web 
 - [x] Compatibilidade com Youtube
 - [x] Compatibilidade com Youtube #shorts
+- [x] Agendador de execução
+- [x] Notificações no telegram
 
 ### Todo
 - [ ] Libertadores 
@@ -84,7 +86,6 @@ Então decidimos criar o futebox; um Robô que gera conteúdo sobre classificaç
 - [ ] COPA do mundo 2021 
 - [ ] Gerador de fala - Google 
 - [ ] Publicador de vídeo
-- [ ] Agendador de execução
 - [ ] Compatibilidade com Instagram
 - [ ] Compatibilidade com Tiktok
 

@@ -1,5 +1,6 @@
 using Futebox.Models;
 using Futebox.Models.Enums;
+using Futebox.Pages.Shared;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,7 +9,7 @@ using System.Linq;
 
 namespace Futebox.Pages
 {
-    public class PartidasModel : PageModel
+    public class PartidasModel : BaseViewModel
     {
         IPartidasService _calendarioService;
 

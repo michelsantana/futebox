@@ -40,10 +40,17 @@ namespace Futebox.Services
 
         public bool DefinirConteudo<T>(string cacheName, T dados, int validadeHoras = 8) where T : class
         {
-            var cacheFilePath = $"{cacheFolderPath}/{cacheName}.txt";
-            var storage = new CacheStorageType<T>(dados, validadeHoras);
-            File.WriteAllText(cacheFilePath, JsonConvert.SerializeObject(storage));
-            var fi = new FileInfo(cacheFilePath);
+            try
+            {
+                var cacheFilePath = $"{cacheFolderPath}/{cacheName}.txt";
+                var storage = new CacheStorageType<T>(dados, validadeHoras);
+                File.WriteAllText(cacheFilePath, JsonConvert.SerializeObject(storage));
+                var fi = new FileInfo(cacheFilePath);
+                return true;
+            }
+            catch
+            {
+            }
             return true;
         }
 

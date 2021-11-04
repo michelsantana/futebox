@@ -92,6 +92,22 @@ namespace Futebox.Services
             return retorno;
         }
 
+        public List<FootstatsPartida> ObterPartidasDoCampeonato(Campeonatos campeonato)
+        {
+            var retorno = new List<FootstatsPartida>();
+
+            var rota = $"3.1/campeonatos/{(int)campeonato}/partidas";
+            var respostaDaApi = _http.Get($"{BaseURL}/{rota}", MontarHeaderToken());
+
+            if (respostaDaApi.IsSuccessStatusCode)
+            {
+                var jsonRetornadoApi = respostaDaApi.Content?.ReadAsStringAsync()?.Result;
+                var deserializado = DeserializarJson<FootstatsPartida>(jsonRetornadoApi);
+                if (deserializado != null) retorno.AddRange(deserializado);
+            }
+            return retorno;
+        }
+
         private Dictionary<string, string> MontarHeaderToken()
         {
             var header = new Dictionary<string, string>() { { "Authorization", token } };

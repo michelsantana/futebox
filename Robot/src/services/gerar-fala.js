@@ -35,6 +35,10 @@ module.exports = function (uid, settings) {
         return utils.existeArquivo(obterArquivoPastaDownloads());
     }
 
+    const ExisteArquivoBaixadoMovido = () => {
+        return utils.existeArquivo(obterArquivoDestino());
+    }
+
     const MoverArquivoBaixadoParaDestino = () =>{
         return utils.moverArquivo(obterArquivoPastaDownloads(), obterArquivoDestino());
     }
@@ -63,6 +67,9 @@ module.exports = function (uid, settings) {
 
         if(ExisteArquivoBaixado() && usarArquivosExistentes) {
             MoverArquivoBaixadoParaDestino();
+            return new Retorno(statusCodes.ok, 'Arquivo do cache');
+        }
+        if(ExisteArquivoBaixadoMovido() && usarArquivosExistentes) {
             return new Retorno(statusCodes.ok, 'Arquivo do cache');
         }
         

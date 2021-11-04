@@ -7,38 +7,13 @@ const pastas = require("./../utils/gerenciador-pastas");
 const utils = require("./../utils/utils");
 const servicoGerarFala = require("./gerar-fala");
 const statusCodes = require("./../utils/services-status-codes");
+const processoServiceContructor = require("./processo-service");
 
-const enumTipo = {
-  [0]: "partida",
-  [1]: "classificacao",
-  [2]: "rodada",
-};
-
-const enumTipoLink = {
-  [0]: "print",
-  [1]: "image",
-};
-
-function Processo(processo) {
-  this.tipo = enumTipo[processo.tipo];
-  this.idExterno = processo.idExterno;
-  this.nome = processo.nome;
-  this.link = processo.link;
-  this.tipoLink = enumTipoLink[processo.tipoLink];
-  this.imgLargura = processo.imgLargura;
-  this.imgAltura = processo.imgAltura;
-  this.roteiro = processo.roteiro;
-  this.attrTitulo = processo.attrTitulo;
-  this.attrDescricao = processo.attrDescricao;
-  this.status = processo.status;
-  this.processado = processo.processado;
-  this.json = processo.json;
-  this.linkThumb = processo.linkThumb;
-  return this;
-}
+const Processo = require("./../model/processo");
 
 module.exports = function (processo, datasourceUrl) {
   const UID = processo;
+  const processoService = new processoServiceContructor(datasourceUrl);
 
   this.obterPastaDoProcesso = () =>
     `${pastas.obterPastaArquivosDoDia()}/${UID}`;
@@ -55,22 +30,22 @@ module.exports = function (processo, datasourceUrl) {
   this.obterArquivoBat = () =>
     `${this.obterPastaDoProcesso()}/${obterNomeArquivo("bat")}`;
   this.obterArquivoBatTituloClipboard = () =>
-    `${this.obterPastaDoProcesso()}/${obterNomeArquivo("title.bat")}`;
+    `${this.obterPastaDoProcesso()}/${obterNomeArquivo("attr.title.ps1")}`;
   this.obterArquivoBatDescricaoClipboard = () =>
-    `${this.obterPastaDoProcesso()}/${obterNomeArquivo("description.bat")}`;
+    `${this.obterPastaDoProcesso()}/${obterNomeArquivo("attr.description.ps1")}`;
   this.obterArquivoAtributos = () =>
     `${this.obterPastaDoProcesso()}/${obterNomeArquivo("txt")}`;
 
   this.ObterProcesso = async () => {
-    return (await axios.get(`${datasourceUrl}/obter`)).data;
+    return await processoService.ObterProcesso();
   };
 
   this.AtualizarProcessoErro = async (erro) => {
-    return (await axios.get(`${datasourceUrl}/erro?mensagem=${erro}`)).data;
+    return await processoService.AtualizarProcessoErro(erro);
   };
 
   this.AtualizarProcessoSucesso = async () => {
-    return (await axios.get(`${datasourceUrl}/sucesso`)).data;
+    return await processoService.AtualizarProcessoSucesso();
   };
 
   this.GerarImagem = async (urlPrint, w, h, urlThumb = null) => {
@@ -111,19 +86,26 @@ module.exports = function (processo, datasourceUrl) {
     );
   };
 
-  this.GerarArquivoAtributos = (titulo, descricao) => {
+  this.GerarArquivoAtributos = (titulo, descricao, roteiro) => {
     fs.writeFileSync(
       this.obterArquivoAtributos(),
-      `[TITLE]\n${titulo}\n[DESCRIPTION]\n${descricao}`
+      `[TITLE]\n\n${titulo}\n\n[DESCRIPTION]\n\n${descricao}\n\n[ROTEIRO]\n\n${roteiro.replace(
+        /:/g,
+        "\n"
+      )}`
     );
-    // fs.writeFileSync(
-    //   this.obterArquivoBatTituloClipboard(),
-    //   `echo ${titulo}|clip`
-    // );
-    // fs.writeFileSync(
-    //   this.obterArquivoBatDescricaoClipboard(),
-    //   `echo ${descricao}|clip`
-    // );
+
+    fs.writeFileSync(
+      this.obterArquivoBatTituloClipboard(),
+      `$PSDefaultParameterValues['*:Encoding'] = 'utf8'\nSet-Clipboard("${titulo}")`,
+      { encoding: "ascii" }
+    );
+
+    fs.writeFileSync(
+      this.obterArquivoBatDescricaoClipboard(),
+      `$PSDefaultParameterValues['*:Encoding'] = 'utf8'\nSet-Clipboard("${descricao}")`,
+      { encoding: "ascii" }
+    );
   };
 
   this.ExecutarBat = () => {
@@ -159,7 +141,11 @@ module.exports = function (processo, datasourceUrl) {
         );
       }
       this.log(`Gerando atributos do video`);
-      this.GerarArquivoAtributos(processo.attrTitulo, processo.attrDescricao);
+      this.GerarArquivoAtributos(
+        processo.attrTitulo,
+        processo.attrDescricao,
+        processo.roteiro
+      );
       this.log(`Gerando fala do roteiro`);
       await this.GerarFala(processo.roteiro);
       this.log(`Gerando bat de video`);

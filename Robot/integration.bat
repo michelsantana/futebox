@@ -8,4 +8,4 @@ set arg4=%4
 cd /d %arg1%
 REM pause
 call integration.step2.bat %arg2% %arg3% %arg4%
-rem pause
+REM pause

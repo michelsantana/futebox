@@ -7,10 +7,11 @@ using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Futebox.Models.Enums;
+using Futebox.Pages.Shared;
 
 namespace Futebox.Pages
 {
-    public class ClassificacaoModel : PageModel
+    public class ClassificacaoModel : BaseViewModel
     {
         readonly IClassificacaoService _classificacaoService;
 

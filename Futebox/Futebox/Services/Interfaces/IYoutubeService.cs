@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Futebox.Services.Interfaces
 {
-    public interface IAgendamentoService
+    public interface IYoutubeService
     {
-        void AgendarExecucao(string processoId, DateTime date);
+        bool IsLogged();
+        void DoLogin();
+        void DoLogout();
+        Task Upload(Processo processo);
     }
 }

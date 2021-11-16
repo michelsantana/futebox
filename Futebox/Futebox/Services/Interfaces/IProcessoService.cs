@@ -16,11 +16,13 @@ namespace Futebox.Services.Interfaces
 
         Processo ExecutarProcesso(string processo);
         bool ArquivosProcesso(string id);
+        Processo PublicarVideo(string processo);
 
-        Processo AtualizarProcessoAgendamentoNotificacao(string id, DateTime horaNotificacao);
-        Processo AtualizarProcesso(string id, bool processado, string erro = "");
+        Processo AtualizarProcessoAgendamento(string id, string porta, DateTime hora);
+        Processo AtualizarProcessoSucesso(string id, string arquivo);
+        Processo AtualizarProcessoErro(string id, string erro);
+        Processo AtualizarRoteiro(Processo processo);
 
         bool Delete(string id);
-        Processo AtualizarRoteiro(Processo processo);
     }
 }

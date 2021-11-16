@@ -58,7 +58,6 @@
         }
 
         function GerarVideo(camp) {
-            debugger;
             var rodada = $(`#rodada-${camp}`).val();
             $.post(`/api/processo/rodada/${camp}/${rodada}`, (response) => {
                 $.SendToast(response.id, 'Processo criado!');
@@ -86,7 +85,6 @@
             $(() => {
                 var camp = '@((int)camp)';
                 $.get(`/api/rodada/ultimarodada/${camp}`, (response) => {
-                    debugger;
                     for (var r of response) {
                         var s = r.split(',');
                         var li = $(`<option value="${s[1]}">${s[0]} - ${s[1]}ª Rodada</option>`);

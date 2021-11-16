@@ -42,7 +42,13 @@ namespace Futebox.DB.Migrations
 
             .WithColumn("processado").AsBoolean().NotNullable() // finalizou processo
 
-            .WithColumn("json").AsString().NotNullable(); // json com dados da entidade ou informações genéricas 
+            .WithColumn("args").AsString().NotNullable() // json com dados da entidade ou informações genéricas 
+
+            .WithColumn("agendado").AsBoolean().NotNullable()
+            .WithColumn("notificacao").AsString().Nullable()
+            .WithColumn("agendamento").AsDateTime().Nullable()
+            .WithColumn("arquivoVideo").AsString().Nullable()
+            .WithColumn("portaExecucao").AsString().Nullable();
         }
     }
 }

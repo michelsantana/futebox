@@ -2,35 +2,69 @@
 @model Futebox.Pages.ProcessosModel
 @{
     ViewData["Title"] = "Processos";
+    bool show = false;
 }
-<div class="row">
-    <div class="col-12">
-        <table id='tabela' class="table">
-            <thead>
-                <tr class="align-middle">
-                    <th scope="col"></th>
-                    <th scope="col">#/#</th>
-                    <th scope="col">nome</th>
-                    <th scope="col">tipo</th>
-                    <th scope="col">agendado?</th>
-                    <th width="138px" scope="col">hora</th>
-                    <th width="138px" scope="col">acao</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var processo in Model.processos)
-                {
-                    @Html.Partial("Templates/_processoTableRow", Tuple.Create(Model, processo))
-                }
-            </tbody>
-        </table>
-    </div>
+<div class="accordion" id="accord">
+    @foreach (var grupo in Model.processos.OrderByDescending(_ => _.agendamento).Select((_, i) => new { entity = _, index = i })
+        .GroupBy(_ => new { dt = _.entity.criacao.ToString("yyyyMMdd"), format = _.entity.criacao.ToString("dd/MM/yyyy") }))
+    {
+        { show = grupo.Any(_ => _.index == 0); }
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading@(grupo.Key.dt)">
+                <button class="accordion-button @(!show ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapse@(grupo.Key.dt)" aria-expanded="true" aria-controls="collapse@(grupo.Key.dt)">
+                    @grupo.Key.format
+                </button>
+            </h2>
+            <div id="collapse@(grupo.Key.dt)" class="accordion-collapse collapse @(show ? "show" : "")" aria-labelledby="heading@(grupo.Key.dt)" data-bs-parent="#accord">
+                <div class="accordion-body">
+                    <table id='tabela' class="table">
+                        <thead>
+                            <tr class="align-middle">
+                                <th scope="col"></th>
+                                <th scope="col">nome</th>
+                                <th scope="col">agendado</th>
+                                <th width="240px" scope="col">hora/porta</th>
+                                <th width="180px" scope="col">acao</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var tupple in grupo.ToList().Select(_ => Tuple.Create(_.index, _.entity)))
+                            {
+                                @Html.Partial("Templates/_processoTableRow", Tuple.Create(Model, tupple.Item1, tupple.Item2))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        @*<div class="row">
+                <div class="col-12">
+                    <h6 class="h6"></h6>
+                    <table id='tabela' class="table">
+                        <thead>
+                            <tr class="align-middle">
+                                <th scope="col"></th>
+                                <th scope="col">#/#</th>
+                                <th scope="col">nome</th>
+                                <th scope="col">tipo</th>
+                                <th scope="col">agendado?</th>
+                                <th width="138px" scope="col">hora</th>
+                                <th width="138px" scope="col">acao</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var processo in grupo.ToList())
+                            {
+                                @Html.Partial("Templates/_processoTableRow", Tuple.Create(Model, processo))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>*@
+    }
 </div>
 <div id="card"></div>
-
-<div class="toast-container">
-
-</div>
 
 @section Scripts{
     <script>
@@ -73,9 +107,18 @@
                 $.SendToast(processo, 'Não agendado, falta hora!')
                 return;
             }
-            $.get(`/api/processo/agendar/${processo}?hora=${hora.split(':')[0]}&minuto=${hora.split(':')[1]}`).then(_ => {
+            var porta = row.find('.porta').val();
+            $.get(`/api/processo/agendar/${processo}?porta=${porta}&hora=${hora.split(':')[0]}&minuto=${hora.split(':')[1]}`).then(_ => {
                 $.SendToast(processo, 'Processo agendado!')
             });
+        }
+        function Publicar(processo) {
+            $.get(`/api/processo/publicar/${processo}`, s => {
+                UpdateRow(processo);
+                $.SendToast(s.id, processoStatus[s.status])
+            }).fail(function () {
+                UpdateRow(processo);
+            });;
         }
 
         function Notificar(processo) {

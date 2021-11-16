@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Futebox.Models.Enums;
+using System.Threading.Tasks;
 
 namespace Futebox.Services
 {
@@ -16,13 +17,15 @@ namespace Futebox.Services
         IPartidasService _partidasService;
         IClassificacaoService _classificacaoService;
         IRodadaService _rodadaService;
+        IYoutubeService _youtubeService;
 
-        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService)
+        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IYoutubeService youtubeService)
         {
             _processoRepositorio = processoRepositorio;
             _partidasService = partidasService;
             _classificacaoService = classificacaoService;
             _rodadaService = rodadaService;
+            _youtubeService = youtubeService;
         }
 
         public List<Processo> ObterProcessos()
@@ -59,7 +62,7 @@ namespace Futebox.Services
                 status = StatusProcesso.Pendente,
                 processado = false,
                 attrTitulo = atributos.Item1,
-                attrDescricao = atributos.Item2,
+                attrDescricao = $"{atributos.Item2}\n{ObterDescricaoDefault()}",
 
                 agendado = false,
                 agendamento = partida.dataPartida.AddHours(2).AddMinutes(10),
@@ -95,7 +98,7 @@ namespace Futebox.Services
                 status = StatusProcesso.Pendente,
                 processado = false,
                 attrTitulo = atributos.Item1,
-                attrDescricao = atributos.Item2,
+                attrDescricao = $"{atributos.Item2}\n{ObterDescricaoDefault()}",
 
                 agendado = false,
                 agendamento = DateTime.Today.AddHours(23).AddMinutes(30),
@@ -132,7 +135,7 @@ namespace Futebox.Services
                 status = StatusProcesso.Pendente,
                 processado = false,
                 attrTitulo = atributos.Item1,
-                attrDescricao = atributos.Item2,
+                attrDescricao = $"{atributos.Item2}\n{ObterDescricaoDefault()}",
 
                 agendado = false,
                 agendamento = DateTime.Now.AddMinutes(30),
@@ -161,35 +164,69 @@ namespace Futebox.Services
             return ExecutarCMD($"command=pasta", $"id={processo}");
         }
 
-        public Processo AtualizarProcessoAgendamentoNotificacao(string id, DateTime horaNotificacao)
+        public Processo PublicarVideo(string processo)
+        {
+            string commandArgs = $"command=publicar";
+            string idArgs = $"id={processo}";
+            string datasourceArgs = $"datasource={Settings.ApplicationHttpBaseUrl}api/processo/{processo}";
+            ExecutarCMD(commandArgs, idArgs, datasourceArgs);
+            return _processoRepositorio.GetById(processo);
+        }
+
+        public Processo AtualizarProcessoAgendamento(string id, string porta, DateTime hora)
         {
             var p = _processoRepositorio.GetById(id);
-            p.agendamento = horaNotificacao;
+            p.agendamento = hora;
             p.agendado = true;
+            p.portaExecucao = porta;
             _processoRepositorio.OpenTransaction();
             _processoRepositorio.Update(p);
             _processoRepositorio.Commit();
             return p;
         }
 
-        public Processo AtualizarProcesso(string id, bool processado, string erro = "")
+        public Processo AtualizarProcessoSucesso(string id, string arquivo)
         {
             var p = _processoRepositorio.GetById(id);
             p.alteracao = DateTime.Now;
-            p.processado = processado;
+            p.processado = true;
             p.status = StatusProcesso.Sucesso;
+            p.arquivoVideo = arquivo;
 
-            if (!string.IsNullOrEmpty(erro))
-            {
-                p.nome = $"{p.nome}";
-                p.status = StatusProcesso.Erro;
-                p.statusMensagem = erro;
-            }
             _processoRepositorio.OpenTransaction();
             _processoRepositorio.Update(p);
             _processoRepositorio.Commit();
 
             return p;
+        }
+
+        public Processo AtualizarProcessoErro(string id, string erro)
+        {
+            var p = _processoRepositorio.GetById(id);
+            p.alteracao = DateTime.Now;
+            p.processado = true;
+            p.status = StatusProcesso.Erro;
+            p.statusMensagem = erro;
+
+            _processoRepositorio.OpenTransaction();
+            _processoRepositorio.Update(p);
+            _processoRepositorio.Commit();
+
+            return p;
+        }
+
+        public Processo AtualizarRoteiro(Processo processo)
+        {
+            switch (processo.tipo)
+            {
+                case TipoProcesso.partida:
+                    return AtualizarRoteiroPartida(processo);
+                case TipoProcesso.classificacao:
+                    return AtualizarRoteiroClassificacao(processo);
+                case TipoProcesso.rodada:
+                    return AtualizarRoteiroRodada(processo);
+            }
+            return processo;
         }
 
         public bool Delete(string id)
@@ -219,20 +256,6 @@ namespace Futebox.Services
             return AtualizarRoteiro(ObterProcesso(processo));
         }
 
-        public Processo AtualizarRoteiro(Processo processo)
-        {
-            switch (processo.tipo)
-            {
-                case TipoProcesso.partida:
-                    return AtualizarRoteiroPartida(processo);
-                case TipoProcesso.classificacao:
-                    return AtualizarRoteiroClassificacao(processo);
-                case TipoProcesso.rodada:
-                    return AtualizarRoteiroRodada(processo);
-            }
-            return processo;
-        }
-
         private Processo AtualizarRoteiroPartida(Processo processo)
         {
             var args = JsonConvert.DeserializeObject<ProcessoPartidaArgs>(processo.args);
@@ -258,5 +281,21 @@ namespace Futebox.Services
             _processoRepositorio.Update(processo);
             return processo;
         }
+
+        private string ObterDescricaoDefault()
+        {
+            var arr = new string[] { "BRASILEIRÃO", "BRASILEIRÃO 2021",
+            "BRASILEIRAO", "BRASILEIRAO 2021", "#BRASILEIRAO", "#BRASILEIRAO2021",
+            "TABELA BRASILEIRÃO", "TABELA BRASILEIRÃO 2021", "TABELA BRASILEIRAO",
+            "TABELA BRASILEIRAO 2021", "#TABELABRASILEIRAO", "#TABELABRASILEIRAO2021",
+            "TABELA CLASSIFICAÇÃO", "TABELA CLASSIFICAÇÃO 2021", "TABELA CLASSIFICACAO",
+            "TABELA CLASSIFICACAO 2021", "#TABELACLASSIFICACAO", "#TABELACLASSIFICACAO2021",
+            "CLASSIFICAÇÃO DO BRASILEIRÃO","CLASSIFICAÇÃO DO BRASILEIRÃO 2021", "CLASSIFICACAO DO BRASILEIRAO",
+            "CLASSIFICACAO DO BRASILEIRAO 2021","#CLASSIFICACAODOBRASILEIRAO", "#CLASSIFICACAODOBRASILEIRAO2021",
+            "CAMPEONATO BRASILEIRO", "CAMPEONATO BRASILEIRO 2021", "CAMPEONATO BRASILEIRO",
+            "CAMPEONATO BRASILEIRO 2021","#CAMPEONATOBRASILEIRO", "#CAMPEONATOBRASILEIRO2021" };
+            return string.Join("\n", arr);
+        }
+
     }
 }

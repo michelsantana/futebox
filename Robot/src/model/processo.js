@@ -26,6 +26,8 @@ module.exports = function Processo(processo) {
   this.linkThumb = processo.linkThumb;
   this.criacao = processo.criacao;
   this.notificacao = processo.notificacao;
+  this.arquivoVideo = processo.arquivoVideo;
+  this.portaExecucao = processo.portaExecucao;
 
   return this;
 };

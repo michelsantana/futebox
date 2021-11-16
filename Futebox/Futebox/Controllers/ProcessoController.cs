@@ -33,13 +33,13 @@ namespace Futebox.Controllers
         public Processo AtualizarProcessoErro(string id, string mensagem)
         {
             var erro = string.IsNullOrEmpty(mensagem) ? "erro" : mensagem;
-            return _processoService.AtualizarProcesso(id, false, erro);
+            return _processoService.AtualizarProcessoErro(id, erro);
         }
 
         [HttpGet("{id}/sucesso")]
-        public Processo AtualizarProcessoSucesso(string id)
+        public Processo AtualizarProcessoSucesso(string id, string arquivo)
         {
-            return _processoService.AtualizarProcesso(id, true);
+            return _processoService.AtualizarProcessoSucesso(id, arquivo);
         }
 
         [HttpPost("{id}/deletar")]
@@ -87,11 +87,23 @@ namespace Futebox.Controllers
         }
 
         [HttpGet("agendar/{id}")]
-        public bool AgendarNotificacaoProcesso(string id, int hora, int minuto)
+        public bool AgendarNotificacaoProcesso(string id, string porta, int hora, int minuto)
         {
-            var p = _processoService.AtualizarProcessoAgendamentoNotificacao(id, DateTime.Today.AddHours(hora).AddMinutes(minuto));
-            _agendamentoService.AgendarNotificacao(p.id, p.agendamento ?? DateTime.Now);
+            var p = _processoService.AtualizarProcessoAgendamento(
+                id,
+                porta,
+                DateTime.Today.AddHours(hora).AddMinutes(minuto)
+                );
+            _agendamentoService.AgendarExecucao(p.id, p.agendamento ?? DateTime.Now);
             return true;
         }
+
+        [HttpGet("publicar/{id}")]
+        public bool PublicarVideoProcesso(string id)
+        {
+            _processoService.PublicarVideo(id);
+            return true;
+        }
+
     }
 }

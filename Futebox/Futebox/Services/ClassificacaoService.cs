@@ -100,6 +100,7 @@ namespace Futebox.Services
                 descricao += $"#{semAcento.Replace(" ", "")}";
                 descricao += "\n";
                 descricao += $"#{semAcento.Replace(" ", "")}{ano}";
+                descricao += "\n";
             });
 
             return Tuple.Create(titulo, descricao);

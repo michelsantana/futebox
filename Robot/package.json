@@ -4,7 +4,8 @@
     "main": "index.js",
     "license": "MIT",
     "scripts": {
-        "integration": "node ./src/integration"
+        "integration": "node ./src/integration",
+        "test": "node ./src/integration command=test"
     },
     "dependencies": {
         "axios": "^0.21.1",

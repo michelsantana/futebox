@@ -33,6 +33,10 @@ namespace Futebox.Models
         public DateTime? agendamento { get; set; }
         public bool agendado { get; set; }
 
+        public string arquivoVideo { get; set; }
+        public string portaExecucao { get; set; }
+
+
         //private object objectArgs;
         //public T ObterArgumentosPartida<T>() where T : class
         //{

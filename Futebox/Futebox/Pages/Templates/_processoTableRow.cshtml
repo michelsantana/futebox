@@ -1,26 +1,44 @@
-﻿@model Tuple<Futebox.Pages.ProcessosModel, Futebox.Models.Processo>
+﻿@model Tuple<Futebox.Pages.ProcessosModel, int, Futebox.Models.Processo>
 @{
-    var processo = Model.Item2;
+    var processo = Model.Item3;
+    var indexStr = $"00000000{Model.Item2}";
+    var index = processo.portaExecucao ?? $"219{indexStr.Substring(indexStr.Length - 2)}";
     var model = Model.Item1;
 }
 <tr data-row-id="@processo.id" class="align-middle">
     <td>
         <span class="badge @(model.cores[(int)processo.status])">&nbsp;</span>
     </td>
-    <td>@processo.id</td>
-    <td>@processo.nome</td>
-    <td>@processo.tipo</td>
+    <td>
+        <b>@processo.id</b><br />
+        @processo.nome<br />
+        @processo.tipo
+    </td>
     <td>@(processo.agendado ? "sim" : "não")</td>
     <td>
         <div class="input-group">
             <input type="time" class="hora form-control form-control-sm" value="@(processo.agendamento?.ToString("HH:mm"))">
+            <input type="text" class="porta form-control form-control-sm" value="@(index)">
             <button class="btn btn-sm btn-outline-info" onclick="Agendar('@processo.id');">⌚</button>
         </div>
     </td>
     <td>
-        <button class="btn btn-sm btn-outline-info" onclick="Play('@processo.id');">▶</button>
-        <button class="btn btn-sm btn-outline-danger" onclick="Delete('@processo.id');">❌</button>
-        <button class="btn btn-sm btn-outline-dark" onclick="Abrir('@processo.id');">📂</button>
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-sm btn-outline-info" onclick="Play('@processo.id');">▶</button>
+            @*<button class="btn btn-sm btn-outline-danger" onclick="Delete('@processo.id');">❌</button>*@
+            @*<button class="btn btn-sm btn-outline-dark" onclick="Abrir('@processo.id');">📂</button>*@
+            <button class="btn btn-sm btn-outline-dark" onclick="Publicar('@processo.id');">☁</button>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-dark dropdown-toggle" type="button" id="ddl@(processo.id)" data-bs-toggle="dropdown" aria-expanded="false">
+                    🛠
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="ddl@(processo.id)">
+                    <li><button class="dropdown-item" onclick="Abrir('@processo.id');">📂&nbsp;Abrir pasta do vídeo</button></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><button class="dropdown-item" onclick="Delete('@processo.id');">❌&nbsp;Excluir processo</button></li>
+                </ul>
+            </div>
+        </div>
         @*<button class="btn btn-sm btn-outline-dark" onclick="Notificar('@processo.id');">TESTAR</button>*@
     </td>
 </tr>

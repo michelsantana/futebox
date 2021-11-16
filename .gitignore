@@ -367,3 +367,4 @@ FodyWeavers.xsd
 arquive/
 Robot/archive/
 .env
+Futebox/Futebox/client_secrets.json

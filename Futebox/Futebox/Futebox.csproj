@@ -9,10 +9,16 @@
 		<PackageReference Include="Dapper.FluentMap" Version="2.0.0" />
 		<PackageReference Include="Dapper.FluentMap.Dommel" Version="2.0.0" />
 		<PackageReference Include="Dommel" Version="2.3.2" />
+		<PackageReference Include="DotNetOpenAuth" Version="4.3.4.13329" />
 		<PackageReference Include="FluentMigrator" Version="3.3.1" />
 		<PackageReference Include="FluentMigrator.Runner" Version="3.3.1" />
 		<PackageReference Include="FluentMigrator.Runner.Core" Version="3.3.1" />
 		<PackageReference Include="FluentMigrator.Runner.SQLite" Version="3.3.1" />
+		<PackageReference Include="Google.Apis" Version="1.55.0" />
+		<PackageReference Include="Google.Apis.Auth" Version="1.55.0" />
+		<PackageReference Include="Google.Apis.Core" Version="1.55.0" />
+		<PackageReference Include="Google.Apis.Oauth2.v2" Version="1.55.0.1869" />
+		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.55.0.2449" />
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.19" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

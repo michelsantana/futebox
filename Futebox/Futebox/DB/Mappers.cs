@@ -62,6 +62,10 @@ namespace Futebox.DB.Mappers
             Map(x => x.notificacao).ToColumn("notificacao");
             Map(x => x.agendamento).ToColumn("agendamento");
             Map(x => x.agendado).ToColumn("agendado");
+
+            Map(x => x.portaExecucao).ToColumn("portaExecucao");
+            Map(x => x.arquivoVideo).ToColumn("arquivoVideo");
+
         }
     }
 }

@@ -7,6 +7,7 @@ namespace Futebox
 {
     public class Settings
     {
+        public static string BackendRoot;
         public static string ApplicationsRoot;
         public static string ApplicationHttpBaseUrl;
         public static string TelegramBotToken;

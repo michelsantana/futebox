@@ -95,7 +95,7 @@ namespace Futebox.Services
                 $"- {partida.campeonato}! " +
                 $"Quem venceu!? #shorts";
             var descricao = $"Fala meus parças, agora trarei #shorts com os finais de partida. Espero que gostem!" +
-                $"#short\n#short\n{partida.campeonato}\n{partida.estadio}";
+                $"#short\n#short\n{partida.campeonato}\n{partida.estadio}\n";
             return Tuple.Create(titulo, descricao);
         }
 

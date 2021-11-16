@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Futebox.DB.Mappers;
 using System;
+using System.IO;
 
 namespace Futebox
 {
@@ -24,6 +25,7 @@ namespace Futebox
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            Settings.BackendRoot = Directory.GetCurrentDirectory();
             Settings.ApplicationsRoot = Configuration.GetValue<string>("ApplicationsRoot");
             Settings.ApplicationHttpBaseUrl = Configuration.GetValue<string>("ApplicationHttpBaseUrl");
             Settings.TelegramBotToken = DotEnv.Get("TELEGRAM_BOT_TOKEN");
@@ -55,6 +57,7 @@ namespace Futebox
             services.AddScoped<IRodadaService, RodadaService>();
             services.AddScoped<IAgendamentoService, AgendamentoService>();
             services.AddScoped<INotifyService, NotifyService>();
+            services.AddScoped<IYoutubeService, YoutubeService>();
 
             services.AddScoped<IProcessoRepositorio, ProcessoRepositorio>();
             services.AddScoped<ITimeRepositorio, TimeRepositorio>();

@@ -57,7 +57,7 @@ namespace Futebox
             services.AddScoped<IRodadaService, RodadaService>();
             services.AddScoped<IAgendamentoService, AgendamentoService>();
             services.AddScoped<INotifyService, NotifyService>();
-            services.AddScoped<IYoutubeService, YoutubeService>();
+            //services.AddScoped<IYoutubeService, YoutubeService>();
 
             services.AddScoped<IProcessoRepositorio, ProcessoRepositorio>();
             services.AddScoped<ITimeRepositorio, TimeRepositorio>();

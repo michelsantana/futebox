@@ -7,5 +7,6 @@ namespace Futebox.Services.Interfaces
 {
     public interface IFutebotService
     {
+        public bool VerificarConfiguracaoYoutubeBrowser();
     }
 }

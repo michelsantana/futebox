@@ -3,4 +3,5 @@ module.exports = {
     ok: 8,
     invalid: 16,
     erro: 32,
+    authFailed: 64
 }

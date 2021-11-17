@@ -2,157 +2,140 @@ const pptr = require('puppeteer');
 const utils = require('./../utils/utils');
 const statusCodes = require('./../utils/services-status-codes');
 const pastas = require('./../utils/gerenciador-pastas');
+const logger = require('./logger');
+const { ServicoFalaRetorno, ServicoFalaSettings } = require('./../model/retornoServicos');
 
-module.exports = function (uid, settings) {
+module.exports = function (uid, settings = new ServicoFalaSettings()) {
+  const log = (m) => logger.log(uid, 'gerar-fala', m);
+  const defaults = new ServicoFalaSettings(pastas.obterPastaArquivos(), `${uid}.mp3`, `${uid} - sem roteiro`, false);
 
-    const defaults = {
-        pasta: pastas.obterPastaArquivos(),
-        arquivo: `${uid}.mp3`,
-        roteiro: `${uid} - sem roteiro`,
-        usarArquivosExistentes: false
-    };
+  settings = Object.assign(settings, defaults);
 
-    const { 
-        salvarEm = defaults.pasta, 
-        nomeArquivo = defaults.arquivo, 
-        roteiro = defaults.roteiro, 
-        usarArquivosExistentes = defaults.usarArquivosExistentes 
-    } = settings;
+  const obterArquivoPastaDownloads = () => `${pastas.obterPastaDownloadsChrome()}/${settings.nomeArquivo}`;
+  const obterArquivoDestino = () => `${settings.pasta}/${settings.arquivo}`;
 
-    const obterArquivoPastaDownloads = () => `${pastas.obterPastaDownloadsChrome()}/${nomeArquivo}`;
-    const obterArquivoDestino = () => `${salvarEm}/${nomeArquivo}`;
+  utils.criarPastaSeNaoExistir(settings.pasta);
 
-    utils.criarPastaSeNaoExistir(salvarEm);
+  const ExisteArquivoBaixado = () => utils.existeArquivo(obterArquivoPastaDownloads());
+  const ExisteArquivoBaixadoMovido = () => utils.existeArquivo(obterArquivoDestino());
+  const MoverArquivoBaixadoParaDestino = () => utils.moverArquivo(obterArquivoPastaDownloads(), obterArquivoDestino());
 
-    function Retorno(status, mensagem){
-        this.status = status;
-        this.mensagem = mensagem;
-        this.arquivoDestino = obterArquivoDestino();
-        return this;
+  let intervaloFinalizacaoDownload = null;
+  const EsperarFinalizacaoDownload = async (page) => {
+    try {
+      function exec() {
+        return setTimeout(() => {
+          if (ExisteArquivoBaixado()) page.evaluate(() => (document.querySelector('.dwlend').id = 'dwlend'));
+          else intervaloFinalizacaoDownload = exec();
+        }, 3000);
+      }
+      intervaloFinalizacaoDownload = exec();
+      await page.waitForSelector('#dwlend', { timeout: 60000 * 5 }); // espera até 5 minutos
+      clearTimeout(intervaloFinalizacaoDownload);
+    } catch (ex) {
+      clearTimeout(intervaloFinalizacaoDownload);
+      return new ServicoFalaRetorno(statusCodes.erro, ex);
+    }
+  };
+
+  this.Executar = async () => {
+    if (ExisteArquivoBaixado() && usarArquivosExistentes) {
+			log('usando cache');
+			log('arquivo já foi baixado');
+      MoverArquivoBaixadoParaDestino();
+			log('movido para destino');
+      return new ServicoFalaRetorno(statusCodes.ok, 'Arquivo do cache');
+    }
+    if (ExisteArquivoBaixadoMovido() && usarArquivosExistentes) {
+			log('usando cache');
+			log('arquivo já movido');
+      return new ServicoFalaRetorno(statusCodes.ok, 'Arquivo do cache');
     }
 
-    const ExisteArquivoBaixado = () => {
-        return utils.existeArquivo(obterArquivoPastaDownloads());
-    }
+		log('abrindo browser');
+    const browser = await pptr.launch({
+      headless: false,
+      args: ['--use-fake-ui-for-media-stream'],
+      ignoreDefaultArgs: ['--mute-audio'],
+    });
 
-    const ExisteArquivoBaixadoMovido = () => {
-        return utils.existeArquivo(obterArquivoDestino());
-    }
+    const page = await browser.newPage();
 
-    const MoverArquivoBaixadoParaDestino = () =>{
-        return utils.moverArquivo(obterArquivoPastaDownloads(), obterArquivoDestino());
-    }
+    await page.setViewport({ width: 1280, height: 720 });
+    await page.goto('https://www.ibm.com/demos/live/tts-demo/self-service/home', { waitUntil: 'networkidle2' });
 
-    let intervaloFinalizacaoDownload = null;
-    const EsperarFinalizacaoDownload = async (page) => {
-        try {
-            function exec(){
-                return setTimeout(() => {
-                    if (ExisteArquivoBaixado())
-                        page.evaluate(() => document.querySelector('.dwlend').id = 'dwlend');
-                    else
-                        intervaloFinalizacaoDownload = exec();
-                }, 3000);
-            };
-            intervaloFinalizacaoDownload = exec();
-            await page.waitForSelector('#dwlend', { timeout: 60000 * 5 }); // espera até 5 minutos
-            clearTimeout(intervaloFinalizacaoDownload);
-        } catch (ex) {
-            clearTimeout(intervaloFinalizacaoDownload);
-            return new Retorno(statusCodes.erro, ex);
-        }
-    }
+		log('navegando para ibm');
+    await page.waitForSelector('audio');
 
-    const Executar = async () => {
+		log('configurando parametros');
+    await page.evaluate(() => (document.querySelector('#text-area').value = ''));
 
-        if(ExisteArquivoBaixado() && usarArquivosExistentes) {
-            MoverArquivoBaixadoParaDestino();
-            return new Retorno(statusCodes.ok, 'Arquivo do cache');
-        }
-        if(ExisteArquivoBaixadoMovido() && usarArquivosExistentes) {
-            return new Retorno(statusCodes.ok, 'Arquivo do cache');
-        }
-        
-        const browser = await pptr.launch({
-            headless: false,
-            args: ['--use-fake-ui-for-media-stream'],
-            ignoreDefaultArgs: ['--mute-audio'],
-        });
+    await page.type('#text-area', roteiro);
+    await page.waitForTimeout(720);
 
-        const page = await browser.newPage();
+    await page.click('#slider');
+    await page.waitForTimeout(720);
 
-        await page.setViewport({ width: 1280, height: 720 });
-        await page.goto('https://www.ibm.com/demos/live/tts-demo/self-service/home', { waitUntil: 'networkidle2' });
+    // await page.keyboard.press('ArrowLeft');
+    // await page.waitForTimeout(720);
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(720);
+    // await page.keyboard.press('ArrowRight');
+    // await page.waitForTimeout(720);
 
-        await page.waitForSelector('audio');
+    await page.click('#downshift-3-toggle-button');
+    await page.waitForTimeout(720);
 
-        await page.evaluate(() => (document.querySelector('#text-area').value = ''));
+    await page.evaluate((nomeDoArquivoDownload) => {
+      let endlink = document.createElement('button');
+      endlink.innerHTML = 'FinalizarForçado';
+      endlink.setAttribute('class', 'dwlend');
+      endlink.setAttribute('onclick', 'this.id="dwlend"');
+      endlink.setAttribute('style', `position:absolute;top:150px;left:0;z-index:99999999999999;font-size:50px;background:#000;width:100%;`);
+      document.body.append(endlink);
 
-        await page.type('#text-area', roteiro);
-        await page.waitForTimeout(720);
+      var audio = document.querySelector('audio');
+      audio.onplay = function () {
+        let link = document.createElement('a');
+        link.innerHTML = 'IndicadorDeInicialização';
+        link.setAttribute(`href`, audio.src);
+        link.setAttribute(`download`, nomeDoArquivoDownload);
+        link.setAttribute('id', 'dwl');
+        link.setAttribute('style', `position:absolute;top:50px;left:0;z-index:99999999999999;font-size:50px;background:#000;width:100%;`);
+        document.body.append(link);
+      };
 
-        await page.click('#slider');
-        await page.waitForTimeout(720);
+      audio.onended = function () {
+        let link = document.createElement('a');
+        link.innerHTML = 'IndicadorDeFinalização';
+        link.setAttribute(`href`, '#');
+        link.setAttribute('id', 'dwlend');
+        link.setAttribute('style', `position:absolute;top:100px;left:0;z-index:99999999999999;font-size:50px;background:#000;width:100%;`);
+        document.body.append(link);
+      };
+    }, nomeArquivo);
 
-        // await page.keyboard.press('ArrowLeft');
-        // await page.waitForTimeout(720);
-        await page.keyboard.press('ArrowRight');
-        await page.waitForTimeout(720);
-        // await page.keyboard.press('ArrowRight');
-        // await page.waitForTimeout(720);
+		log('tocando');
+    await page.click('.play-btn.bx--btn');
+    await page.waitForSelector('audio[src]');
 
-        await page.click('#downshift-3-toggle-button');
-        await page.waitForTimeout(720);
+    await page.waitForSelector('#dwl', { timeout: 60000 });
+    await page.click('#dwl');
 
-        await page.evaluate((nomeDoArquivoDownload) => {
-            let endlink = document.createElement('button');
-            endlink.innerHTML = 'FinalizarForçado';
-            endlink.setAttribute('class', 'dwlend');
-            endlink.setAttribute('onclick', 'this.id="dwlend"');
-            endlink.setAttribute('style', `position:absolute;top:150px;left:0;z-index:99999999999999;font-size:50px;background:#000;width:100%;`);
-            document.body.append(endlink);
+    await EsperarFinalizacaoDownload(page);
+		log('arquivo baixado');
 
-            var audio = document.querySelector('audio');
-            audio.onplay = function () {
-                let link = document.createElement('a');
-                link.innerHTML = 'IndicadorDeInicialização';
-                link.setAttribute(`href`, audio.src);
-                link.setAttribute(`download`, nomeDoArquivoDownload);
-                link.setAttribute('id', 'dwl');
-                link.setAttribute('style', `position:absolute;top:50px;left:0;z-index:99999999999999;font-size:50px;background:#000;width:100%;`);
-                document.body.append(link);
-            };
+    MoverArquivoBaixadoParaDestino();
+		log('arquivo movido para destino');
 
-            audio.onended = function () {
-                let link = document.createElement('a');
-                link.innerHTML = 'IndicadorDeFinalização';
-                link.setAttribute(`href`, '#');
-                link.setAttribute('id', 'dwlend');
-                link.setAttribute('style', `position:absolute;top:100px;left:0;z-index:99999999999999;font-size:50px;background:#000;width:100%;`);
-                document.body.append(link);
-            };
-        }, nomeArquivo);
+    await page.close();
+    await browser.close();
+		log('concluido');
 
-        await page.click('.play-btn.bx--btn');
-        await page.waitForSelector('audio[src]');
+    return new ServicoFalaRetorno(statusCodes.ok, 'Novo arquivo gerado');
+  };
 
-        await page.waitForSelector('#dwl', { timeout: 60000 });
-        await page.click('#dwl');
-
-        await EsperarFinalizacaoDownload(page);
-
-        MoverArquivoBaixadoParaDestino();
-
-        await page.close();
-        await browser.close();
-
-        return new Retorno(statusCodes.ok, 'Novo arquivo gerado');
-    };
-
-    return {
-        Executar: Executar,
-        RetornoType: Retorno
-    };
+  return this;
 };
 
 /*

@@ -17,15 +17,13 @@ namespace Futebox.Services
         IPartidasService _partidasService;
         IClassificacaoService _classificacaoService;
         IRodadaService _rodadaService;
-        IYoutubeService _youtubeService;
 
-        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IYoutubeService youtubeService)
+        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService)
         {
             _processoRepositorio = processoRepositorio;
             _partidasService = partidasService;
             _classificacaoService = classificacaoService;
             _rodadaService = rodadaService;
-            _youtubeService = youtubeService;
         }
 
         public List<Processo> ObterProcessos()

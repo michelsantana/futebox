@@ -44,4 +44,13 @@ namespace Futebox.Models.Enums
         Sucesso = 32,
         Erro = 64
     }
+
+    public enum RobotResultCommand
+    {
+        RESULT,
+        ERROR,
+        ISTRUE,
+        ISFALSE,
+        NONE,
+    }
 }

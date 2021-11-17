@@ -1,30 +1,18 @@
 const fs = require('fs');
-const child_process = require('child_process');
 const pptr = require('puppeteer');
 const pastas = require('./../utils/gerenciador-pastas');
 const statusCodes = require('./../utils/services-status-codes');
 const processoServiceContructor = require('./processo-service');
 const Processo = require('./../model/processo');
 const moment = require('moment');
+const logger = require('./logger');
+const { ServiceResult } = require('./../model/retornoServicos');
 
 module.exports = function (uid, datasourceUrl) {
   const UID = uid;
+
+  const log = (m) => logger.log(UID, 'upload-youtube', m);
   const processoService = new processoServiceContructor(datasourceUrl);
-  const stack = [];
-
-  const log = (m) => {
-    const now = moment().format('DD/MM/YYYY HH:mm:ss');
-    const message = `[${UID}][${now}]\n\t${m}`;
-    stack.push(message);
-    console.log(message);
-  };
-
-  function Retorno(status, mensagem) {
-    this.status = status;
-    this.mensagem = mensagem;
-    this.arquivoDestino = obterArquivoDestino();
-    return this;
-  }
 
   const obterPastaRaiz = () => pastas.obterPastaRaiz();
   const obterPastaChrome = () => `${obterPastaRaiz()}/node_modules/puppeteer/.local-chromium/win64-901912/chrome-win/`;
@@ -34,7 +22,7 @@ module.exports = function (uid, datasourceUrl) {
     fs.writeFileSync(obterBat(), `start ${obterPastaChrome()}chrome --remote-debugging-port=%1`);
   };
 
-  const Executar = async () => {
+  this.Executar = async () => {
     try {
       log('obtendo processo');
       const processo = new Processo(await processoService.ObterProcesso());
@@ -52,17 +40,11 @@ module.exports = function (uid, datasourceUrl) {
         return new Promise((res, rej) => setTimeout(res, segundos * 1000));
       };
 
-      const ConectarBrowser = async () => {
-        log(`conectando browser na porta ${portaExecucao}`);
-        const browserURL = `http://127.0.0.1:${portaExecucao}`;
+      const browser = await pptr.launch({
+        headless: false,
+        args: [`--user-data-dir=${process.env.USERPROFILE}\\AppData\\Local\\Chromium\\User Data`, `--profile-directory=Profile 1`],
+      });
 
-        child_process.exec(`${obterBat()} ${portaExecucao}`, (error, stdout, stderr) => {});
-
-        await espera(2);
-        return await pptr.connect({ browserURL: browserURL });
-      };
-
-      const browser = await ConectarBrowser();
       log('conectado');
       await espera(2);
 
@@ -78,7 +60,7 @@ module.exports = function (uid, datasourceUrl) {
 
       if (isLoginPage) {
         log('por favor fazer login');
-        return new Retorno(statusCodes.erro, 'LOGIN');
+        return new ServiceResult(statusCodes.authFailed, 'LOGIN');
       }
       log('logado');
 
@@ -195,12 +177,20 @@ module.exports = function (uid, datasourceUrl) {
     } catch (ex) {
       log(`Erro: ${JSON.stringify(ex)}`);
     } finally {
-      //await processoService.AtualizarLogProcesso(messageStack.join('\n'));
+      await processoService.AtualizarLogProcesso(messageStack.join('\n'));
     }
   };
 
-  return {
-    Executar: Executar,
-    RetornoType: Retorno,
-  };
+  this;
 };
+
+
+// const ConectarBrowser = async () => {
+//   log(`conectando browser na porta ${portaExecucao}`);
+//   const browserURL = `http://127.0.0.1:${portaExecucao}`;
+
+//   child_process.exec(`${obterBat()} ${portaExecucao}`, (error, stdout, stderr) => {});
+
+//   await espera(2);
+//   return await pptr.connect({ browserURL: browserURL });
+// };

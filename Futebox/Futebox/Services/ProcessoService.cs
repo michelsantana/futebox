@@ -17,13 +17,15 @@ namespace Futebox.Services
         IPartidasService _partidasService;
         IClassificacaoService _classificacaoService;
         IRodadaService _rodadaService;
+        IFutebotService _futebotService;
 
-        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService)
+        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IFutebotService futebotService)
         {
             _processoRepositorio = processoRepositorio;
             _partidasService = partidasService;
             _classificacaoService = classificacaoService;
             _rodadaService = rodadaService;
+            _futebotService = futebotService;
         }
 
         public List<Processo> ObterProcessos()
@@ -145,30 +147,26 @@ namespace Futebox.Services
             return processo;
         }
 
-        public Processo ExecutarProcesso(string processo)
+        public Processo GerarVideoProcesso(string processo)
         {
-            string commandArgs = $"command=executar";
-            string idArgs = $"id={processo}";
-            string datasourceArgs = $"datasource={Settings.ApplicationHttpBaseUrl}api/processo/{processo}";
-
             AtualizarRoteiro(processo);
-
-            ExecutarCMD(commandArgs, idArgs, datasourceArgs);
-            return _processoRepositorio.GetById(processo);
+            var resultado = _futebotService.GerarVideo(processo);
+            return AtualizarProcessoLog(processo, resultado.stack.ToArray());
         }
 
         public bool ArquivosProcesso(string processo)
         {
-            return ExecutarCMD($"command=pasta", $"id={processo}");
+            var resultado = _futebotService.AbrirPasta(processo);
+            AtualizarProcessoLog(processo, resultado.stack.ToArray());
+            if (resultado.command == RobotResultCommand.OK) return true;
+            return false;
         }
 
         public Processo PublicarVideo(string processo)
         {
-            string commandArgs = $"command=publicar";
-            string idArgs = $"id={processo}";
-            string datasourceArgs = $"datasource={Settings.ApplicationHttpBaseUrl}api/processo/{processo}";
-            ExecutarCMD(commandArgs, idArgs, datasourceArgs);
-            return _processoRepositorio.GetById(processo);
+            AtualizarRoteiro(processo);
+            var resultado = _futebotService.PublicarVideo(processo);
+            return AtualizarProcessoLog(processo, resultado.stack.ToArray());
         }
 
         public Processo AtualizarProcessoAgendamento(string id, string porta, DateTime hora)
@@ -213,6 +211,16 @@ namespace Futebox.Services
             return p;
         }
 
+        public Processo AtualizarProcessoLog(string id, string[] lines)
+        {
+            var p = _processoRepositorio.GetById(id);
+            p.alteracao = DateTime.Now;
+            p.statusMensagem =  $"{p.statusMensagem}\n[UPDATE:{p.alteracao}]\n{string.Join("\n", lines)}";
+
+            _processoRepositorio.Update(p);
+            return p;
+        }
+
         public Processo AtualizarRoteiro(Processo processo)
         {
             switch (processo.tipo)
@@ -230,22 +238,6 @@ namespace Futebox.Services
         public bool Delete(string id)
         {
             _processoRepositorio.Delete(id);
-            return true;
-        }
-
-        private bool ExecutarCMD(params object[] args)
-        {
-            string botFolder = $"{Settings.ApplicationsRoot}/Robot";
-            string botBatch = @"integration.bat";
-            string argsBuild(object[] arg) => string.Join(" ", arg.Select(_ => $"\"{_}\""));
-
-            string strCmdText = $"{botFolder}/{botBatch}";
-            ProcessStartInfo processInfo = new ProcessStartInfo(strCmdText, $"{botFolder} {argsBuild(args)}");
-            processInfo.UseShellExecute = true;
-            Process batchProcess = new Process();
-            batchProcess.StartInfo = processInfo;
-            batchProcess.Start();
-            batchProcess.WaitForExit();
             return true;
         }
 

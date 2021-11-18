@@ -6,7 +6,7 @@
 }
 <div class="accordion" id="accord">
     @foreach (var grupo in Model.processos.OrderByDescending(_ => _.agendamento).Select((_, i) => new { entity = _, index = i })
-        .GroupBy(_ => new { dt = _.entity.criacao.ToString("yyyyMMdd"), format = _.entity.criacao.ToString("dd/MM/yyyy") }))
+      .GroupBy(_ => new { dt = _.entity.criacao.ToString("yyyyMMdd"), format = _.entity.criacao.ToString("dd/MM/yyyy") }))
     {
         { show = grupo.Any(_ => _.index == 0); }
         <div class="accordion-item">
@@ -66,6 +66,23 @@
 </div>
 <div id="card"></div>
 
+<div class="modal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="plog" class="modal-body">
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts{
     <script>
 
@@ -90,6 +107,16 @@
                 $.SendToast(s.id, processoStatus[s.status])
             }).fail(function () {
                 UpdateRow(processo);
+            });;
+        }
+        function Log(processo) {
+            $('#plog').html('');
+            $.get(`/api/processo/${processo}/obter`, s => {
+                console.log(s.statusMensagem);
+                $('#plog').html(`<pre>${s.statusMensagem}</pre>`);
+                $('.modal').modal('show');
+            }).fail(function () {
+
             });;
         }
         function Delete(processo) {

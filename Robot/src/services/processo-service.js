@@ -1,13 +1,22 @@
 const axios = require('axios').default;
+const Processo = require('./../model/processomodel');
 
-module.exports = function (datasourceUrl) {
-  this.ObterProcesso = async () => (await axios.get(`${datasourceUrl}/obter`)).data;
+module.exports = class ProcessoServiceConstructor {
+  datasourceApiUrl = '';
+  constructor(datasourceApiUrl) {
+    this.datasourceApiUrl = datasourceApiUrl;
+  }
 
-  this.AtualizarProcessoErro = async (erro) => (await axios.get(`${datasourceUrl}/erro?mensagem=${erro}`)).data;
+  /** @type {Processo} */
+  async ObterProcesso() {
+    return new Processo((await axios.get(`${this.datasourceApiUrl}/obter`)).data);
+  }
 
-  this.AtualizarProcessoSucesso = async (arquivo) => (await axios.get(`${datasourceUrl}/sucesso?arquivo=${encodeURIComponent(arquivo)}`)).data;
+  async AtualizarProcessoErro(erro) {
+    return new Processo((await axios.get(`${this.datasourceApiUrl}/erro?mensagem=${erro}`)).data);
+  }
 
-  this.AtualizarLogProcesso = async (message) => (await axios.post(`${datasourceUrl}/log`, { log: message })).data;
-
-  return this;
+  async AtualizarProcessoSucesso(arquivo) {
+    return new Processo((await axios.get(`${this.datasourceApiUrl}/sucesso?arquivo=${encodeURIComponent(arquivo)}`)).data);
+  }
 };

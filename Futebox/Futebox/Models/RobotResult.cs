@@ -10,30 +10,30 @@ namespace Futebox.Models
     public class RobotResult
     {
         public RobotResultCommand command { get; set; }
-        public string commandLine { get; set; }
-        public string[] args { get; set; }
-        private object _arg { get; set; }
+        public List<string> stack { get; set; }
 
-        public T ConvertArg<T>() where T : class
+        public RobotResult()
         {
-            if (command == RobotResultCommand.RESULT)
-            {
-                if (_arg == null) _arg = JsonConvert.DeserializeObject<T>(args[0]);
-                return (T)_arg;
-            }
-            return null;
+            this.command = RobotResultCommand.BLANK;
+            this.stack = new List<string>();
         }
 
-        public RobotResult(string command)
+        public void ReadLine(string command)
         {
-            this.commandLine = command;
-            string[] args = this.commandLine.Split(' ');
-            if (args[0] == "!RESULT") this.command = RobotResultCommand.RESULT;
-            else if (args[0] == "!ERROR") this.command = RobotResultCommand.ERROR;
-            else if (args[0] == "!TRUE") this.command = RobotResultCommand.ISTRUE;
-            else if (args[0] == "!FALSE") this.command = RobotResultCommand.ISFALSE;
-            else this.command = RobotResultCommand.NONE;
-            this.args = args.Skip(1).ToArray();
+            command = (command ?? "");
+            if (command.StartsWith("!")){
+                if (command.StartsWith("!OK")) this.command = RobotResultCommand.OK;
+                else if (command.StartsWith("!ERROR")) this.command = RobotResultCommand.ERROR;
+                else if (command.StartsWith("!AUTHFAILED")) this.command = RobotResultCommand.AUTHFAILED;
+                else if (command.StartsWith("!BLANK")) this.command = RobotResultCommand.BLANK;
+                else if (command.StartsWith("!INVALID")) this.command = RobotResultCommand.INVALID;
+                else this.command = RobotResultCommand.BLANK;
+            }
+            if (!string.IsNullOrEmpty(command.Trim()))
+            {
+                this.stack.Add(command);
+                EyeLog.Log(command);
+            }
         }
     }
 }

@@ -69,7 +69,7 @@ namespace Futebox.Controllers
         [HttpGet("executar/{id}")]
         public Processo ExecutarProcesso(string id)
         {
-            return _processoService.ExecutarProcesso(id);
+            return _processoService.GerarVideoProcesso(id);
         }
 
         [HttpGet("arquivos/{id}")]

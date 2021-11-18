@@ -14,7 +14,7 @@ namespace Futebox.Services.Interfaces
         Processo SalvarProcessoClassificacao(Campeonatos campeonato);
         Processo SalvarProcessoRodada(Campeonatos campeonato, int rodada);
 
-        Processo ExecutarProcesso(string processo);
+        Processo GerarVideoProcesso(string processo);
         bool ArquivosProcesso(string id);
         Processo PublicarVideo(string processo);
 

@@ -1,25 +1,42 @@
 ﻿using Futebox.Models;
-using Futebox.Models.Enums;
 using Futebox.Services.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Futebox.Services
 {
     public class FutebotService : IFutebotService
     {
-        public bool VerificarConfiguracaoYoutubeBrowser()
+        public RobotResult VerificarConfiguracaoYoutubeBrowser()
         {
             string commandArgs = $"command=youtube";
-            ExecutarCMD(commandArgs, new object[] { });
-
-            return true;
+            return ExecutarCMD(commandArgs, new object[] { });
         }
 
+        public RobotResult GerarVideo(string processoId)
+        {
+            string commandArgs = $"command=video";
+            string idArgs = $"id={processoId}";
+            string datasourceArgs = $"datasource={Settings.ApplicationHttpBaseUrl}api/processo/{processoId}";
+            return ExecutarCMD(commandArgs, idArgs, datasourceArgs);
+        }
 
-        private bool ExecutarCMD(params object[] args)
+        public RobotResult PublicarVideo(string processoId)
+        {
+            string commandArgs = $"command=publicar";
+            string idArgs = $"id={processoId}";
+            string datasourceArgs = $"datasource={Settings.ApplicationHttpBaseUrl}api/processo/{processoId}";
+            return ExecutarCMD(commandArgs, idArgs, datasourceArgs);
+        }
+
+        public RobotResult AbrirPasta(string processoId)
+        {
+            string commandArgs = $"command=pasta";
+            return ExecutarCMD(commandArgs, new object[] { });
+        }
+
+        private RobotResult ExecutarCMD(params object[] args)
         {
             string botFolder = $"{Settings.ApplicationsRoot}/Robot";
             string botBatch = @"integration.bat";
@@ -32,28 +49,28 @@ namespace Futebox.Services
             processInfo.RedirectStandardError = true;
 
             processInfo.UseShellExecute = false;
-            processInfo.CreateNoWindow = true;
+            processInfo.CreateNoWindow = false;
 
             Process batchProcess = new Process();
             batchProcess.StartInfo = processInfo;
-            RobotResult datareceived = null;
+            RobotResult datareceived = new RobotResult();
             batchProcess.OutputDataReceived += (args, b) =>
             {
                 var command = b?.Data;
-                if (command.StartsWith('!'))
-                {
-                    datareceived = new RobotResult(command);
-                }
+                datareceived.ReadLine(command);
+            };
+            batchProcess.ErrorDataReceived += (args, b) =>
+            {
+                var command = b?.Data;
+                datareceived.ReadLine(command);
             };
             batchProcess.Start();
             batchProcess.BeginOutputReadLine();
+            batchProcess.BeginErrorReadLine();
 
             batchProcess.WaitForExit();
-            var result = batchProcess.StandardOutput.ReadToEndAsync().Result;
-            Console.WriteLine(result);
-            return true;
+            
+            return datareceived;
         }
-
-        
     }
 }

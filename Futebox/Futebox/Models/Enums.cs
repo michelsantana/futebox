@@ -47,10 +47,10 @@ namespace Futebox.Models.Enums
 
     public enum RobotResultCommand
     {
-        RESULT,
+        OK,
         ERROR,
-        ISTRUE,
-        ISFALSE,
-        NONE,
+        AUTHFAILED,
+        BLANK,
+        INVALID,
     }
 }

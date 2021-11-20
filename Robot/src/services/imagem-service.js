@@ -78,9 +78,11 @@ module.exports = class ImagemService {
   async Executar() {
     try {
       const arquivoImagemCache = this.#ExisteArquivoImagemVideo();
-      const arquivoThumbCache = this.#ExisteArquivoThumbVideo();
+      //const arquivoThumbCache = this.#ExisteArquivoThumbVideo();
 
-      if (arquivoImagemCache && arquivoThumbCache) return new ServiceResult(Status.ok, 'Arquivo gerado com sucesso', `${this.#ObterImagemVideo()}|${this.#ObterThumbVideo()}`);
+      if (arquivoImagemCache 
+        //&& arquivoThumbCache
+        ) return new ServiceResult(Status.ok, 'Arquivo gerado com sucesso', `${this.#ObterImagemVideo()}|${this.#ObterThumbVideo()}`);
 
       await this.#AbrirBrowser();
       await this.#AbrirPagina();
@@ -90,10 +92,10 @@ module.exports = class ImagemService {
         await this.#SalvarPrint(this.#ObterImagemVideo());
       }
 
-      if (!arquivoThumbCache) {
-        await this.#NavegarParaThumb();
-        await this.#SalvarPrint(this.#ObterThumbVideo());
-      }
+      // if (!arquivoThumbCache) {
+      //   await this.#NavegarParaThumb();
+      //   await this.#SalvarPrint(this.#ObterThumbVideo());
+      // }
 
       await this.#FecharBrowser();
       return new ServiceResult(Status.ok, 'Arquivo gerado com sucesso', `${this.#ObterImagemVideo()}|${this.#ObterThumbVideo()}`);

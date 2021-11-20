@@ -21,7 +21,7 @@ module.exports = class Integracao {
   }
 
   async #GerarVideo() {
-    const pasta = `${pastas.obterPastaArquivosDoDia()}/${this.args.id}`;
+    const pasta = `${pastas.obterPastaArquivosDoDia()}${this.args.id}`;
     const _processoService = new ProcessoService(this.args.datasource);
     const processo = await _processoService.ObterProcesso();
 
@@ -51,7 +51,7 @@ module.exports = class Integracao {
     }
   }
   async #UploadVideo() {
-    const pasta = `${pastas.obterPastaArquivosDoDia()}/${this.args.id}`;
+    const pasta = `${pastas.obterPastaArquivosDoDia()}${this.args.id}`;
     const _processoService = new ProcessoService(this.args.datasource);
     const processo = await _processoService.ObterProcesso();
     try {
@@ -76,7 +76,7 @@ module.exports = class Integracao {
     return resultadoUpload;
   }
   async #AbrirPastaArquivos() {
-    const pasta = `${pastas.obterPastaArquivosDoDia()}/${this.args.id}`;
+    const pasta = `${pastas.obterPastaArquivosDoDia()}${this.args.id}`;
     const _batchService = new BatchService(new Settings(pasta, `${this.args.id}`, null, true));
     _batchService.BatchAbrirPasta();
     return new ServiceResult(Status.ok, 'Pasta aberta');

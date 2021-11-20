@@ -19,7 +19,7 @@
         <div>
             <div class="row">
                 <div class="col-12 text-truncate">
-                    <pre class="d-inline-block text-truncate m-0">📂@processo.arquivoVideo</pre>
+                    <pre class="d-inline-block text-truncate m-0">📂<a onclick="Abrir('@processo.id');">@(processo.arquivoVideo)</a></pre>
                 </div>
                 <div class="col-12 text-truncate ">
                     <pre class="d-inline-block text-truncate m-0">🔗@processo.linkVideo?.Trim()</pre>
@@ -36,7 +36,7 @@
         <div class="d-flex justify-content-between">
             <button class="btn btn-sm btn-outline-primary" onclick="Play('@processo.id');">▶&nbsp;Gerar</button>
             <button class="btn btn-sm btn-outline-warning" onclick="Publicar('@processo.id');">☁&nbsp;Publicar</button>
-            <button class="btn btn-sm btn-outline-info" onclick="Abrir('@processo.id');">📂&nbsp;Abrir pasta</button>
+            <!-- <button class="btn btn-sm btn-outline-info" onclick="Abrir('@processo.id');">📂&nbsp;Abrir pasta</button> -->
             <button class="btn btn-sm btn-outline-info" onclick="Log('@processo.id');">🧾&nbsp;Log</button>
             <button class="btn btn-sm btn-outline-danger" onclick="return Delete('@processo.id');">❌&nbsp;Excluir</button>
 

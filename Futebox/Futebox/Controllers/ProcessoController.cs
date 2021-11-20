@@ -29,19 +29,30 @@ namespace Futebox.Controllers
             return _processoService.ObterProcesso(id);
         }
 
-        [HttpGet("{id}/erro")]
-        public Processo AtualizarProcessoErro(string id, string mensagem)
+        [HttpGet("{id}/videocompleto")]
+        public Processo AtualizarProcessoVideoCompleto(string id, string arquivo)
         {
-            var erro = string.IsNullOrEmpty(mensagem) ? "erro" : mensagem;
-            return _processoService.AtualizarProcessoErro(id, erro);
+            return _processoService.AtualizarProcessoVideoCompleto(id, arquivo);
         }
 
-        [HttpGet("{id}/sucesso")]
-        public Processo AtualizarProcessoSucesso(string id, string arquivo)
+        [HttpGet("{id}/videoerro")]
+        public Processo AtualizarProcessoVideoErro(string id)
         {
-            return _processoService.AtualizarProcessoSucesso(id, arquivo);
+            return _processoService.AtualizarProcessoVideoErro(id);
         }
 
+        [HttpGet("{id}/publicado")]
+        public Processo AtualizarProcessoPublicado(string id, string link)
+        {
+            return _processoService.AtualizarProcessoPublicado(id, link);
+        }
+        
+        [HttpGet("{id}/publicacaoerro")]
+        public Processo AtualizarProcessoPublicacaoErro(string id)
+        {
+            return _processoService.AtualizarProcessoPublicacaoErro(id);
+        }
+        
         [HttpPost("{id}/deletar")]
         public bool DeletarProcesso(string id)
         {
@@ -75,7 +86,7 @@ namespace Futebox.Controllers
         [HttpGet("arquivos/{id}")]
         public bool ArquivosProcesso(string id)
         {
-            return _processoService.ArquivosProcesso(id);
+            return _processoService.AbrirPastaProcesso(id);
         }
 
         [HttpGet("notificar/{id}")]
@@ -87,13 +98,9 @@ namespace Futebox.Controllers
         }
 
         [HttpGet("agendar/{id}")]
-        public bool AgendarNotificacaoProcesso(string id, string porta, int hora, int minuto)
+        public bool AgendarNotificacaoProcesso(string id, int hora, int minuto)
         {
-            var p = _processoService.AtualizarProcessoAgendamento(
-                id,
-                porta,
-                DateTime.Today.AddHours(hora).AddMinutes(minuto)
-                );
+            var p = _processoService.AgendarProcesso(id, DateTime.Today.AddHours(hora).AddMinutes(minuto));
             _agendamentoService.AgendarExecucao(p.id, p.agendamento ?? DateTime.Now);
             return true;
         }

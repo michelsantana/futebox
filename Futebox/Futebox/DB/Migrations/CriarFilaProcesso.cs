@@ -48,7 +48,7 @@ namespace Futebox.DB.Migrations
             .WithColumn("notificacao").AsString().Nullable()
             .WithColumn("agendamento").AsDateTime().Nullable()
             .WithColumn("arquivoVideo").AsString().Nullable()
-            .WithColumn("portaExecucao").AsString().Nullable();
+            .WithColumn("linkVideo").AsString().Nullable();
         }
     }
 }

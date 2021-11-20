@@ -6,6 +6,8 @@
 
 <div class="text-center">
     <h1 class="display-4">Lista de Times do Footstats</h1>
+    
+   <a onclick="Sync()" class="display-6">Syncronizar</a>
 
     <main>
         <div class="container">
@@ -50,6 +52,12 @@
 </div>
 @section Scripts{
     <script>
+
+        function Sync() {
+            $.post(`/api/gerenciamentotimes/todos`, {}, (response) => {
+                console.log(response);
+            });
+        }
 
         function SalvarTime(id) {
             $.post(`/api/gerenciamentotimes/${id}`, {}, (response) => {

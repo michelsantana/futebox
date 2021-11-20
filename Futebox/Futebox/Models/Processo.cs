@@ -34,7 +34,7 @@ namespace Futebox.Models
         public bool agendado { get; set; }
 
         public string arquivoVideo { get; set; }
-        public string portaExecucao { get; set; }
+        public string linkVideo { get; set; }
 
 
         //private object objectArgs;

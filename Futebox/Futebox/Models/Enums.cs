@@ -39,10 +39,13 @@ namespace Futebox.Models.Enums
 
     public enum StatusProcesso
     {
-        Pendente = 8,
-        Executando = 16,
-        Sucesso = 32,
-        Erro = 64
+        Criado = 8,
+        Agendado = 16,
+        VideoErro = 32,
+        VideoCompleto = 64,
+        PublicacaoErro = 128,
+        Publicado = 256,
+        Erro = 512
     }
 
     public enum RobotResultCommand

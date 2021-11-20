@@ -42,11 +42,11 @@ module.exports = class Integracao {
       _batchService.GerarBatchFFMPEG(arquivoImagem, arquivoAudio);
       const resultadoBatch = _batchService.BatchGerarVideo();
 
-      await _processoService.AtualizarProcessoSucesso(resultadoBatch.arg);
+      await _processoService.AtualizarProcessoVideoCompleto(resultadoBatch.arg);
       return new ServiceResult(Status.ok, 'Video concluido');
     } catch (ex) {
       console.log(ex);
-      await _processoService.AtualizarProcessoErro('');
+      await _processoService.AtualizarProcessoVideoErro();
       return new ServiceResult(Status.erro, 'Erro ao gerar video');
     }
   }
@@ -58,12 +58,14 @@ module.exports = class Integracao {
       const settings = new Settings(pasta, `${this.args.id}`, processo, true);
       const _uploadService = new UploadService(settings);
       const resultadoUpload = await _uploadService.Executar();
-      if (resultadoUpload.status == Status.erro) throw new Error(resultadoUpload.arg);
+      if (resultadoUpload.status == Status.erro) throw new Error(resultadoUpload.mensagem);
+
+      await _processoService.AtualizarProcessoPublicado(resultadoUpload.arg);
 
       return resultadoUpload;
     } catch (ex) {
       console.log(ex);
-      await _processoService.AtualizarProcessoErro('');
+      await _processoService.AtualizarProcessoPublicacaoErro();
       return new ServiceResult(Status.erro, 'Erro ao publicar video');
     }
   }
@@ -74,6 +76,7 @@ module.exports = class Integracao {
     return resultadoUpload;
   }
   async #AbrirPastaArquivos() {
+    const pasta = `${pastas.obterPastaArquivosDoDia()}/${this.args.id}`;
     const _batchService = new BatchService(new Settings(pasta, `${uid}`, processo, true));
     _batchService.BatchAbrirPasta();
     return new ServiceResult(Status.ok, 'Pasta aberta');

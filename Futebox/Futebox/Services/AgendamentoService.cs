@@ -23,12 +23,14 @@ namespace Futebox.Services
             public Task Execute(IJobExecutionContext context)
             {
                 var jobkey = context.JobDetail.Key;
-
+                IProcessoService _processoService = null;
+                INotifyService _notifyService = null;
+                Processo processo = null;
                 try
                 {
-                    var _processoService = (IProcessoService)context.MergedJobDataMap[nameof(IProcessoService)];
-                    var _notifyService = (INotifyService)context.MergedJobDataMap[nameof(INotifyService)];
-                    var processo = (Processo)context.MergedJobDataMap["processo"];
+                    _processoService = (IProcessoService)context.MergedJobDataMap[nameof(IProcessoService)];
+                    _notifyService = (INotifyService)context.MergedJobDataMap[nameof(INotifyService)];
+                    processo = (Processo)context.MergedJobDataMap["processo"];
 
                     EyeLog.Log($"[VIDEO][START][{jobkey.Name}]");
                     _processoService.AtualizarRoteiro(processo);
@@ -47,6 +49,7 @@ namespace Futebox.Services
                 {
                     EyeLog.Log($"[ERROR][{jobkey.Name}]");
                     EyeLog.Log($"{ex.Message}");
+                    _notifyService?.Notify($"[ERRO][{jobkey.Name}]");
                 }
                 finally
                 {

@@ -12,11 +12,19 @@ module.exports = class ProcessoServiceConstructor {
     return new Processo((await axios.get(`${this.datasourceApiUrl}/obter`)).data);
   }
 
-  async AtualizarProcessoErro(erro) {
-    return new Processo((await axios.get(`${this.datasourceApiUrl}/erro?mensagem=${erro}`)).data);
+  async AtualizarProcessoVideoCompleto(arquivo) {
+    return new Processo((await axios.get(`${this.datasourceApiUrl}/videocompleto?arquivo=${encodeURIComponent(arquivo)}`)).data);
   }
 
-  async AtualizarProcessoSucesso(arquivo) {
-    return new Processo((await axios.get(`${this.datasourceApiUrl}/sucesso?arquivo=${encodeURIComponent(arquivo)}`)).data);
+  async AtualizarProcessoVideoErro() {
+    return new Processo((await axios.get(`${this.datasourceApiUrl}/videoerro`)).data);
+  }
+
+  async AtualizarProcessoPublicado(link) {
+    return new Processo((await axios.get(`${this.datasourceApiUrl}/publicado?link=${encodeURIComponent(link)}`)).data);
+  }
+
+  async AtualizarProcessoPublicacaoErro() {
+    return new Processo((await axios.get(`${this.datasourceApiUrl}/publicacaoerro`)).data);
   }
 };

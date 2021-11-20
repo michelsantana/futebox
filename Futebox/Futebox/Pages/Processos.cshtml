@@ -6,7 +6,7 @@
 }
 <div class="accordion" id="accord">
     @foreach (var grupo in Model.processos.OrderByDescending(_ => _.agendamento).Select((_, i) => new { entity = _, index = i })
-      .GroupBy(_ => new { dt = _.entity.criacao.ToString("yyyyMMdd"), format = _.entity.criacao.ToString("dd/MM/yyyy") }))
+     .GroupBy(_ => new { dt = _.entity.criacao.ToString("yyyyMMdd"), format = _.entity.criacao.ToString("dd/MM/yyyy") }))
     {
         { show = grupo.Any(_ => _.index == 0); }
         <div class="accordion-item">
@@ -17,14 +17,11 @@
             </h2>
             <div id="collapse@(grupo.Key.dt)" class="accordion-collapse collapse @(show ? "show" : "")" aria-labelledby="heading@(grupo.Key.dt)" data-bs-parent="#accord">
                 <div class="accordion-body">
-                    <table id='tabela' class="table">
+                    <table id='tabela' class="table table-borderless" style="table-layout:fixed;">
                         <thead>
                             <tr class="align-middle">
-                                <th scope="col"></th>
-                                <th scope="col">nome</th>
-                                <th scope="col">agendado</th>
-                                <th width="240px" scope="col">hora/porta</th>
-                                <th width="180px" scope="col">acao</th>
+                                <th width="60%" scope="col">Processo</th>
+                                <th width="40%" scope="col" valign="middle">Configurações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,13 +83,6 @@
 @section Scripts{
     <script>
 
-        var processoStatus = {
-            '@((int)Futebox.Models.Enums.StatusProcesso.Erro)': '@($"{Futebox.Models.Enums.StatusProcesso.Erro}")',
-            '@((int)Futebox.Models.Enums.StatusProcesso.Executando)': '@($"{Futebox.Models.Enums.StatusProcesso.Executando}")',
-            '@((int)Futebox.Models.Enums.StatusProcesso.Pendente)': '@($"{Futebox.Models.Enums.StatusProcesso.Pendente}")',
-            '@((int)Futebox.Models.Enums.StatusProcesso.Sucesso)': '@($"{Futebox.Models.Enums.StatusProcesso.Sucesso}")',
-        }
-
         function UpdateRow(id) {
             $.get(`/processos?handler=ProcessoTableRow&processoId=${id}`, (r) => {
                 var remover = $(`[data-row-id="${id}"]`);
@@ -104,7 +94,7 @@
         function Play(processo) {
             $.get(`/api/processo/executar/${processo}`, s => {
                 UpdateRow(processo);
-                $.SendToast(s.id, processoStatus[s.status])
+                $.SendToast(s.id, "Executando")
             }).fail(function () {
                 UpdateRow(processo);
             });;
@@ -120,9 +110,11 @@
             });;
         }
         function Delete(processo) {
-            $.post(`/api/processo/${processo}/deletar`, {}, s => {
-                $(`[data-row-id="${processo}"]`).remove();
-            });
+            if (confirm("Remover?")) {
+                $.post(`/api/processo/${processo}/deletar`, {}, s => {
+                    $(`[data-row-id="${processo}"]`).remove();
+                });
+            }
         }
         function Abrir(processo) {
             $.get(`/api/processo/arquivos/${processo}`);
@@ -134,15 +126,14 @@
                 $.SendToast(processo, 'Não agendado, falta hora!')
                 return;
             }
-            var porta = row.find('.porta').val();
-            $.get(`/api/processo/agendar/${processo}?porta=${porta}&hora=${hora.split(':')[0]}&minuto=${hora.split(':')[1]}`).then(_ => {
+            $.get(`/api/processo/agendar/${processo}?hora=${hora.split(':')[0]}&minuto=${hora.split(':')[1]}`).then(_ => {
                 $.SendToast(processo, 'Processo agendado!')
             });
         }
         function Publicar(processo) {
             $.get(`/api/processo/publicar/${processo}`, s => {
                 UpdateRow(processo);
-                $.SendToast(s.id, processoStatus[s.status])
+                $.SendToast(s.id, "Publicando")
             }).fail(function () {
                 UpdateRow(processo);
             });;

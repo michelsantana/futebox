@@ -59,7 +59,7 @@ namespace Futebox.Services
                 imgLargura = 1080,
                 args = JsonConvert.SerializeObject(new ProcessoPartidaArgs(partida.idExterno)),
                 roteiro = roteiro,
-                status = StatusProcesso.Pendente,
+                status = StatusProcesso.Criado,
                 processado = false,
                 attrTitulo = atributos.Item1,
                 attrDescricao = $"{atributos.Item2}\n{ObterDescricaoDefault()}",
@@ -95,7 +95,7 @@ namespace Futebox.Services
                 imgLargura = 1920,
                 args = JsonConvert.SerializeObject(new ProcessoClassificacaoArgs(campeonato)),
                 roteiro = roteiro,
-                status = StatusProcesso.Pendente,
+                status = StatusProcesso.Criado,
                 processado = false,
                 attrTitulo = atributos.Item1,
                 attrDescricao = $"{atributos.Item2}\n{ObterDescricaoDefault()}",
@@ -132,7 +132,7 @@ namespace Futebox.Services
                 imgLargura = 1920,
                 args = JsonConvert.SerializeObject(new ProcessoRodadaArgs(campeonato, rodada)),
                 roteiro = roteiro,
-                status = StatusProcesso.Pendente,
+                status = StatusProcesso.Criado,
                 processado = false,
                 attrTitulo = atributos.Item1,
                 attrDescricao = $"{atributos.Item2}\n{ObterDescricaoDefault()}",
@@ -151,42 +151,54 @@ namespace Futebox.Services
         {
             AtualizarRoteiro(processo);
             var resultado = _futebotService.GerarVideo(processo);
-            return AtualizarProcessoLog(processo, resultado.stack.ToArray());
+            var processoRetorno = AtualizarProcessoLog(processo, resultado.stack.ToArray());
+            if (resultado.command == RobotResultCommand.ERROR) throw new Exception("Erro ao gerar o vídeo!");
+            if (resultado.command == RobotResultCommand.INVALID) throw new Exception("Comando inválido");
+            if (resultado.command == RobotResultCommand.BLANK) throw new Exception("Sem retorno!?");
+            return processoRetorno;
         }
 
-        public bool ArquivosProcesso(string processo)
+        public bool AbrirPastaProcesso(string processo)
         {
             var resultado = _futebotService.AbrirPasta(processo);
             AtualizarProcessoLog(processo, resultado.stack.ToArray());
-            if (resultado.command == RobotResultCommand.OK) return true;
-            return false;
+            if (resultado.command == RobotResultCommand.ERROR) throw new Exception("Erro ao gerar o vídeo!");
+            if (resultado.command == RobotResultCommand.INVALID) throw new Exception("Comando inválido");
+            if (resultado.command == RobotResultCommand.BLANK) throw new Exception("Sem retorno!?");
+            return true;
         }
 
         public Processo PublicarVideo(string processo)
         {
-            AtualizarRoteiro(processo);
             var resultado = _futebotService.PublicarVideo(processo);
-            return AtualizarProcessoLog(processo, resultado.stack.ToArray());
+            var processoRetorno = AtualizarProcessoLog(processo, resultado.stack.ToArray());
+            if (resultado.command == RobotResultCommand.ERROR) throw new Exception("Erro ao publicar o vídeo!");
+            if (resultado.command == RobotResultCommand.AUTHFAILED) throw new Exception("Não autenticado para publicar o vídeo");
+            if (resultado.command == RobotResultCommand.INVALID) throw new Exception("Comando inválido");
+            if (resultado.command == RobotResultCommand.BLANK) throw new Exception("Sem retorno!?");
+            return processoRetorno;
         }
 
-        public Processo AtualizarProcessoAgendamento(string id, string porta, DateTime hora)
+        public Processo AgendarProcesso(string id, DateTime hora)
         {
             var p = _processoRepositorio.GetById(id);
             p.agendamento = hora;
+            p.status = StatusProcesso.Agendado;
             p.agendado = true;
-            p.portaExecucao = porta;
+
             _processoRepositorio.OpenTransaction();
             _processoRepositorio.Update(p);
             _processoRepositorio.Commit();
+
             return p;
         }
 
-        public Processo AtualizarProcessoSucesso(string id, string arquivo)
+        public Processo AtualizarProcessoVideoCompleto(string id, string arquivo)
         {
             var p = _processoRepositorio.GetById(id);
             p.alteracao = DateTime.Now;
             p.processado = true;
-            p.status = StatusProcesso.Sucesso;
+            p.status = StatusProcesso.VideoCompleto;
             p.arquivoVideo = arquivo;
 
             _processoRepositorio.OpenTransaction();
@@ -196,13 +208,41 @@ namespace Futebox.Services
             return p;
         }
 
-        public Processo AtualizarProcessoErro(string id, string erro)
+        public Processo AtualizarProcessoVideoErro(string id)
         {
             var p = _processoRepositorio.GetById(id);
             p.alteracao = DateTime.Now;
             p.processado = true;
-            p.status = StatusProcesso.Erro;
-            p.statusMensagem = erro;
+            p.status = StatusProcesso.VideoErro;
+
+            _processoRepositorio.OpenTransaction();
+            _processoRepositorio.Update(p);
+            _processoRepositorio.Commit();
+
+            return p;
+        }
+
+        public Processo AtualizarProcessoPublicado(string id, string link)
+        {
+            var p = _processoRepositorio.GetById(id);
+            p.alteracao = DateTime.Now;
+            p.processado = true;
+            p.status = StatusProcesso.Publicado;
+            p.linkVideo = link;
+
+            _processoRepositorio.OpenTransaction();
+            _processoRepositorio.Update(p);
+            _processoRepositorio.Commit();
+
+            return p;
+        }
+
+        public Processo AtualizarProcessoPublicacaoErro(string id)
+        {
+            var p = _processoRepositorio.GetById(id);
+            p.alteracao = DateTime.Now;
+            p.processado = true;
+            p.status = StatusProcesso.PublicacaoErro;
 
             _processoRepositorio.OpenTransaction();
             _processoRepositorio.Update(p);
@@ -215,7 +255,7 @@ namespace Futebox.Services
         {
             var p = _processoRepositorio.GetById(id);
             p.alteracao = DateTime.Now;
-            p.statusMensagem =  $"{p.statusMensagem}\n[UPDATE:{p.alteracao}]\n{string.Join("\n", lines)}";
+            p.statusMensagem = $"{p.statusMensagem}\n[UPDATE:{p.alteracao}]\n{string.Join("\n", lines)}";
 
             _processoRepositorio.Update(p);
             return p;

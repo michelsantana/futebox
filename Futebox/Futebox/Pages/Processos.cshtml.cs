@@ -13,14 +13,6 @@ namespace Futebox.Pages
     {
         IProcessoService _processoService;
         public List<Processo> processos = new List<Processo>();
-        public Dictionary<int, string> cores = new Dictionary<int, string>()
-        {
-            { (int)StatusProcesso.Pendente, "badge bg-warning" },
-            { (int)StatusProcesso.Executando, "badge bg-info" },
-            { (int)StatusProcesso.Sucesso, "badge bg-success" },
-            { (int)StatusProcesso.Erro, "badge bg-danger" },
-            { 1, "badge bg-warning" },
-        };
 
         public ProcessosModel(IProcessoService processoService)
         {

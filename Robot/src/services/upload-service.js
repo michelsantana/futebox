@@ -5,6 +5,9 @@ const ServiceResult = require('./../model/serviceresult');
 const Settings = require('../model/settings');
 const Status = require('./../model/statuscodes');
 const utils = require('./../utils/utils');
+const pastas = require('./../utils/gerenciador-pastas');
+require('dotenv').config();
+//const chromiumProfile = process.env.chromiumProfile;
 
 module.exports = class UploadService {
   /** @type {Settings} */
@@ -13,6 +16,7 @@ module.exports = class UploadService {
   browser;
   /** @type {Page} */
   page;
+  headless = false;
 
   constructor(settings = new Settings()) {
     this.settings = settings;
@@ -25,7 +29,9 @@ module.exports = class UploadService {
   async #AbrirBrowser() {
     this.browser = await pptr.launch({
       headless: false,
-      args: [`--user-data-dir=${process.env.USERPROFILE}\\AppData\\Local\\Chromium\\User Data`, `--profile-directory=Profile 1`],
+      userDataDir: `${process.env.USERPROFILE}\\AppData\\Local\\Chromium\\User Data`,
+      defaultViewport: { width: 1920, height: 1080 },
+      args: ['--no-sandbox', '--window-position=0,1080', ],
     });
   }
 
@@ -139,6 +145,12 @@ module.exports = class UploadService {
     await this.#Esperar(4);
   }
 
+  async #ObterLinkDoVideo() {
+    return await this.page.$eval('#details .video-url-fadeable a[href]', (element) => {
+      return element.innerHTML;
+    });
+  }
+
   async Executar() {
     try {
       await this.#AbrirBrowser();
@@ -156,6 +168,9 @@ module.exports = class UploadService {
       await this.#PreencherCampoTitulo();
       await this.#PreencherCampoDescricao();
       await this.#SelecionarPlaylist();
+
+      const linkVideo = await this.#ObterLinkDoVideo();
+
       await this.#ClicarEmProximo();
       await this.#ClicarEmProximo();
       await this.#ClicarEmProximo();
@@ -164,7 +179,7 @@ module.exports = class UploadService {
       await this.#ClicarEmPublicar();
 
       await this.#FecharBrowser();
-      return new ServiceResult(Status.ok, 'Video publicado');
+      return new ServiceResult(Status.ok, 'Video publicado', linkVideo);
     } catch (ex) {
       this.#FecharBrowser();
       throw ex;
@@ -173,11 +188,13 @@ module.exports = class UploadService {
 
   async StatusLogin() {
     try {
+      this.headless = true;
       await this.#AbrirBrowser();
       await this.#AbrirPagina();
 
       const estaLogado = await this.#EstaLogado();
       if (!estaLogado) {
+        await this.page.screenshot({ path: `${pastas.obterPastaArquivos()}/oi.png` });
         await this.#FecharBrowser();
         return new ServiceResult(Status.authFailed, 'Precisa autenticar esse perfil');
       }

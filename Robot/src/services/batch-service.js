@@ -55,7 +55,7 @@ module.exports = class BatchService {
   }
 
   BatchGerarVideo() {
-		fs.rmSync(this.#ObterArquivoVideo());
+    if (utils.existeArquivo(this.#ObterArquivoVideo())) fs.rmSync(this.#ObterArquivoVideo());
     child_process.execSync(`call ${this.#ObterShellFFMPEG()}`);
     return new ServiceResult(Status.ok, 'Vídeo gerado', `${this.#ObterArquivoVideo()}`);
   }

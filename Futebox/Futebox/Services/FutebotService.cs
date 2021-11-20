@@ -25,7 +25,7 @@ namespace Futebox.Services
         public RobotResult PublicarVideo(string processoId)
         {
             string commandArgs = $"command=publicar";
-            string idArgs = $"id={processoId}";
+            string idArgs = $"id={processoId}"; 
             string datasourceArgs = $"datasource={Settings.ApplicationHttpBaseUrl}api/processo/{processoId}";
             return ExecutarCMD(commandArgs, idArgs, datasourceArgs);
         }
@@ -33,7 +33,8 @@ namespace Futebox.Services
         public RobotResult AbrirPasta(string processoId)
         {
             string commandArgs = $"command=pasta";
-            return ExecutarCMD(commandArgs, new object[] { });
+            string idArgs = $"id={processoId}"; 
+            return ExecutarCMD(commandArgs, idArgs);
         }
 
         private RobotResult ExecutarCMD(params object[] args)

@@ -77,7 +77,7 @@ module.exports = class Integracao {
   }
   async #AbrirPastaArquivos() {
     const pasta = `${pastas.obterPastaArquivosDoDia()}/${this.args.id}`;
-    const _batchService = new BatchService(new Settings(pasta, `${uid}`, processo, true));
+    const _batchService = new BatchService(new Settings(pasta, `${this.args.id}`, null, true));
     _batchService.BatchAbrirPasta();
     return new ServiceResult(Status.ok, 'Pasta aberta');
   }

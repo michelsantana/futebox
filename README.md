@@ -76,6 +76,8 @@ Então decidimos criar o futebox; um Robô que gera conteúdo sobre classificaç
 - [x] Compatibilidade com Youtube #shorts
 - [x] Agendador de execução
 - [x] Notificações no telegram
+- [x] Upload automático
+
 
 ### Todo
 - [ ] Libertadores 
@@ -85,7 +87,6 @@ Então decidimos criar o futebox; um Robô que gera conteúdo sobre classificaç
 - [ ] Brasileirão série C
 - [ ] COPA do mundo 2021 
 - [ ] Gerador de fala - Google 
-- [ ] Publicador de vídeo
 - [ ] Compatibilidade com Instagram
 - [ ] Compatibilidade com Tiktok
 

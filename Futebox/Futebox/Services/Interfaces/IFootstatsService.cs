@@ -11,6 +11,8 @@ namespace Futebox.Services.Interfaces
     {
         List<FootstatsTime> ObterTimesServico();
         List<FootstatsClassificacao> ObterClassificacaoServico(Campeonatos campeonato);
+        FootstatsPartida ObterPartida(int partida);
+        List<FootstatsPartida> ObterPartidasPeriodo();
         List<FootstatsPartida> ObterPartidasHoje();
         List<FootstatsPartida> ObterPartidasDaRodada(Campeonatos campeonato, int rodada);
         List<FootstatsPartida> ObterPartidasDoCampeonato(Campeonatos campeonato);

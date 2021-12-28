@@ -10,7 +10,9 @@ namespace Futebox
         public static string BackendRoot;
         public static string ApplicationsRoot;
         public static string ApplicationHttpBaseUrl;
+        public static string RobotEndpointBaseUrl;
         public static string TelegramBotToken;
         public static string TelegramNotifyUserId;
+        public static bool DEBUGMODE;
     }
 }

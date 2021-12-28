@@ -20,11 +20,12 @@ namespace Futebox.Models.Enums
     public enum PageViewModes
     {
         padrao,
-        print,
-        thumb
+        igv,
+        yts,
+        ytv,
     }
 
-    public enum TipoProcesso
+    public enum CategoriaVideo
     {
         partida,
         classificacao,
@@ -39,13 +40,26 @@ namespace Futebox.Models.Enums
 
     public enum StatusProcesso
     {
-        Criado = 8,
-        Agendado = 16,
-        VideoErro = 32,
-        VideoCompleto = 64,
-        PublicacaoErro = 128,
-        Publicado = 256,
-        Erro = 512
+        Criado = 0,
+        Agendado = 10,
+
+        GerandoImagem = 20,
+        ImagemErro = 25,
+        ImagemOK = 29,
+
+        GerandoAudio = 30,
+        AudioErro = 35,
+        AudioOK = 39,
+
+        GerandoVideo = 40,
+        VideoErro = 45,
+        VideoOK = 49,
+
+        Publicando = 50,
+        PublicandoErro = 55,
+        PublicandoOK = 59,
+
+        Erro = 100
     }
 
     public enum RobotResultCommand
@@ -55,5 +69,13 @@ namespace Futebox.Models.Enums
         AUTHFAILED,
         BLANK,
         INVALID,
+    }
+
+    public enum RedeSocialFinalidade
+    {
+        NENHUMA,
+        YoutubeShorts,
+        YoutubeVideo,
+        InstagramVideo
     }
 }

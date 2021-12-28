@@ -3,6 +3,8 @@ using Futebox.Models.Enums;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Futebox.Controllers
 {
@@ -24,73 +26,54 @@ namespace Futebox.Controllers
         }
 
         [HttpGet("{id}/obter")]
-        public Processo ObterProcesso(string id)
+        public async Task<Processo> ObterProcesso(string id)
         {
             return _processoService.ObterProcesso(id);
         }
 
-        [HttpGet("{id}/videocompleto")]
-        public Processo AtualizarProcessoVideoCompleto(string id, string arquivo)
+        [HttpGet("{id}/{sub}/obter")]
+        public async Task<Dictionary<string, object>> ObterProcesso(string id, string sub)
         {
-            return _processoService.AtualizarProcessoVideoCompleto(id, arquivo);
+            return new Dictionary<string, object>()
+            {
+                { "processo", _processoService.ObterProcesso(id) },
+                { "subprocesso", _processoService.ObterSubProcessoId(sub) }
+            };
         }
 
-        [HttpGet("{id}/videoerro")]
-        public Processo AtualizarProcessoVideoErro(string id)
+        [HttpGet("{id}/{sub}/sub")]
+        public async Task<SubProcesso> ObterSubProcesso(string id, string sub)
         {
-            return _processoService.AtualizarProcessoVideoErro(id);
+            var subs = _processoService.ObterSubProcessos(id).Find(_ => _.id == sub);
+            return subs;
         }
 
-        [HttpGet("{id}/publicado")]
-        public Processo AtualizarProcessoPublicado(string id, string link)
-        {
-            return _processoService.AtualizarProcessoPublicado(id, link);
-        }
-        
-        [HttpGet("{id}/publicacaoerro")]
-        public Processo AtualizarProcessoPublicacaoErro(string id)
-        {
-            return _processoService.AtualizarProcessoPublicacaoErro(id);
-        }
-        
         [HttpPost("{id}/deletar")]
-        public bool DeletarProcesso(string id)
+        public async Task<bool> DeletarProcesso(string id)
         {
             return _processoService.Delete(id);
         }
 
         [HttpPost("partida/{id}")]
-        public Processo AddProcessoPartida(string id)
+        public async Task<Processo> AddProcessoPartida(string id)
         {
             return _processoService.SalvarProcessoPartida(int.Parse(id));
         }
 
         [HttpPost("classificacao/{id}")]
-        public Processo AddProcessoClassificacao(string id)
+        public async Task<Processo> AddProcessoClassificacao(string id)
         {
             return _processoService.SalvarProcessoClassificacao((Campeonatos)int.Parse(id));
         }
 
         [HttpPost("rodada/{id}/{rodada}")]
-        public Processo AddProcessoRodada(string id, string rodada)
+        public async Task<Processo> AddProcessoRodada(string id, string rodada)
         {
             return _processoService.SalvarProcessoRodada((Campeonatos)int.Parse(id), int.Parse(rodada));
         }
 
-        [HttpGet("executar/{id}")]
-        public Processo ExecutarProcesso(string id)
-        {
-            return _processoService.GerarVideoProcesso(id);
-        }
-
-        [HttpGet("arquivos/{id}")]
-        public bool ArquivosProcesso(string id)
-        {
-            return _processoService.AbrirPastaProcesso(id);
-        }
-
         [HttpGet("notificar/{id}")]
-        public bool NotificarProcesso(string id)
+        public async Task<bool> NotificarProcesso(string id)
         {
             var p = _processoService.ObterProcesso(id);
             _notifyService.Notify(p.notificacao);
@@ -98,19 +81,56 @@ namespace Futebox.Controllers
         }
 
         [HttpGet("agendar/{id}")]
-        public bool AgendarNotificacaoProcesso(string id, int hora, int minuto)
+        public async Task<bool> AgendarNotificacaoProcesso(string id, int dia, int mes, int ano, int hr, int min)
         {
-            var p = _processoService.AgendarProcesso(id, DateTime.Today.AddHours(hora).AddMinutes(minuto));
+            var dt = new DateTime(ano, mes, dia, hr, min, 0);
+            var p = _processoService.AgendarProcesso(id, dt);
             _agendamentoService.AgendarExecucao(p.id, p.agendamento ?? DateTime.Now);
             return true;
         }
 
-        [HttpGet("publicar/{id}")]
-        public bool PublicarVideoProcesso(string id)
+        [HttpGet("robo/imagem/{id}/{sub}")]
+        public async Task<bool> GerarImagem(string id, string sub)
         {
-            _processoService.PublicarVideo(id);
+            var processo = _processoService.ObterProcesso(id);
+            var subprocesso = _processoService.ObterSubProcessoId(sub);
+            _processoService.GerarImagem(ref processo, ref subprocesso);
             return true;
         }
 
+        [HttpGet("robo/audio/{id}/{sub}")]
+        public async Task<bool> GerarAudio(string id, string sub)
+        {
+            var processo = _processoService.ObterProcesso(id);
+            var subprocesso = _processoService.ObterSubProcessoId(sub);
+            _processoService.GerarAudio(ref processo, ref subprocesso);
+            return true;
+        }
+
+        [HttpGet("robo/video/{id}/{sub}")]
+        public async Task<bool> GerarVideo(string id, string sub)
+        {
+            var processo = _processoService.ObterProcesso(id);
+            var subprocesso = _processoService.ObterSubProcessoId(sub);
+            _processoService.GerarVideo(ref processo, ref subprocesso);
+            return true;
+        }
+
+        [HttpGet("robo/publicar/{id}/{sub}")]
+        public async Task<bool> PublicarVideo(string id, string sub)
+        {
+            var processo = _processoService.ObterProcesso(id);
+            var subprocesso = _processoService.ObterSubProcessoId(sub);
+            _processoService.PublicarVideo(ref processo, ref subprocesso);
+            return true;
+        }
+
+        [HttpGet("robo/pasta/{id}")]
+        public async Task<bool> PastaVideo(string id)
+        {
+            var processo = _processoService.ObterProcesso(id);
+            _processoService.AbrirPasta(processo);
+            return true;
+        }
     }
 }

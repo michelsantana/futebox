@@ -1,208 +1,50 @@
-const pptr = require('puppeteer');
-const { Browser, Page } = require('puppeteer');
-
-const ServiceResult = require('./../model/serviceresult');
-const Settings = require('../model/settings');
-const Status = require('./../model/statuscodes');
-const utils = require('./../utils/utils');
-const pastas = require('./../utils/gerenciador-pastas');
+const UploadServiceSettings = require('../model/upload-service-settings');
+const UploadInstagramService = require('./upload-instagram-service');
+const UploadYoutubeService = require('./upload-youtube-service');
 require('dotenv').config();
-//const chromiumProfile = process.env.chromiumProfile;
 
 module.exports = class UploadService {
-  /** @type {Settings} */
+  /** @type {UploadServiceSettings} */
   settings;
-  /** @type {Browser} */
-  browser;
-  /** @type {Page} */
-  page;
-  headless = false;
 
   constructor(settings = new Settings()) {
     this.settings = settings;
   }
 
-  async #Esperar(timeoutMs) {
-    await utils.sleep(timeoutMs);
-  }
-
-  async #AbrirBrowser() {
-    this.browser = await pptr.launch({
-      headless: false,
-      userDataDir: `${process.env.USERPROFILE}\\AppData\\Local\\Chromium\\User Data`,
-      defaultViewport: { width: 1920, height: 1080 },
-      args: ['--no-sandbox', '--window-position=0,1080', ],
-    });
-  }
-
-  async #FecharBrowser() {
-    await this.browser?.close();
-  }
-
-  async #AbrirPagina() {
-    this.page = await this.browser.newPage();
-    await this.page.setViewport({ width: 1280, height: 720 });
-    await this.page.goto('https://studio.youtube.com/channel/UCWs2h6plWKR8xCZM3ljNGRw', { waitUntil: 'networkidle2' });
-    await this.#Esperar(2);
-  }
-
-  async #EstaLogado() {
-    const paginaDeLogin = await this.page.evaluate(() => document.querySelectorAll('[type="email"]').length > 0);
-    if (paginaDeLogin) {
-      return false;
-    }
-    return true;
-  }
-
-  async #AbrirTelaDeUpload() {
-    await this.page.click('#create-icon');
-    await this.#Esperar(1);
-
-    await this.page.click('#text-item-0');
-    await this.#Esperar(1);
-  }
-
-  async #RealizarUploadDoVideo() {
-    const elementUploadHandle = await this.page.$('[type="file"]');
-    await elementUploadHandle.uploadFile(this.settings.processo.arquivoVideo);
-    await this.#Esperar(10);
-  }
-
-  async #PreencherCampo(seletor, texto) {
-    await this.page.click(seletor);
-    await this.#Esperar(0.7);
-    await this.page.keyboard.down('ControlLeft');
-    await this.#Esperar(0.7);
-    await this.page.keyboard.press('A');
-    await this.#Esperar(0.7);
-    await this.page.keyboard.up('ControlLeft');
-    await this.#Esperar(0.7);
-
-    await this.page.keyboard.down('Backspace');
-    await this.#Esperar(0.7);
-
-    await this.page.keyboard.type(texto);
-  }
-
-  async #PreencherCampoTitulo() {
-    await this.#PreencherCampo('.input-container.title #textbox', this.settings.processo.attrTitulo);
-    await this.#Esperar(1);
-  }
-
-  async #PreencherCampoDescricao() {
-    await this.#PreencherCampo('.input-container.description #textbox', this.settings.processo.attrDescricao);
-    await this.#Esperar(1);
-  }
-
-  async #SelecionarPlaylist() {
-    const nomePlaylist = {
-      partida: 'shorts',
-      classificacao: 'classi',
-      rodada: 'calen',
-    };
-
-    const seletorCampoPlaylist = '.dropdown.style-scope.ytcp-video-metadata-playlists';
-    const seletorConcluir = '.done-button.action-button.style-scope.ytcp-playlist-dialog';
-
-    await this.page.click(seletorCampoPlaylist);
-    await this.#Esperar(1);
-
-    const clickId = await this.page.evaluate((t) => {
-      let id = '';
-      const seletorLista = '.checkbox-label.style-scope.ytcp-checkbox-group';
-      const seletorNomeDoItem = '.label.label-text.style-scope.ytcp-checkbox-group';
-      const itens = document.querySelectorAll(seletorLista);
-
-      Array.from(itens).forEach((_) => {
-        const item = _.querySelector(seletorNomeDoItem)?.innerHTML;
-        if (item && item.toLowerCase()?.indexOf(t.toLowerCase()) > -1) id = _.id;
-      });
-      return id;
-    }, nomePlaylist[this.settings.processo.tipo.desc]);
-
-    await this.page.click(`#${clickId}`);
-    await this.#Esperar(1);
-    await this.page.click(seletorConcluir);
-    await this.#Esperar(1);
-  }
-
-  async #SelecionarVisibilidade(visibilidade) {
-    if (!visibilidade || visibilidade == 'public') return;
-    if (visibilidade == 'privado') await this.page.click('[name="PRIVATE"]');
-    if (visibilidade == 'naolistado') await this.page.click('[name="UNLISTED"]');
-    await this.#Esperar(1);
-  }
-
-  async #ClicarEmProximo() {
-    const seletorRodapeJanela = '.button-area.ytcp-uploads-dialog';
-    await this.page.click(`${seletorRodapeJanela} #next-button`);
-    await this.#Esperar(1);
-  }
-
-  async #ClicarEmPublicar() {
-    const seletorRodapeJanela = '.button-area.ytcp-uploads-dialog';
-    await this.page.click(`${seletorRodapeJanela} #done-button`);
-    await this.#Esperar(4);
-  }
-
-  async #ObterLinkDoVideo() {
-    return await this.page.$eval('#details .video-url-fadeable a[href]', (element) => {
-      return element.innerHTML;
-    });
-  }
-
   async Executar() {
     try {
-      await this.#AbrirBrowser();
-      await this.#AbrirPagina();
-
-      const estaLogado = await this.#EstaLogado();
-      if (!estaLogado) {
-        await this.#FecharBrowser();
-        return new ServiceResult(Status.authFailed, 'Precisa autenticar esse perfil');
+      if (this.settings.redeSocial == 'YoutubeShorts') {
+        const _service = new UploadYoutubeService(this.settings);
+        return _service.Executar();
       }
-
-      await this.#AbrirTelaDeUpload();
-      await this.#RealizarUploadDoVideo();
-
-      await this.#PreencherCampoTitulo();
-      await this.#PreencherCampoDescricao();
-      await this.#SelecionarPlaylist();
-
-      const linkVideo = await this.#ObterLinkDoVideo();
-
-      await this.#ClicarEmProximo();
-      await this.#ClicarEmProximo();
-      await this.#ClicarEmProximo();
-
-      await this.#SelecionarVisibilidade();
-      await this.#ClicarEmPublicar();
-
-      await this.#FecharBrowser();
-      return new ServiceResult(Status.ok, 'Video publicado', linkVideo);
+      if (this.settings.redeSocial == 'YoutubeVideo') {
+        const _service = new UploadYoutubeService(this.settings);
+        return _service.Executar();
+      }
+      if (this.settings.redeSocial == 'InstagramVideo') {
+        const _service = new UploadInstagramService(this.settings);
+        return _service.Executar();
+      }
     } catch (ex) {
-      this.#FecharBrowser();
       throw ex;
     }
   }
 
   async StatusLogin() {
     try {
-      this.headless = true;
-      await this.#AbrirBrowser();
-      await this.#AbrirPagina();
-
-      const estaLogado = await this.#EstaLogado();
-      if (!estaLogado) {
-        await this.page.screenshot({ path: `${pastas.obterPastaArquivos()}/oi.png` });
-        await this.#FecharBrowser();
-        return new ServiceResult(Status.authFailed, 'Precisa autenticar esse perfil');
+      if (this.settings.redeSocial == 'YoutubeShorts') {
+        const _service = new UploadYoutubeService(this.settings);
+        return _service.StatusLogin();
       }
-      await this.#FecharBrowser();
-
-      return new ServiceResult(Status.ok, 'Autenticado');
+      if (this.settings.redeSocial == 'YoutubeVideo') {
+        const _service = new UploadYoutubeService(this.settings);
+        return _service.StatusLogin();
+      }
+      if (this.settings.redeSocial == 'InstagramVideo') {
+        const _service = new UploadInstagramService(this.settings);
+        return _service.StatusLogin();
+      }
     } catch (ex) {
-      this.#FecharBrowser();
       throw ex;
     }
   }

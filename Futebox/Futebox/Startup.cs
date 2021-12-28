@@ -17,6 +17,9 @@ using Microsoft.Extensions.Logging;
 using Futebox.DB.Mappers;
 using System;
 using System.IO;
+using Quartz;
+using Quartz.Core;
+using Quartz.Impl;
 
 namespace Futebox
 {
@@ -28,8 +31,10 @@ namespace Futebox
             Settings.BackendRoot = Directory.GetCurrentDirectory();
             Settings.ApplicationsRoot = Configuration.GetValue<string>("ApplicationsRoot");
             Settings.ApplicationHttpBaseUrl = Configuration.GetValue<string>("ApplicationHttpBaseUrl");
+            Settings.RobotEndpointBaseUrl = Configuration.GetValue<string>("RobotEndpointBaseUrl");
             Settings.TelegramBotToken = DotEnv.Get("TELEGRAM_BOT_TOKEN");
             Settings.TelegramNotifyUserId = DotEnv.Get("TELEGRAM_NOTIFY_USERID");
+            Settings.DEBUGMODE = Configuration.GetValue<bool>("DEBUG");
         }
 
         public IConfiguration Configuration { get; }
@@ -57,13 +62,16 @@ namespace Futebox
             services.AddScoped<IRodadaService, RodadaService>();
             services.AddScoped<IAgendamentoService, AgendamentoService>();
             services.AddScoped<INotifyService, NotifyService>();
-            //services.AddScoped<IYoutubeService, YoutubeService>();
-
+            services.AddScoped<ISubProcessoRepositorio, SubProcessoRepositorio>();
             services.AddScoped<IProcessoRepositorio, ProcessoRepositorio>();
             services.AddScoped<ITimeRepositorio, TimeRepositorio>();
 
             services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
-
+            services.AddQuartz(_ =>
+            {
+                _.UseMicrosoftDependencyInjectionScopedJobFactory();
+            });
+            
             ConfigureMigrations(services);
             ConfigureFluentMapper();
         }

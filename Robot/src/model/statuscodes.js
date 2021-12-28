@@ -1,7 +1,7 @@
 module.exports = class Status {
-  static blank = 256;
-  static ok = 8;
-  static invalid = 16;
-  static erro = 32;
-  static authFailed = 64;
+  static blank = 404;
+  static ok = 200;
+  static invalid = 400;
+  static erro = 500;
+  static authFailed = 401;
 };

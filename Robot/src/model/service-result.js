@@ -3,11 +3,13 @@ const Status = require('./statuscodes');
 module.exports = class ServiceResult {
     status = Status.blank;
     mensagem = '';
-    arg = '';
-    constructor(status, mensagem, arg = '') {
+    resultado = '';
+    stack = [];
+    constructor(status, mensagem, resultado = '') {
       this.status = status;
       this.mensagem = mensagem;
-      this.arg = arg;
+      this.resultado = resultado;
     }
+    log = (m) => `${new Date()} - ${this.stack.push(m)}`;
   };
   

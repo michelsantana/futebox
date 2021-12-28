@@ -38,6 +38,23 @@ namespace Futebox.Services
             return null;
         }
 
+        public T ObterConteudoExpirado<T>(string cacheName) where T : class
+        {
+            var cacheFilePath = $"{cacheFolderPath}/{cacheName}.txt";
+
+            if (File.Exists(cacheFilePath))
+            {
+                var fileContent = File.ReadAllText(cacheFilePath);
+                var fi = new FileInfo(cacheFilePath);
+                if (string.IsNullOrEmpty(fileContent)) return null;
+
+                var storage = JsonConvert.DeserializeObject<CacheStorageType<T>>(fileContent);
+                return storage.Dados();
+            }
+
+            return null;
+        }
+
         public bool DefinirConteudo<T>(string cacheName, T dados, int validadeHoras = 8) where T : class
         {
             try

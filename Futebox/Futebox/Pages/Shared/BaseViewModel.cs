@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Futebox.Models.Enums;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
@@ -15,5 +16,9 @@ namespace Futebox.Pages.Shared
             return Partial("Templates/_toaster", Tuple.Create(title, message));
         }
 
+        public bool skipCache(PageViewModes viewMode) => 
+                viewMode == PageViewModes.yts ||
+                viewMode == PageViewModes.ytv ||
+                viewMode == PageViewModes.igv;
     }
 }

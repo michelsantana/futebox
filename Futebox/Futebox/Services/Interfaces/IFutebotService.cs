@@ -1,17 +1,18 @@
 ﻿using Futebox.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Futebox.Models.Enums;
 
 namespace Futebox.Services.Interfaces
 {
     public interface IFutebotService
     {
-        RobotResult VerificarConfiguracaoYoutubeBrowser();
-        RobotResult GerarVideo(string processoId);
-        RobotResult PublicarVideo(string processoId);
-        RobotResult AbrirPasta(string processoId);
+        RobotResultApi VerificarConfiguracaoYoutubeBrowser();
+        RobotResultApi VerificarConfiguracaoInstagramBrowser();
+
+        RobotResultApi GerarImagem(SubProcesso subProcesso);
+        RobotResultApi GerarAudio(SubProcesso subProcesso);
+        RobotResultApi GerarVideo(SubProcesso subProcesso);
+        RobotResultApi PublicarVideo(SubProcesso subProcesso);
+        RobotResultApi AbrirPasta(Processo subProcesso);
 
     }
 }

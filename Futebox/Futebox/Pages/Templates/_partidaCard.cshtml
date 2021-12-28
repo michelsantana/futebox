@@ -19,6 +19,10 @@
             width: auto !important;
         }
 
+    .focus .gerarpartida {
+        display: none !important;
+    }
+
     .focus .wm {
         display: block;
     }
@@ -81,6 +85,7 @@
     .focus .card-footer, .focus .card-header {
         font-size: 22px;
     }
+
     .focus .card-body {
         min-height: 164px;
     }
@@ -92,13 +97,14 @@
     .br {
         border-right: 1px solid #030303;
     }
+
     .sp {
         padding: 0 10px 0 10px;
     }
 </style>
 <div class="wm">
-        <img src="~/img/logo-1.png" />
-    </div>
+    <img src="~/img/logo-1.png" />
+</div>
 <h1 class="fs-sport text-center sub">@(Model.rodadaFoco)<sup>a</sup> Rodada !</h1>
 <h1 class="fs-sport text-center titulo">@Model.nomeCampeonato</h1>
 <div class="row sp">
@@ -133,115 +139,11 @@
                 <div class="card-footer fs-sport f">
                     estádio @p.estadio
                 </div>
+                <div class="card-footer gerarpartida fs-sport f">
+                    <button onclick="GerarVideoPartida('@p.idExterno')" class="btn btn-outline-danger">⚙</button>
+                </div>
             </div>
         </div>
     }
 </div>
 
-
-
-@*@foreach (var p in Model.partidas)
-    {
-        <div class="col-3 mb-5">
-            <div id="content" class="card text-center">
-                <div class="wm">
-                    <img src="~/img/logo-1.png" />
-                </div>
-                <div class="card-body" id="bg">
-                    <div class="d-flex justify-content-between flex-column align-items-left">
-                        <div class="d-flex justify-content-between align-items-center fs-sport">
-                            <div class="logo-l d-flex flex-row align-items-center">
-                                <img src="@(p.timeMandante.ObterLogoLocal())" />
-                                <div class="name-l ml-5">
-                                    @(p.timeMandante.nome)
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center fs-sport">
-                            <div class="logo-r d-flex flex-row align-items-center">
-                                <img src="@(p.timeVisitante.ObterLogoLocal())" />
-                                <div class="name-r ml-5">
-                                    @(p.timeVisitante.nome)
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer text-muted fs-sport f">
-                    @p.dataHoraDaPartida <br /> estádio @p.estadio
-                </div>
-            </div>
-        </div>
-    }*@
-
-
-
-
-
-@*<style>
-
-
-        .logo-l > img,
-        .logo-r > img {
-            width: 60px;
-        }
-
-        #content {
-            width: 100%;
-            height: 100%;
-        }
-
-        .wm {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            opacity: .1;
-        }
-
-            .wm > img {
-                width: 100%;
-                margin-top: 33%;
-            }
-    </style>
-    <div class="row">
-        <table class="table table-borderless">
-            <thead>
-                <tr>
-                    <th width="30%"></th>
-                    <th width="30%"></th>
-                    <th width="20%"></th>
-                    <th width="20%"></th>
-                </tr>
-            </thead>
-            <tbody>
-
-                @foreach (var p in Model.partidas.Take(Model.partidas.Count / 2))
-                {
-                    <tr>
-                        <td class="">
-                            <div class="logo-l d-flex flex-row align-items-center justify-content-start">
-                                <img src="@(p.timeMandante.ObterLogoLocal())" />
-                                <div class="name-r ml-5">
-                                    @(p.timeMandante.nome)
-                                </div>
-                            </div>
-                        </td>
-                        <td class="logo-r">
-                            <div class="logo-l d-flex flex-row align-items-center justify-content-end">
-                                <div class="name-r ml-5">
-                                    @(p.timeVisitante.nome)
-                                </div>
-                                <img src="@(p.timeVisitante.ObterLogoLocal())" />
-                            </div>
-                        </td>
-                        <td>
-                            @p.dataPartida.ToString("D"), @p.dataPartida.ToString("dd MMMM YYYY") às @p.dataPartida.ToString("HH:mm")
-                        </td>
-                        <td>
-                            @p.estadio
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>*@

@@ -28,7 +28,7 @@ namespace Futebox.Pages
 
         public void OnGet(string campeonato, PageViewModes viewMode)
         {
-            clearCache = viewMode == PageViewModes.print;
+            clearCache = skipCache(viewMode);
             classificacao = new List<ClassificacaoVM>();
             if (!string.IsNullOrEmpty(campeonato))
                 campeonatoFoco = ((Campeonatos)int.Parse(campeonato));

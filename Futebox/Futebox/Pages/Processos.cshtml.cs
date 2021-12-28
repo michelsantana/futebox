@@ -13,6 +13,7 @@ namespace Futebox.Pages
     {
         IProcessoService _processoService;
         public List<Processo> processos = new List<Processo>();
+        public List<SubProcesso> subprocessos = new List<SubProcesso>();
 
         public ProcessosModel(IProcessoService processoService)
         {
@@ -23,12 +24,14 @@ namespace Futebox.Pages
         {
             this.processos = _processoService.ObterProcessos()?.ToList();
             this.processos = this.processos.OrderBy(_ => (_.criacao.Ticks) * -1).ToList();
+            this.subprocessos = _processoService.ObterSubProcessos()?.ToList();
         }
 
-        public PartialViewResult OnGetProcessoTableRow(string processoId)
-        {
-            var processo = _processoService.ObterProcesso(processoId);
-            return Partial("Templates/_processoTableRow", Tuple.Create(this, processo));
-        }
+        //public PartialViewResult OnGetProcessoTableRow(string processoId)
+        //{
+        //    var processo = _processoService.ObterProcesso(processoId);
+        //    var subprocessos = _processoService.ObterSubProcessos(processoId);
+        //    //return Partial("Templates/_processoTableRow", Tuple.Create(this, processo, subprocessos));
+        //}
     }
 }

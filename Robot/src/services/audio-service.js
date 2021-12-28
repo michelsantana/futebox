@@ -1,30 +1,30 @@
 const pptr = require('puppeteer');
 const { Browser, Page } = require('puppeteer');
-
-const Settings = require('../model/settings');
-const ServiceResult = require('../model/serviceresult');
+const AudioServiceSettings = require('../model/audio-service-settings');
+const ServiceResult = require('../model/service-result');
 const Status = require('../model/statuscodes');
 const pastas = require('./../utils/gerenciador-pastas');
 const utils = require('./../utils/utils');
+const fs = require('fs');
 
 module.exports = class AudioService {
-  /** @type {Settings} */
+  /** @type {AudioServiceSettings} */
   settings;
   /** @type {Browser} */
   browser;
   /** @type {Page} */
   page;
 
-  constructor(settings = new Settings()) {
+  constructor(settings) {
     this.settings = settings;
   }
 
   #ObterArquivoNaPastaDownloads() {
-    return `${pastas.obterPastaDownloadsChrome()}/${this.settings.nomeArquivoDestino}.mp3`;
+    return `${pastas.obterPastaDownloadsChrome()}/${this.settings.nomeDoArquivo}`;
   }
 
   #ObterArquivoNoDestino() {
-    return `${this.settings.pastaDestino}/${this.settings.nomeArquivoDestino}.mp3`;
+    return `${this.settings.pasta}/${this.settings.nomeDoArquivo}`;
   }
 
   #ExisteArquivoBaixado() {
@@ -84,7 +84,7 @@ module.exports = class AudioService {
     await this.page.keyboard.down('Backspace');
     await this.#Esperar(0.7);
 
-    await this.page.keyboard.type(this.settings.processo.roteiro);
+    await this.page.keyboard.type(this.settings.roteiro);
 
     await this.#Esperar(0.7);
 
@@ -126,7 +126,7 @@ module.exports = class AudioService {
         link.setAttribute('style', `position:absolute;top:100px;left:0;z-index:99999999999999;font-size:50px;background:#F00;width:100%;`);
         document.body.append(link);
       };
-    }, this.settings.nomeArquivoDestino);
+    }, `${this.settings.nomeDoArquivo}`);
   }
 
   async #TocarAudio() {

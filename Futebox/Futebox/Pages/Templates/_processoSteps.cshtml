@@ -1,23 +1,79 @@
-﻿@model Futebox.Models.Processo
+﻿@model Futebox.Models.SubProcesso
 @{
+    var s1 = "📅";
+    var s2 = "🎞";
+    var s3 = "☁";
+    var nd = "⚪";
+    var ok = "🟢";
+    var er = "🔴";
     var spinner = "<div class='spinner-border' role='status'><span class='visually-hidden'>Loading...</span></div>";
-    var progress = new Dictionary<int, Tuple<string, string, string, string>>() {
-            { (int)Futebox.Models.Enums.StatusProcesso.Erro, Tuple.Create("0%", "📅⚪", "▶⚪", "☁⚪") },
-            { (int)Futebox.Models.Enums.StatusProcesso.Criado, Tuple.Create("0%", "📅⚪", "▶⚪", "☁⚪") },
-            { (int)Futebox.Models.Enums.StatusProcesso.Agendado, Tuple.Create("33.3%", "📅🟢", "▶⚪", "☁⚪") },
-            { (int)Futebox.Models.Enums.StatusProcesso.VideoErro, Tuple.Create("49.6%", "📅🟢", "▶🔴", "☁") },
-            { (int)Futebox.Models.Enums.StatusProcesso.VideoCompleto, Tuple.Create("66.6%", "📅🟢", "▶🟢", "☁") },
-            { (int)Futebox.Models.Enums.StatusProcesso.PublicacaoErro, Tuple.Create("83.3%", "📅🟢", "▶🟢", "☁🔴") },
-            { (int)Futebox.Models.Enums.StatusProcesso.Publicado, Tuple.Create("100%", "📅🟢", "▶🟢", "☁🟢") },
-    };
+    var counter = 0m;
+    var step = 7.7m;
+    var progress = new Dictionary<int, Tuple<string, string, string, string>>();
+
+
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.Erro, Tuple.Create($"0000000000000{(counter)}%", $"{s1}{er}", $"{s2}{er}", $"{s3}{er}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.Criado, Tuple.Create($"00000000000{(counter)}%", $"{s1}{nd}", $"{s2}{nd}", $"{s3}{nd}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.Agendado, Tuple.Create($"000000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{nd}", $"{s3}{nd}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.GerandoImagem, Tuple.Create($"0000{(counter += step)}%", $"{s1}{ok}", $"{s2}{nd}", $"{s3}{nd}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.ImagemErro, Tuple.Create($"0000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{nd}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.ImagemOK, Tuple.Create($"000000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{nd}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.GerandoAudio, Tuple.Create($"00000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{nd}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.AudioErro, Tuple.Create($"00000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.AudioOK, Tuple.Create($"0000000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.GerandoVideo, Tuple.Create($"00000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.VideoErro, Tuple.Create($"00000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.VideoOK, Tuple.Create($"0000000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.Publicando, Tuple.Create($"0000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.PublicandoErro, Tuple.Create($"000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.PublicandoOK, Tuple.Create($"00000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    ;
+
     var currentProgress = progress[(int)Model.status];
 }
 
-<div class="row">
-    <div class="col-4 text-end">@currentProgress.Item2</div>
-    <div class="col-4 text-end">@currentProgress.Item3</div>
-    <div class="col-4 text-end">@currentProgress.Item4</div>
-</div>
-<div class="progress" style="height: 5px;">
-    <div class="progress-bar" role="progressbar" style="width: @currentProgress.Item1" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+@*<div class="row">
+        <div class="col-3 text-end sr-only">Agendado<br />@currentProgress.Item2</div>
+        <div class="col-3 text-end sr-only">Vídeo<br />@currentProgress.Item3</div>
+        <div class="col-3 text-end sr-only">Rede Social<br />@currentProgress.Item4</div>
+    </div>*@
+<div class="row d-flex align-items-center">
+    <div class="col-1">
+        @if (Model.redeSocial == Models.Enums.RedeSocialFinalidade.InstagramVideo)
+        {
+            <img width="100%" src="~/img/redes/ig.png" />
+        }
+        @if (Model.redeSocial == Models.Enums.RedeSocialFinalidade.YoutubeShorts)
+        {
+            <img width="100%" src="~/img/redes/yt.png" />
+        }
+        @if (Model.redeSocial == Models.Enums.RedeSocialFinalidade.YoutubeVideo)
+        {
+            <img width="100%" src="~/img/redes/yt.png" />
+        }
+    </div>
+    <div class="col-2">
+        @Model.status
+    </div>
+    <div class="col-7">
+        <div class="progress" style="height: 20px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: @currentProgress.Item1.Replace(",", ".")" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="btn-group" role="group">
+            <button class="btn btn-sm btn-outline-primary" onclick="Play('@Model.id');">
+                <object style="cursor:pointer;" data="~/img/icones/imagem.svg" width="100%" height="100%"></object>
+            </button>
+            <button class="btn btn-sm btn-outline-warning" onclick="Publicar('@Model.id');">
+                <object style="cursor:pointer;" data="~/img/icones/audio.svg"width="100%" height="100%"></object>
+            </button>
+            <button class="btn btn-sm btn-outline-info" onclick="Publicar('@Model.id');">
+                <object style="cursor:pointer;" data="~/img/icones/video.svg"width="100%" height="100%"></object>
+            </button>
+            <button class="btn btn-sm btn-outline-info" onclick="Publicar('@Model.id');">
+                <object style="cursor:pointer;" data="~/img/icones/publicar.svg"width="100%" height="100%"></object>
+            </button>
+        </div>
+    </div>
 </div>

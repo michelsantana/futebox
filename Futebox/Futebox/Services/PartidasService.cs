@@ -21,12 +21,43 @@ namespace Futebox.Services
             _timeRepositorio = timeRepositorio;
         }
 
-        public IEnumerable<PartidaVM> ObterPartidasHoje(bool clearCache = false)
+        public PartidaVM ObterPartida(int idPartida, bool skipCache = false)
         {
             var hoje = DateTime.Now.ToString("yyyyMMdd");
-            var cacheName = $"{nameof(FootstatsPartida)}{hoje}";
+            var cacheName = $"{nameof(FootstatsPartida)}-partida-{idPartida}";
+            var resultado = _cache.ObterConteudo<FootstatsPartida>(cacheName);
+            if (resultado == null || skipCache)
+            {
+                resultado = _footstatsService.ObterPartida(idPartida);
+                _cache.DefinirConteudo(cacheName, resultado, 24);
+            }
+
+            return ConverterEmPartidaVM(resultado);
+        }
+
+        public IEnumerable<PartidaVM> ObterPartidasPeriodo(bool skipCache = false)
+        {
+            var hoje = DateTime.Now.ToString("yyyyMMdd");
+            var cacheName = $"{nameof(FootstatsPartida)}-{hoje}-periodo";
             var resultado = _cache.ObterConteudo<List<FootstatsPartida>>(cacheName);
-            if (resultado == null || resultado?.Count == 0 || clearCache)
+            if (resultado == null || resultado?.Count == 0 || skipCache)
+            {
+                resultado = _footstatsService.ObterPartidasPeriodo();
+                _cache.DefinirConteudo(cacheName, resultado, 24);
+            }
+
+            var campeonatos = CampeonatoUtils.ObterCampeonatosAtivos().Select(_ => (int)_);
+            resultado = resultado.FindAll(_ => campeonatos.Contains(_.idCampeonato));
+
+            return resultado.Select(_ => ConverterEmPartidaVM(_));
+        }
+
+        public IEnumerable<PartidaVM> ObterPartidasHoje(bool skipCache = false)
+        {
+            var hoje = DateTime.Now.ToString("yyyyMMdd");
+            var cacheName = $"{nameof(FootstatsPartida)}-{hoje}";
+            var resultado = _cache.ObterConteudo<List<FootstatsPartida>>(cacheName);
+            if (resultado == null || resultado?.Count == 0 || skipCache)
             {
                 resultado = _footstatsService.ObterPartidasHoje();
                 _cache.DefinirConteudo(cacheName, resultado, 24);
@@ -41,7 +72,7 @@ namespace Futebox.Services
         public IEnumerable<PartidaVM> ObterPartidasDaRodada(Campeonatos campeonato, int rodada, bool clearCache = false)
         {
             var hoje = DateTime.Now.ToString("yyyyMMdd");
-            var cacheName = $"{nameof(FootstatsPartida)}{hoje}";
+            var cacheName = $"{nameof(FootstatsPartida)}-{hoje}";
             var resultado = _cache.ObterConteudo<List<FootstatsPartida>>(cacheName);
             if (resultado == null || resultado?.Count == 0 || clearCache)
             {
@@ -64,6 +95,11 @@ namespace Futebox.Services
             }
 
             return resultado.Select(_ => ConverterEmPartidaVM(_));
+        }
+
+        public IEnumerable<PartidaVM> ObterPartidasAntigas(string cacheFile)
+        {
+            return _cache.ObterConteudoExpirado<List<FootstatsPartida>>(cacheFile).Select(_ => ConverterEmPartidaVM(_));
         }
 
         public string ObterRoteiroDaPartida(int idPartida)

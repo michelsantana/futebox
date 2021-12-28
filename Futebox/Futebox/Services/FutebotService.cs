@@ -1,77 +1,76 @@
 ﻿using Futebox.Models;
+using Futebox.Models.Enums;
 using Futebox.Services.Interfaces;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Futebox.Services
 {
     public class FutebotService : IFutebotService
     {
-        public RobotResult VerificarConfiguracaoYoutubeBrowser()
+        readonly IHttpHandler _http;
+
+        public FutebotService(IHttpHandler http)
         {
-            string commandArgs = $"command=youtube";
-            return ExecutarCMD(commandArgs, new object[] { });
+            _http = http;
         }
 
-        public RobotResult GerarVideo(string processoId)
+        public RobotResultApi VerificarConfiguracaoYoutubeBrowser()
         {
-            string commandArgs = $"command=video";
-            string idArgs = $"id={processoId}";
-            string datasourceArgs = $"datasource={Settings.ApplicationHttpBaseUrl}api/processo/{processoId}";
-            return ExecutarCMD(commandArgs, idArgs, datasourceArgs);
+            return RoboExecutarRC("ytstatus");
+        }
+        public RobotResultApi VerificarConfiguracaoInstagramBrowser()
+        {
+            return RoboExecutarRC("igstatus");
         }
 
-        public RobotResult PublicarVideo(string processoId)
+        public RobotResultApi GerarImagem(SubProcesso subProcesso)
         {
-            string commandArgs = $"command=publicar";
-            string idArgs = $"id={processoId}"; 
-            string datasourceArgs = $"datasource={Settings.ApplicationHttpBaseUrl}api/processo/{processoId}";
-            return ExecutarCMD(commandArgs, idArgs, datasourceArgs);
+            return RoboExecutarRC("imagem", subProcesso);
+        }
+        public RobotResultApi GerarAudio(SubProcesso subProcesso)
+        {
+            return RoboExecutarRC("audio", subProcesso);
+        }
+        public RobotResultApi GerarVideo(SubProcesso subProcesso)
+        {
+            return RoboExecutarRC("video", subProcesso);
+        }
+        public RobotResultApi PublicarVideo(SubProcesso subProcesso)
+        {
+            return RoboExecutarRC("publicar", subProcesso);
+        }
+        public RobotResultApi AbrirPasta(Processo processo)
+        {
+            return RoboExecutarRC("pasta", "pasta", Uri.EscapeDataString(Path.GetFullPath(processo.pastaDosArquivos)));
         }
 
-        public RobotResult AbrirPasta(string processoId)
+        private RobotResultApi RoboExecutarRC(string command, SubProcesso subProcesso)
         {
-            string commandArgs = $"command=pasta";
-            string idArgs = $"id={processoId}"; 
-            return ExecutarCMD(commandArgs, idArgs);
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(subProcesso);
+            var data = new System.Net.Http.StringContent(json, Encoding.UTF8, "application/json");
+            var result = _http.Post($"{Settings.RobotEndpointBaseUrl}rc/{command}", data);
+            return JsonConvert.DeserializeObject<RobotResultApi>(result.Content.ReadAsStringAsync().Result);
         }
 
-        private RobotResult ExecutarCMD(params object[] args)
+        private RobotResultApi RoboExecutarRC(string command, string queryStringKey, string queryStringValue)
         {
-            string botFolder = $"{Settings.ApplicationsRoot}/Robot";
-            string botBatch = @"integration.bat";
-            string argsBuild(object[] arg) => string.Join(" ", arg.Select(_ => $"\"{_}\""));
+            var result = _http.Get($"{Settings.RobotEndpointBaseUrl}rc/{command}?{queryStringKey}={queryStringValue}");
+            return JsonConvert.DeserializeObject<RobotResultApi>(result.Content.ReadAsStringAsync().Result);
+        }
 
-            string strCmdText = $"{botFolder}/{botBatch}";
-            ProcessStartInfo processInfo = new ProcessStartInfo(strCmdText, $"{botFolder} {argsBuild(args)}");
-            processInfo.UseShellExecute = true;
-            processInfo.RedirectStandardOutput = true;
-            processInfo.RedirectStandardError = true;
-
-            processInfo.UseShellExecute = false;
-            processInfo.CreateNoWindow = false;
-
-            Process batchProcess = new Process();
-            batchProcess.StartInfo = processInfo;
-            RobotResult datareceived = new RobotResult();
-            batchProcess.OutputDataReceived += (args, b) =>
-            {
-                var command = b?.Data;
-                datareceived.ReadLine(command);
-            };
-            batchProcess.ErrorDataReceived += (args, b) =>
-            {
-                var command = b?.Data;
-                datareceived.ReadLine(command);
-            };
-            batchProcess.Start();
-            batchProcess.BeginOutputReadLine();
-            batchProcess.BeginErrorReadLine();
-
-            batchProcess.WaitForExit();
-            
-            return datareceived;
+        private RobotResultApi RoboExecutarRC(string command)
+        {
+            var result = _http.Get($"{Settings.RobotEndpointBaseUrl}rc/{command}");
+            return JsonConvert.DeserializeObject<RobotResultApi>(result.Content.ReadAsStringAsync().Result);
         }
     }
 }

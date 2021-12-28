@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Futebox.DB.Mappers;
+using static Futebox.DB.Mappers.ProcessoMap;
+using Futebox.Models;
 
 namespace Futebox
 {
@@ -17,6 +19,9 @@ namespace Futebox
             {
                 config.AddMap(new TimeMap());
                 config.AddMap(new ProcessoMap());
+                config.AddMap(new InstagramSubProcessoMap<SubProcessoInstagramVideo>());
+                config.AddMap(new YoutubeSubProcessoMap<SubProcessoYoutubeVideo>());
+                config.AddMap(new YoutubeSubProcessoMap<SubProcessoYoutubeShort>());
                 config.ForDommel();
             });
         }

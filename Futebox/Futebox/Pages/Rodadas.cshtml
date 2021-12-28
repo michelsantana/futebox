@@ -64,6 +64,12 @@
             });
         }
 
+        function GerarVideoPartida(partida) {
+            $.post(`/api/processo/partida/${partida}`, (response) => {
+                $.SendToast(response.id, 'Processo criado!');
+            });
+        }
+
         $('#rodada').click(() => {
             $('#rodada').toggleClass('focus');
         });

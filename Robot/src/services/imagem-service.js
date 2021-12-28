@@ -1,39 +1,31 @@
 const pptr = require('puppeteer');
 const { Browser, Page } = require('puppeteer');
+const ImagemServiceSettings = require('../model/imagem-service-settings');
 
-const Settings = require('../model/settings');
-const ServiceResult = require('../model/serviceresult');
+const ServiceResult = require('../model/service-result');
 const Status = require('../model/statuscodes');
 const utils = require('./../utils/utils');
 
 module.exports = class ImagemService {
-  /** @type {Settings} */
-  settings;
+  /** @type {ImagemServiceSettings} */
+  settings = {};
   /** @type {Browser} */
   browser;
   /** @type {Page} */
   page;
 
-  constructor(settings = new Settings()) {
+  constructor(settings) {
     this.settings = settings;
+    this.result = new ServiceResult(Status.blank, 'instance', []);
   }
 
   #ObterImagemVideo() {
-    return `${this.settings.pastaDestino}/${this.settings.nomeArquivoDestino}.png`;
-  }
-  #ObterThumbVideo() {
-    return `${this.settings.pastaDestino}/${this.settings.nomeArquivoDestino}.thumb.png`;
+    return `${this.settings.pasta}/${this.settings.nomeDoArquivo}`;
   }
 
   #ExisteArquivoImagemVideo() {
     if (this.settings.usarArquivosExistentes && utils.existeArquivo(this.#ObterImagemVideo())) return true;
 
-    return false;
-  }
-
-  #ExisteArquivoThumbVideo() {
-    if (!this.settings.processo.linkThumb) return true;
-    if (this.settings.usarArquivosExistentes && utils.existeArquivo(this.#ObterThumbVideo())) return true;
     return false;
   }
 
@@ -56,18 +48,13 @@ module.exports = class ImagemService {
   async #AbrirPagina() {
     this.page = await this.browser.newPage();
     await this.page.setViewport({
-      width: ~~this.settings.processo.imgLargura,
-      height: ~~this.settings.processo.imgAltura,
+      width: ~~this.settings.largura,
+      height: ~~this.settings.altura,
     });
   }
 
   async #NavegarParaImagem() {
-    await this.page.goto(this.settings.processo.link, { waitUntil: 'networkidle2' });
-    await this.#Esperar(8);
-  }
-
-  async #NavegarParaThumb() {
-    await this.page.goto(this.settings.processo.link, { waitUntil: 'networkidle2' });
+    await this.page.goto(this.settings.link, { waitUntil: 'networkidle2' });
     await this.#Esperar(8);
   }
 
@@ -78,11 +65,8 @@ module.exports = class ImagemService {
   async Executar() {
     try {
       const arquivoImagemCache = this.#ExisteArquivoImagemVideo();
-      //const arquivoThumbCache = this.#ExisteArquivoThumbVideo();
 
-      if (arquivoImagemCache 
-        //&& arquivoThumbCache
-        ) return new ServiceResult(Status.ok, 'Arquivo gerado com sucesso', `${this.#ObterImagemVideo()}|${this.#ObterThumbVideo()}`);
+      if (arquivoImagemCache) return new ServiceResult(Status.ok, 'Arquivo gerado com sucesso', `${this.#ObterImagemVideo()}`);
 
       await this.#AbrirBrowser();
       await this.#AbrirPagina();
@@ -92,13 +76,8 @@ module.exports = class ImagemService {
         await this.#SalvarPrint(this.#ObterImagemVideo());
       }
 
-      // if (!arquivoThumbCache) {
-      //   await this.#NavegarParaThumb();
-      //   await this.#SalvarPrint(this.#ObterThumbVideo());
-      // }
-
       await this.#FecharBrowser();
-      return new ServiceResult(Status.ok, 'Arquivo gerado com sucesso', `${this.#ObterImagemVideo()}|${this.#ObterThumbVideo()}`);
+      return new ServiceResult(Status.ok, 'Arquivo gerado com sucesso', `${this.#ObterImagemVideo()}`);
     } catch (ex) {
       this.#FecharBrowser();
       throw ex;

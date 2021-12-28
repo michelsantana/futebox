@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Futebox.Models.Enums;
+using System;
 
 namespace Futebox.Models
 {
@@ -21,5 +19,7 @@ namespace Futebox.Models
         public string estadio { get; set; }
         public string campeonato { get; set; }
         public int rodada { get; set; }
+
+        public RedeSocialFinalidade[] sociais = new RedeSocialFinalidade[] { RedeSocialFinalidade.YoutubeShorts, RedeSocialFinalidade.InstagramVideo };
     }
 }

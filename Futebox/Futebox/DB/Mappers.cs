@@ -40,32 +40,102 @@ namespace Futebox.DB.Mappers
     {
         public ProcessoMap()
         {
-            ToTable("videoprocesso");
+            ToTable("processo");
             Map(x => x.id).ToColumn("id");
             Map(x => x.criacao).ToColumn("criacao");
             Map(x => x.alteracao).ToColumn("alteracao");
 
+            Map(x => x.agendado).ToColumn("agendado");
+            Map(x => x.agendamento).ToColumn("agendamento");
+            Map(x => x.campeonatoId).ToColumn("campeonatoId");
+            Map(x => x.categoria).ToColumn("categoria");
             Map(x => x.nome).ToColumn("nome");
-            Map(x => x.linkThumb).ToColumn("linkThumb");
-            Map(x => x.link).ToColumn("link");
-            Map(x => x.tipoLink).ToColumn("tipoLink");
-            Map(x => x.imgLargura).ToColumn("imgLargura");
-            Map(x => x.imgAltura).ToColumn("imgAltura");
-            Map(x => x.roteiro).ToColumn("roteiro");
-            Map(x => x.attrTitulo).ToColumn("attrTitulo");
-            Map(x => x.attrDescricao).ToColumn("attrDescricao");
+            Map(x => x.notificacao).ToColumn("notificacao");
+            Map(x => x.partidaId).ToColumn("partidaId");
+            Map(x => x.rodadaId).ToColumn("rodadaId");
             Map(x => x.status).ToColumn("status");
             Map(x => x.statusMensagem).ToColumn("statusMensagem");
-            Map(x => x.processado).ToColumn("processado");
-            Map(x => x.args).ToColumn("args");
+        }
 
-            Map(x => x.notificacao).ToColumn("notificacao");
-            Map(x => x.agendamento).ToColumn("agendamento");
-            Map(x => x.agendado).ToColumn("agendado");
+        //public class SubProcessoMap : DommelEntityMap<SubProcesso>
+        //{
+        //    public SubProcessoMap()
+        //    {
+        //        ToTable("subprocesso");
+        //        Map(x => x.id).ToColumn("id");
+        //        Map(x => x.criacao).ToColumn("criacao");
+        //        Map(x => x.alteracao).ToColumn("alteracao");
 
-            Map(x => x.linkVideo).ToColumn("linkVideo");
-            Map(x => x.arquivoVideo).ToColumn("arquivoVideo");
+        //        Map(x => x.alturaVideo).ToColumn("alteracao");
+        //        Map(x => x.categoriaVideo).ToColumn("categoriaVideo");
+        //        Map(x => x.larguraVideo).ToColumn("larguraVideo");
+        //        Map(x => x.linkDaImagemDoVideo).ToColumn("linkDaImagemDoVideo");
+        //        Map(x => x.linkPostagem).ToColumn("linkPostagem");
+        //        Map(x => x.nomeDoArquivo).ToColumn("nomeDoArquivo");
+        //        Map(x => x.pastaDoArquivo).ToColumn("pastaDoArquivo");
+        //        Map(x => x.processoId).ToColumn("processoId");
+        //        Map(x => x.redeSocial).ToColumn("redeSocial");
+        //        Map(x => x.roteiro).ToColumn("roteiro");
+        //        Map(x => x.status).ToColumn("status");
+        //    }
+        //}
 
+        public class YoutubeSubProcessoMap<T> : DommelEntityMap<T> where T : YoutubeSubProcessoBase
+        {
+            public YoutubeSubProcessoMap()
+            {
+                ToTable("subprocesso");
+                Map(x => x.id).ToColumn("id");
+                Map(x => x.criacao).ToColumn("criacao");
+                Map(x => x.alteracao).ToColumn("alteracao");
+
+                Map(x => x.alturaVideo).ToColumn("alturaVideo");
+                Map(x => x.categoriaVideo).ToColumn("categoriaVideo");
+                Map(x => x.descricaoVideo).ToColumn("descricaoVideo");
+                Map(x => x.larguraVideo).ToColumn("larguraVideo");
+                Map(x => x.linkDaImagemDoVideo).ToColumn("linkDaImagemDoVideo");
+                Map(x => x.linkPostagem).ToColumn("linkPostagem");
+
+                Map(x => x.nomeDoArquivoAudio).ToColumn("nomeDoArquivoAudio");
+                Map(x => x.nomeDoArquivoImagem).ToColumn("nomeDoArquivoImagem");
+                Map(x => x.nomeDoArquivoVideo).ToColumn("nomeDoArquivoVideo");
+
+                Map(x => x.pastaDoArquivo).ToColumn("pastaDoArquivo");
+                Map(x => x.playlist).ToColumn("playlist");
+                Map(x => x.processoId).ToColumn("processoId");
+                Map(x => x.redeSocial).ToColumn("redeSocial");
+                Map(x => x.roteiro).ToColumn("roteiro");
+                Map(x => x.status).ToColumn("status");
+                Map(x => x.tituloVideo).ToColumn("tituloVideo");
+            }
+        }
+
+        public class InstagramSubProcessoMap<T> : DommelEntityMap<T> where T : InstagramSubProcessoBase
+        {
+            public InstagramSubProcessoMap()
+            {
+                ToTable("subprocesso");
+                Map(x => x.id).ToColumn("id");
+                Map(x => x.criacao).ToColumn("criacao");
+                Map(x => x.alteracao).ToColumn("alteracao");
+
+                Map(x => x.alturaVideo).ToColumn("alturaVideo");
+                Map(x => x.categoriaVideo).ToColumn("categoriaVideo");
+                Map(x => x.larguraVideo).ToColumn("larguraVideo");
+                Map(x => x.legendaPostagem).ToColumn("legendaPostagem");
+                Map(x => x.linkDaImagemDoVideo).ToColumn("linkDaImagemDoVideo");
+                Map(x => x.linkPostagem).ToColumn("linkPostagem");
+                
+                Map(x => x.nomeDoArquivoAudio).ToColumn("nomeDoArquivoAudio");
+                Map(x => x.nomeDoArquivoImagem).ToColumn("nomeDoArquivoImagem");
+                Map(x => x.nomeDoArquivoVideo).ToColumn("nomeDoArquivoVideo");
+                
+                Map(x => x.pastaDoArquivo).ToColumn("pastaDoArquivo");
+                Map(x => x.processoId).ToColumn("processoId");
+                Map(x => x.redeSocial).ToColumn("redeSocial");
+                Map(x => x.roteiro).ToColumn("roteiro");
+                Map(x => x.status).ToColumn("status");
+            }
         }
     }
 }

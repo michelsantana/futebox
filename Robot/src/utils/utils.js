@@ -8,5 +8,5 @@ module.exports = {
   moverArquivo: (origem, destino) => {
     fs.copyFileSync(origem, destino);
     fs.rmSync(origem);
-  },
+  }
 };

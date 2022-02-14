@@ -48,25 +48,27 @@ namespace Futebox
             services.AddLogging(config => config.AddDebug().AddConsole());
 
             services.AddSingleton<IDatabaseConfig, DatabaseConfig>((_) => new DatabaseConfig(Configuration.GetValue<string>("DatabaseName")));
-            services.AddSingleton<SchedulerService>();
+            services.AddSingleton<ISchedulerService, SchedulerService>();
+            services.AddSingleton<IQueueService, QueueService>();
+            services.AddSingleton<IBrowserService, BrowserService>();
 
-            services.AddScoped<IHttpHandler, HttpHandler>();
-            services.AddScoped<ICacheHandler, CacheHandler>();
+            services.AddSingleton<IHttpHandler, HttpHandler>();
+            services.AddSingleton<ICacheHandler, CacheHandler>();
 
-            services.AddScoped<IGerenciamentoTimesService, GerenciamentoTimesService>();
-            services.AddScoped<IFootstatsService, FootstatsService>();
-            services.AddScoped<IClassificacaoService, ClassificacaoService>();
-            services.AddScoped<IPartidasService, PartidasService>();
-            services.AddScoped<IFutebotService, FutebotService>();
-            services.AddScoped<IProcessoService, ProcessoService>();
-            services.AddScoped<IRodadaService, RodadaService>();
-            services.AddScoped<IAgendamentoService, AgendamentoService>();
-            services.AddScoped<INotifyService, NotifyService>();
-            services.AddScoped<ISubProcessoRepositorio, SubProcessoRepositorio>();
-            services.AddScoped<IProcessoRepositorio, ProcessoRepositorio>();
-            services.AddScoped<ITimeRepositorio, TimeRepositorio>();
+            services.AddSingleton<IGerenciamentoTimesService, GerenciamentoTimesService>();
+            services.AddSingleton<IFootstatsService, FootstatsService>();
+            services.AddSingleton<IClassificacaoService, ClassificacaoService>();
+            services.AddSingleton<IPartidasService, PartidasService>();
+            services.AddSingleton<IFutebotService, FutebotService>();
+            services.AddSingleton<IProcessoService, ProcessoService>();
+            services.AddSingleton<IRodadaService, RodadaService>();
+            services.AddSingleton<IAgendamentoService, AgendamentoService>();
+            services.AddSingleton<INotifyService, NotifyService>();
+            services.AddSingleton<ISubProcessoRepositorio, SubProcessoRepositorio>();
+            services.AddSingleton<IProcessoRepositorio, ProcessoRepositorio>();
+            services.AddSingleton<ITimeRepositorio, TimeRepositorio>();
 
-            services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
+            services.AddSingleton(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
             services.AddQuartz(_ =>
             {
                 _.UseMicrosoftDependencyInjectionScopedJobFactory();
@@ -82,7 +84,7 @@ namespace Futebox
                .ConfigureRunner(rb => rb
                    .AddSQLite()
                    .WithGlobalConnectionString($"{Configuration.GetValue<string>("DatabaseName")}")
-                   .ScanIn(typeof(CriarEstruturaInicial).Assembly).For.Migrations())
+                   .ScanIn(typeof(DbSchemaTime).Assembly).For.Migrations())
                .AddLogging(lb => lb.AddFluentMigratorConsole())
                .BuildServiceProvider(false)
                .GetRequiredService<IMigrationRunner>()

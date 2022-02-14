@@ -14,39 +14,46 @@
     <hr class="col-3 col-md-2 mb-5">
 
     <div class="row g-5">
-        @foreach (var camp in Models.CampeonatoUtils.ObterCampeonatosAtivos())
+        @foreach (var camp in Model.campeonatosAtivos)
         {
-        <div class="co d-flex flex-column">
-            <h1>@($"{camp}")</h1>
-            <button class="btn btn-primary" onclick="Ver('@((int)camp)')">Ver</button>
-            <button class="btn btn-primary" onclick="GerarVideo('@((int)camp)')">Gerar Processo</button>
-        </div>
+            if (Futebox.Models.CampeonatoUtils.Config[camp].FasesPossiveis()?.Count() > 0)
+            {
+                @foreach (var fase in Futebox.Models.CampeonatoUtils.Config[camp].FasesPossiveis())
+                {
+                    <div class="co d-flex flex-column">
+                        <h1>@($"{camp} - {fase}")</h1>
+                        <button class="btn btn-primary" onclick="Ver('@((int)camp)', '@fase')">Ver</button>
+                        <button class="btn btn-primary" onclick="GerarVideo('@((int)camp)', '@fase')">Gerar Processo</button>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="co d-flex flex-column">
+                    <h1>@($"{camp}")</h1>
+                    <button class="btn btn-primary" onclick="Ver('@((int)camp)', '')">Ver</button>
+                    <button class="btn btn-primary" onclick="GerarVideo('@((int)camp)', '')">Gerar Processo</button>
+                </div>
+            }
         }
     </div>
 </div>
 
 @section Scripts{
     <script>
-        function Ver(camp) {
-            fetch(`/classificacao?handler=Campeonato&campeonato=${camp}`)
-                .then((response) => {
-                    return response.text();
-                })
-                .then((result) => {
-                    document.getElementById('classificacao').innerHTML = result;
-                });
+
+        function Ver(campeonato, fase) {
+            fetch(`/classificacao?handler=Campeonato&campeonato=${campeonato}&fase=${fase}`)
+                .then((response) => response.text())
+                .then((result) => document.getElementById('classificacao').innerHTML = result);
         }
 
-        function GerarVideo(camp) {
-            $.post(`/api/processo/classificacao/${camp}`, (response) => {
-                $.SendToast(response.id, 'Processo criado!');
-            });
+        function GerarVideo(campeonato, fase) {
+            $.post(`/api/processo/classificacao/${campeonato}?fase=${fase}`, (response) => $.SendToast(response.id, 'Processo criado!'));
         }
 
+        $('#classificacao').click(() => $('#classificacao').toggleClass('focus'));
 
-        $('#classificacao').click(() => {
-            $('#classificacao').toggleClass('focus');
-        })
     </script>
     @if ((Model.campeonatoFoco.HasValue))
     {

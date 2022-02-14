@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Futebox.Models;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Futebox.Models.Enums;
 using Futebox.Pages.Shared;
 
@@ -15,31 +13,31 @@ namespace Futebox.Pages
     {
         IRodadaService _service;
         public List<PartidaVM> partidas = new List<PartidaVM>();
-        public Campeonatos? campeonatoFoco = null;
+        public EnumCampeonato? campeonatoFoco = null;
         public int? rodadaFoco = null;
         public string nomeCampeonato;
-        private bool clearCache = false;
+        public PageViewModes visualizacao = PageViewModes.padrao;
 
         public RodadasModel(IRodadaService service)
         {
             _service = service;
         }
 
-        public void OnGet(string campeonato, string rodada, PageViewModes viewMode)
+        public void OnGet(PageViewModes visualizacao, string campeonato, string rodada)
         {
-            clearCache = skipCache(viewMode);
+            this.visualizacao = visualizacao;
             partidas = new List<PartidaVM>();
             if (!string.IsNullOrEmpty(campeonato))
-                campeonatoFoco = ((Campeonatos)int.Parse(campeonato));
+                campeonatoFoco = ((EnumCampeonato)int.Parse(campeonato));
             if (!string.IsNullOrEmpty(rodada))
                 rodadaFoco = (int.Parse(rodada));
         }
 
         public PartialViewResult OnGetRodada(int campeonato, int rodada)
         {
-            var enumCampeonato = (Campeonatos)campeonato;
+            var enumCampeonato = (EnumCampeonato)campeonato;
             nomeCampeonato = CampeonatoUtils.ObterNomeDoCampeonato(enumCampeonato);
-            partidas = _service.ObterPartidasDaRodada(enumCampeonato, rodada, clearCache)?.ToList();
+            partidas = _service.ObterPartidasDaRodada(enumCampeonato, rodada, UsarCache(visualizacao))?.ToList();
             rodadaFoco = rodada;
             partidas = partidas.OrderBy(_ => _.dataPartida).ToList();
 

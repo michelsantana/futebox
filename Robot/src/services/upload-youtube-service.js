@@ -26,18 +26,16 @@ module.exports = class UploadService {
   }
 
   async #AbrirBrowser() {
-    // this.browser = await pptr.launch({
-    //   headless: false,
-    //   userDataDir: `${process.env.USERPROFILE}\\AppData\\Local\\Chromium\\User Data`,
-    //   defaultViewport: { width: 1920, height: 1080 },
-    //   args: ['--no-sandbox', '--window-position=0,1080', ],
-    // });
+    const profileDir = process.env.USERPROFILE;
     this.browser = await pptr.launch({
-      executablePath: `${process.env.USERPROFILE}\\AppData\\Local\\Google\\Chrome SxS\\Application\\chrome.exe`,
+      executablePath: `${profileDir}\\AppData\\Local\\Google\\Chrome SxS\\Application\\chrome.exe`,
       headless: false,
-      userDataDir: `${process.env.USERPROFILE}\\AppData\\Local\\Google\\Chrome SxS\\User Data`,
+      userDataDir: `${profileDir}\\AppData\\Local\\Google\\Chrome SxS\\User Data`,
       defaultViewport: { width: 1920, height: 1080 },
-      args: [`--user-data-dir=${process.env.USERPROFILE}\\AppData\\Local\\Google\\Chrome SxS\\User Data\\Profile 1`],
+      args: [
+        `--user-data-dir=${profileDir}\\AppData\\Local\\Google\\Chrome SxS\\User Data\\`,
+        `--profile-directory="Profile 1"`
+      ],
     });
   }
 

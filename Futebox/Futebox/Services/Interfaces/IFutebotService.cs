@@ -1,5 +1,6 @@
 ﻿using Futebox.Models;
 using Futebox.Models.Enums;
+using System.Threading.Tasks;
 
 namespace Futebox.Services.Interfaces
 {
@@ -8,10 +9,10 @@ namespace Futebox.Services.Interfaces
         RobotResultApi VerificarConfiguracaoYoutubeBrowser();
         RobotResultApi VerificarConfiguracaoInstagramBrowser();
 
-        RobotResultApi GerarImagem(SubProcesso subProcesso);
-        RobotResultApi GerarAudio(SubProcesso subProcesso);
+        Task<RobotResultApi> GerarImagem(SubProcesso subProcesso);
+        Task<RobotResultApi> GerarAudio(SubProcesso subProcesso);
         RobotResultApi GerarVideo(SubProcesso subProcesso);
-        RobotResultApi PublicarVideo(SubProcesso subProcesso);
+        Task<RobotResultApi> PublicarVideo(SubProcesso subProcesso);
         RobotResultApi AbrirPasta(Processo subProcesso);
 
     }

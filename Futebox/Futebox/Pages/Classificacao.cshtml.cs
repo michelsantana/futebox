@@ -15,50 +15,60 @@ namespace Futebox.Pages
     {
         readonly IClassificacaoService _classificacaoService;
 
-        public List<ClassificacaoVM> classificacao;
-        public string nomeCampeonato;
-        public Campeonatos? campeonatoFoco = null;
-        public List<string> legenda = new List<string>();
-        private bool clearCache = false;
+        public EnumCampeonato? campeonatoFoco = null;
+        public EnumCampeonato[] campeonatosAtivos = CampeonatoUtils.ObterCampeonatosAtivos();
+        public PageViewModes visualizacao = PageViewModes.padrao;
 
         public ClassificacaoModel(IClassificacaoService classificacaoService)
         {
             _classificacaoService = classificacaoService;
         }
 
-        public void OnGet(string campeonato, PageViewModes viewMode)
+        public void OnGet(PageViewModes visualizacao, string campeonato)
         {
-            clearCache = skipCache(viewMode);
-            classificacao = new List<ClassificacaoVM>();
-            if (!string.IsNullOrEmpty(campeonato))
-                campeonatoFoco = ((Campeonatos)int.Parse(campeonato));
+            if (!string.IsNullOrEmpty(campeonato)) campeonatoFoco = ((Models.Enums.EnumCampeonato)int.Parse(campeonato));
+            this.visualizacao = visualizacao;
         }
 
-        public PartialViewResult OnGetCampeonato(int campeonato)
+        public PartialViewResult OnGetCampeonato(int campeonato, string fase = null)
         {
-            var enumCampeonato = (Campeonatos)campeonato;
-            nomeCampeonato = CampeonatoUtils.ObterNomeDoCampeonato(enumCampeonato);
-            classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(enumCampeonato, clearCache)?.ToList();
-            legenda.Clear();
-            var partial = "Templates/_tabelaDeClassificacao";
+            var partialModel = new PartialModel();
+            var enumCampeonato = (EnumCampeonato)campeonato;
+
+            partialModel.nomeCampeonato = CampeonatoUtils.ObterNomeDoCampeonato(enumCampeonato);
+
+            if(string.IsNullOrEmpty(fase)) partialModel.classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(enumCampeonato, UsarCache(visualizacao))?.ToList();
+            else partialModel.classificacao = _classificacaoService.ObterClassificacaoPorCampeonatoFase(enumCampeonato, fase, UsarCache(visualizacao))?.ToList();
+
+            string partial;
             switch (enumCampeonato)
             {
-                case Campeonatos.BrasileiraoSerieA:
-                    IdentificarCoresDestaqueBrasileiraoSerieA();
+                case EnumCampeonato.BrasileiraoSerieA:
+                    IdentificarCoresDestaqueBrasileiraoSerieA(partialModel);
+                    partial = "Templates/_tabelaDeClassificacao";
                     break;
-                case Campeonatos.BrasileiraoSerieB:
-                    IdentificarCoresDestaqueBrasileiraoSerieB();
+                case EnumCampeonato.BrasileiraoSerieB:
+                    IdentificarCoresDestaqueBrasileiraoSerieB(partialModel);
+                    partial = "Templates/_tabelaDeClassificacao";
                     break;
-                case Campeonatos.Libertadores2021:
+                case EnumCampeonato.Libertadores2021:
                     partial = "Templates/_tabelaDeClassificacaoLibertadores";
                     break;
+                case EnumCampeonato.Paulistao2022:
+                    IdentificarCoresDestaquePaulistao(partialModel);
+                    partial = "Templates/_tabelaDeClassificacaoLibertadores";
+                    break;
+                default:
+                    partial = "Templates/_tabelaDeClassificacao";
+                    break;
             }
-            return Partial(partial, this);
+            return Partial(partial, partialModel);
         }
 
-        private void IdentificarCoresDestaqueBrasileiraoSerieA()
+        private void IdentificarCoresDestaqueBrasileiraoSerieA(PartialModel partial)
         {
-            foreach (var time in classificacao)
+            partial.legenda.Clear();
+            foreach (var time in partial.classificacao)
             {
                 if (time.posicao < 5)
                 {
@@ -86,15 +96,16 @@ namespace Futebox.Pages
                     continue;
                 }
             }
-            legenda.Add("<span class='badge bg-info'>&nbsp;</span> Fase de grupos da Copa Libertadores");
-            legenda.Add("<span class='badge bg-warning'>&nbsp;</span> Qualificatórias da Copa Libertadores");
-            legenda.Add("<span class='badge bg-success'>&nbsp;</span> Fase de grupos da Copa Sul-Americana");
-            legenda.Add("<span class='badge bg-danger'>&nbsp;</span> Rebaixamento");
+            partial.legenda.Add("<span class='badge bg-info'>&nbsp;</span> Fase de grupos da Copa Libertadores");
+            partial.legenda.Add("<span class='badge bg-warning'>&nbsp;</span> Qualificatórias da Copa Libertadores");
+            partial.legenda.Add("<span class='badge bg-success'>&nbsp;</span> Fase de grupos da Copa Sul-Americana");
+            partial.legenda.Add("<span class='badge bg-danger'>&nbsp;</span> Rebaixamento");
         }
 
-        private void IdentificarCoresDestaqueBrasileiraoSerieB()
+        private void IdentificarCoresDestaqueBrasileiraoSerieB(PartialModel partial)
         {
-            foreach (var time in classificacao)
+            partial.legenda.Clear();
+            foreach (var time in partial.classificacao)
             {
                 if (time.posicao < 5)
                 {
@@ -112,8 +123,35 @@ namespace Futebox.Pages
                     continue;
                 }
             }
-            legenda.Add("<span class='badge bg-info'>&nbsp;</span> Promoção");
-            legenda.Add("<span class='badge bg-danger'>&nbsp;</span> Rebaixamento");
+            partial.legenda.Add("<span class='badge bg-info'>&nbsp;</span> Promoção");
+            partial.legenda.Add("<span class='badge bg-danger'>&nbsp;</span> Rebaixamento");
+        }
+
+        private void IdentificarCoresDestaquePaulistao(PartialModel partial)
+        {
+            partial.legenda.Clear();
+            foreach (var time in partial.classificacao)
+            {
+                if (time.posicao == 1 || time.posicao == 2)
+                {
+                    time.corDestaque = "azul";
+                    continue;
+                }
+                else
+                {
+                    time.corDestaque = "branco";
+                    continue;
+                }
+            }
+            partial.legenda.Add("<span class='badge bg-info'>&nbsp;</span> Próxima rodada");
+        }
+
+        public class PartialModel
+        {
+            public string nomeCampeonato { get; set; }
+            public string visualizacao { get; set; }
+            public List<ClassificacaoVM> classificacao { get; set; }
+            public List<string> legenda = new List<string>();
         }
     }
 }

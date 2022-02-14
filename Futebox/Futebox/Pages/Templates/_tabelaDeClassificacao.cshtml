@@ -1,4 +1,4 @@
-﻿@model ClassificacaoModel
+﻿@model ClassificacaoModel.PartialModel
 @{
     Dictionary<string, string> classes = new Dictionary<string, string>()
     {
@@ -112,7 +112,7 @@
                             <span class="badge @ObterDestaque(time.corDestaque)">&nbsp;</span>
                         </td>
                         <td class="fw-bold text-center">@(time.posicao)º</td>
-                        <td class="text-center"><img width="32" src='~/img/LOGO_@(time.time.sigla).png' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" /></td>
+                        <td class="text-center"><img width="32" src='@(time.time.ObterLogoLocal())' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" /></td>
                         <td class="fw-bold text-start">@time.clube</td>
                         <td class="fw-bold text-center">@time.pontos</td>
                         <td class="fw-bold text-center">@time.partidasJogadas</td>
@@ -151,7 +151,7 @@
                             <span class="@ObterDestaque(time.corDestaque)">&nbsp;</span>
                         </td>
                         <td class="fw-bold text-center">@(time.posicao)º</td>
-                        <td class="text-center"><img width="32" src='~/img/LOGO_@(time.time.sigla).png' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" /></td>
+                        <td class="text-center"><img width="32" src='@(time.time.ObterLogoLocal())' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" /></td>
                         <td class="fw-bold text-start">@time.clube</td>
                         <td class="fw-bold text-center">@time.pontos</td>
                         <td class="fw-bold text-center">@time.partidasJogadas</td>

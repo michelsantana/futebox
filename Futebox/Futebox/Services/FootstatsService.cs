@@ -42,7 +42,7 @@ namespace Futebox.Services
             return retorno;
         }
 
-        public List<FootstatsClassificacao> ObterClassificacaoServico(Campeonatos campeonato)
+        public List<FootstatsClassificacao> ObterClassificacaoServico(Models.Enums.EnumCampeonato campeonato)
         {
             var retorno = new List<FootstatsClassificacao>();
 
@@ -110,7 +110,7 @@ namespace Futebox.Services
             return retorno;
         }
 
-        public List<FootstatsPartida> ObterPartidasDaRodada(Campeonatos campeonato, int rodada)
+        public List<FootstatsPartida> ObterPartidasDaRodada(Models.Enums.EnumCampeonato campeonato, int rodada)
         {
             var retorno = new List<FootstatsPartida>();
 
@@ -126,7 +126,7 @@ namespace Futebox.Services
             return retorno;
         }
 
-        public List<FootstatsPartida> ObterPartidasDoCampeonato(Campeonatos campeonato)
+        public List<FootstatsPartida> ObterPartidasDoCampeonato(Models.Enums.EnumCampeonato campeonato)
         {
             var retorno = new List<FootstatsPartida>();
 

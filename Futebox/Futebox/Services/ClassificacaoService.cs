@@ -14,29 +14,45 @@ namespace Futebox.Services
         readonly ICacheHandler _cache;
         readonly ITimeRepositorio _timeRepositorio;
         readonly IFootstatsService _footstatsService;
-        readonly ILogger<IClassificacaoService> _logger;
 
-        public ClassificacaoService(ICacheHandler cache, ITimeRepositorio timeRepositorio, IFootstatsService footstatsService, ILogger<IClassificacaoService> logger)
+        public ClassificacaoService(ICacheHandler cache, ITimeRepositorio timeRepositorio, IFootstatsService footstatsService)
         {
             _cache = cache;
-            _logger = logger;
             _timeRepositorio = timeRepositorio;
             _footstatsService = footstatsService;
         }
 
-        public IEnumerable<ClassificacaoVM> ObterClassificacaoPorCampeonato(Campeonatos campeonato, bool clearCache = false)
+        public IEnumerable<ClassificacaoVM> ObterClassificacaoPorCampeonato(EnumCampeonato campeonato, bool usarCache = true)
         {
             var cacheName = $"{nameof(FootstatsClassificacao)}{campeonato}";
             var resultado = _cache.ObterConteudo<List<FootstatsClassificacao>>(cacheName);
-            if (resultado == null || resultado.Count == 0 || clearCache)
+            if (resultado == null || resultado.Count == 0 || !usarCache)
             {
                 resultado = _footstatsService.ObterClassificacaoServico(campeonato);
                 _cache.DefinirConteudo(cacheName, resultado, 3);
             }
-            return resultado.Select(_ => ConverterEmClassificacaoVM(_));
+
+            return resultado
+                .Select(_ => ConverterEmClassificacaoVM(_));
         }
 
-        public string ObterRoteiroDaClassificacao(IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
+        public IEnumerable<ClassificacaoVM> ObterClassificacaoPorCampeonatoFase(EnumCampeonato campeonato, string fase, bool usarCache = true)
+        {
+            var cacheName = $"{nameof(FootstatsClassificacao)}{campeonato}";
+            var resultado = _cache.ObterConteudo<List<FootstatsClassificacao>>(cacheName);
+            if (resultado == null || resultado.Count == 0 || !usarCache)
+            {
+                resultado = _footstatsService.ObterClassificacaoServico(campeonato);
+                _cache.DefinirConteudo(cacheName, resultado, 3);
+            }
+
+            resultado = resultado.GroupBy(_ => _.fase).First(_ => _.Key == fase).ToList();
+
+            return resultado
+                .Select(_ => ConverterEmClassificacaoVM(_));
+        }
+
+        public string ObterRoteiroDaClassificacao(IEnumerable<ClassificacaoVM> classificacao, EnumCampeonato campeonato)
         {
 
             var msg = $"{RoteiroDefaults.ObterSaudacao()} "
@@ -63,7 +79,7 @@ namespace Futebox.Services
             return msg;
         }
 
-        public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
+        public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<ClassificacaoVM> classificacao, EnumCampeonato campeonato)
         {
             var camp = CampeonatoUtils.ObterNomeDoCampeonato(campeonato);
             var data = DateTime.Now.ToString("dd/MM/yyyy");

@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Futebox.Models.Enums
+﻿namespace Futebox.Models.Enums
 {
-    public enum Campeonatos
+    public enum EnumCampeonato
     {
         BrasileiraoSerieA = 767,
         BrasileiraoSerieB = 769,
-        Libertadores2021 = 771
+        Libertadores2021 = 771,
+        Paulistao2022 = 789
     }
 
     public enum OrigemDado

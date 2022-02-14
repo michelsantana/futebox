@@ -22,8 +22,7 @@ namespace Futebox.Services
         IRodadaService _rodadaService;
         IFutebotService _futebotService;
 
-        public ProcessoService(IProcessoRepositorio processoRepositorio, ISubProcessoRepositorio subProcessoRepositorio,
-        IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IFutebotService futebotService)
+        public ProcessoService(IProcessoRepositorio processoRepositorio, ISubProcessoRepositorio subProcessoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IFutebotService futebotService)
         {
             _processoRepositorio = processoRepositorio;
             _subProcessoRepositorio = subProcessoRepositorio;
@@ -111,12 +110,12 @@ namespace Futebox.Services
             }
         }
 
-        public Processo SalvarProcessoClassificacao(Campeonatos campeonato)
+        public Processo SalvarProcessoClassificacao(Models.Enums.EnumCampeonato campeonato)
         {
             var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(campeonato, true);
             return SalvarProcessoClassificacao(new RedeSocialFinalidade[] { RedeSocialFinalidade.YoutubeVideo }.ToList(), classificacao, campeonato);
         }
-        private Processo SalvarProcessoClassificacao(List<RedeSocialFinalidade> redesSociais, IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
+        private Processo SalvarProcessoClassificacao(List<RedeSocialFinalidade> redesSociais, IEnumerable<ClassificacaoVM> classificacao, Models.Enums.EnumCampeonato campeonato)
         {
             var atributos = _classificacaoService.ObterAtributosDoVideo(classificacao, campeonato);
             var processo = new Processo()
@@ -140,7 +139,7 @@ namespace Futebox.Services
             }
             return processo;
         }
-        private void SalvarSubProcessoClassificacao(IEnumerable<ClassificacaoVM> classificacao, Tuple<string, string> atributos, Processo processo, Campeonatos campeonato, RedeSocialFinalidade redeSocial)
+        private void SalvarSubProcessoClassificacao(IEnumerable<ClassificacaoVM> classificacao, Tuple<string, string> atributos, Processo processo, Models.Enums.EnumCampeonato campeonato, RedeSocialFinalidade redeSocial)
         {
             var roteiro = _classificacaoService.ObterRoteiroDaClassificacao(classificacao, campeonato);
             if (redeSocial == RedeSocialFinalidade.YoutubeVideo)
@@ -178,13 +177,13 @@ namespace Futebox.Services
             }
         }
 
-        public Processo SalvarProcessoRodada(Campeonatos campeonato, int rodada)
+        public Processo SalvarProcessoRodada(Models.Enums.EnumCampeonato campeonato, int rodada)
         {
             var partidas = _rodadaService.ObterPartidasDaRodada(campeonato, rodada);
             return SalvarProcessoRodada(new RedeSocialFinalidade[] { RedeSocialFinalidade.YoutubeVideo }.ToList(), partidas, campeonato, rodada);
 
         }
-        public Processo SalvarProcessoRodada(List<RedeSocialFinalidade> redesSociais, IEnumerable<PartidaVM> partidas, Campeonatos campeonato, int rodada)
+        public Processo SalvarProcessoRodada(List<RedeSocialFinalidade> redesSociais, IEnumerable<PartidaVM> partidas, Models.Enums.EnumCampeonato campeonato, int rodada)
         {
             var atributos = _rodadaService.ObterAtributosDoVideo(partidas, campeonato, rodada);
             var processo = new Processo()
@@ -208,7 +207,7 @@ namespace Futebox.Services
             }
             return processo;
         }
-        private void SalvarSubProcessoRodada(IEnumerable<PartidaVM> partidas, int rodada, Tuple<string, string> atributos, Processo processo, Campeonatos campeonato, RedeSocialFinalidade redeSocial)
+        private void SalvarSubProcessoRodada(IEnumerable<PartidaVM> partidas, int rodada, Tuple<string, string> atributos, Processo processo, Models.Enums.EnumCampeonato campeonato, RedeSocialFinalidade redeSocial)
         {
             var roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, campeonato, rodada);
             if (redeSocial == RedeSocialFinalidade.YoutubeVideo)
@@ -271,10 +270,11 @@ namespace Futebox.Services
             return p;
         }
 
-        public void GerarImagem(ref Processo processo, ref SubProcesso sub)
+        public async Task GerarImagem(Processo processo, SubProcesso sub)
         {
             //AtualizarRoteiro(processo);
-            var resultado = _futebotService.GerarImagem(sub);
+            AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoImagem);
+            var resultado = await _futebotService.GerarImagem(sub);
             AtualizarProcessoLog(processo.id, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
@@ -284,20 +284,17 @@ namespace Futebox.Services
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
                 AtualizarStatus(ref processo, ref sub, StatusProcesso.ImagemErro);
-            }
-            if (resultado.status == HttpStatusCode.BadRequest)
-            {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.Erro);
+                throw new Exception("GerarImagem"); ;
             }
         }
 
-        public void GerarAudio(ref Processo processo, ref SubProcesso sub)
+        public async Task GerarAudio(Processo processo, SubProcesso sub)
         {
             //AtualizarRoteiro(processo);
-            AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoImagem);
-            var resultado = _futebotService.GerarAudio(sub);
-
+            AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoAudio);
+            var resultado = await _futebotService.GerarAudio(sub);
             AtualizarProcessoLog(processo.id, resultado.stack.ToArray());
+
             if (resultado.status == HttpStatusCode.OK)
             {
                 AtualizarStatus(ref processo, ref sub, StatusProcesso.AudioOK);
@@ -305,21 +302,17 @@ namespace Futebox.Services
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
                 AtualizarStatus(ref processo, ref sub, StatusProcesso.AudioErro);
+                throw new Exception("GerarAudio"); ;
             }
-            if (resultado.status == HttpStatusCode.BadRequest)
-            {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.Erro);
-            }
-            //return processoRetorno;
         }
 
-        public void GerarVideo(ref Processo processo, ref SubProcesso sub)
+        public async Task GerarVideo(Processo processo, SubProcesso sub)
         {
             //AtualizarRoteiro(processo);
-            AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoAudio);
+            AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoVideo);
             var resultado = _futebotService.GerarVideo(sub);
-
             AtualizarProcessoLog(processo.id, resultado.stack.ToArray());
+
             if (resultado.status == HttpStatusCode.OK)
             {
                 AtualizarStatus(ref processo, ref sub, StatusProcesso.VideoOK);
@@ -327,21 +320,17 @@ namespace Futebox.Services
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
                 AtualizarStatus(ref processo, ref sub, StatusProcesso.VideoErro);
+                throw new Exception("GerarVideo"); ;
             }
-            if (resultado.status == HttpStatusCode.BadRequest)
-            {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.Erro);
-            }
-            //return processoRetorno;
         }
 
-        public void PublicarVideo(ref Processo processo, ref SubProcesso sub)
+        public async Task PublicarVideo(Processo processo, SubProcesso sub)
         {
             //AtualizarRoteiro(processo);
-            AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoVideo);
-            var resultado = _futebotService.PublicarVideo(sub);
-
+            AtualizarStatus(ref processo, ref sub, StatusProcesso.Publicando);
+            var resultado = await _futebotService.PublicarVideo(sub);
             AtualizarProcessoLog(processo.id, resultado.stack.ToArray());
+
             if (resultado.status == HttpStatusCode.OK)
             {
                 AtualizarStatus(ref processo, ref sub, StatusProcesso.PublicandoOK);
@@ -349,19 +338,16 @@ namespace Futebox.Services
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
                 AtualizarStatus(ref processo, ref sub, StatusProcesso.PublicandoErro);
+                throw new Exception("PublicarVideo"); ;
             }
             if (resultado.status == HttpStatusCode.BadRequest)
             {
                 AtualizarStatus(ref processo, ref sub, StatusProcesso.Erro);
+                throw new Exception("PublicarVideo"); ;
             }
-            if (resultado.status == HttpStatusCode.Unauthorized)
-            {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.PublicandoErro);
-            }
-            //return processoRetorno;
         }
 
-        public void AbrirPasta(Processo processo)
+        public async Task AbrirPasta(Processo processo)
         {
             var resultado = _futebotService.AbrirPasta(processo);
             if (resultado.status == HttpStatusCode.InternalServerError) throw new Exception("Erro ao gerar o vídeo!");

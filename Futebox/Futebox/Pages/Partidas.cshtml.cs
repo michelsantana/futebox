@@ -30,7 +30,7 @@ namespace Futebox.Pages
             qsPageViewMode = viewMode;
             qsPartidaId = partidaId;
 
-            partidas = _calendarioService.ObterPartidasPeriodo(skipCache(viewMode))?.ToList();
+            partidas = _calendarioService.ObterPartidasPeriodo(UsarCache(viewMode))?.ToList();
             //partidas = _calendarioService.ObterPartidasAntigas("FootstatsPartida20211110").ToList();
         }
 
@@ -40,7 +40,7 @@ namespace Futebox.Pages
             qsPageViewMode = viewMode;
 
             //partidas = _calendarioService.ObterPartida(Convert.ToInt32(partidaId))?.ToList();
-            partida = _calendarioService.ObterPartida(Convert.ToInt32(partidaId), skipCache(viewMode));
+            partida = _calendarioService.ObterPartida(Convert.ToInt32(partidaId), UsarCache(viewMode));
 
             return Partial("Templates/_partidaFoco", this);
         }

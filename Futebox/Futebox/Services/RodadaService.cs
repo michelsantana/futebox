@@ -21,11 +21,11 @@ namespace Futebox.Services
             _partidasService = partidasService;
         }
 
-        public List<PartidaVM> ObterPartidasDaRodada(Campeonatos campeonato, int rodada, bool clearCache = false)
+        public List<PartidaVM> ObterPartidasDaRodada(Models.Enums.EnumCampeonato campeonato, int rodada, bool usarCache = true)
         {
             var cacheName = $"{nameof(PartidaVM)}-{campeonato}-{rodada}";
             var resultado = _cache.ObterConteudo<List<FootstatsPartida>>(cacheName);
-            if (resultado == null || resultado.Count == 0 || clearCache)
+            if (resultado == null || resultado.Count == 0 || !usarCache)
             {
                 resultado = _footStatsService.ObterPartidasDaRodada(campeonato, rodada);
                 _cache.DefinirConteudo(cacheName, resultado, 3);
@@ -33,7 +33,7 @@ namespace Futebox.Services
             return resultado.Select(_ => _partidasService.ConverterEmPartidaVM(_)).ToList();
         }
 
-        public string ObterRoteiroDaRodada(IEnumerable<PartidaVM> partidas, Campeonatos campeonato, int rodada)
+        public string ObterRoteiroDaRodada(IEnumerable<PartidaVM> partidas, Models.Enums.EnumCampeonato campeonato, int rodada)
         {
             var roteiro = RoteiroDefaults.ObterSaudacao();
             roteiro += $"Veja agora a programação dos jogos da {rodada}ª rodada do {CampeonatoUtils.ObterNomeDoCampeonato(campeonato)}: ";
@@ -67,7 +67,7 @@ namespace Futebox.Services
                 .Count > 0;
         }
 
-        public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<PartidaVM> partidas, Campeonatos campeonato, int rodada)
+        public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<PartidaVM> partidas, Models.Enums.EnumCampeonato campeonato, int rodada)
         {
             var camp = CampeonatoUtils.ObterNomeDoCampeonato(campeonato);
             var data = DateTime.Now.ToString("dd/MM/yyyy");

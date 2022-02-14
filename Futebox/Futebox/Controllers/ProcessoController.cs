@@ -63,13 +63,13 @@ namespace Futebox.Controllers
         [HttpPost("classificacao/{id}")]
         public async Task<Processo> AddProcessoClassificacao(string id)
         {
-            return _processoService.SalvarProcessoClassificacao((Campeonatos)int.Parse(id));
+            return _processoService.SalvarProcessoClassificacao((EnumCampeonato)int.Parse(id));
         }
 
         [HttpPost("rodada/{id}/{rodada}")]
         public async Task<Processo> AddProcessoRodada(string id, string rodada)
         {
-            return _processoService.SalvarProcessoRodada((Campeonatos)int.Parse(id), int.Parse(rodada));
+            return _processoService.SalvarProcessoRodada((EnumCampeonato)int.Parse(id), int.Parse(rodada));
         }
 
         [HttpGet("notificar/{id}")]
@@ -94,7 +94,7 @@ namespace Futebox.Controllers
         {
             var processo = _processoService.ObterProcesso(id);
             var subprocesso = _processoService.ObterSubProcessoId(sub);
-            _processoService.GerarImagem(ref processo, ref subprocesso);
+            _processoService.GerarImagem(processo, subprocesso);
             return true;
         }
 
@@ -103,7 +103,7 @@ namespace Futebox.Controllers
         {
             var processo = _processoService.ObterProcesso(id);
             var subprocesso = _processoService.ObterSubProcessoId(sub);
-            _processoService.GerarAudio(ref processo, ref subprocesso);
+            _processoService.GerarAudio(processo, subprocesso);
             return true;
         }
 
@@ -112,7 +112,7 @@ namespace Futebox.Controllers
         {
             var processo = _processoService.ObterProcesso(id);
             var subprocesso = _processoService.ObterSubProcessoId(sub);
-            _processoService.GerarVideo(ref processo, ref subprocesso);
+            _processoService.GerarVideo(processo, subprocesso);
             return true;
         }
 
@@ -121,7 +121,7 @@ namespace Futebox.Controllers
         {
             var processo = _processoService.ObterProcesso(id);
             var subprocesso = _processoService.ObterSubProcessoId(sub);
-            _processoService.PublicarVideo(ref processo, ref subprocesso);
+            _processoService.PublicarVideo(processo, subprocesso);
             return true;
         }
 

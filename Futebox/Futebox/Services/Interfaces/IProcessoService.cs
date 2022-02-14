@@ -2,6 +2,7 @@
 using Futebox.Models.Enums;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Futebox.Services.Interfaces
 {
@@ -14,16 +15,16 @@ namespace Futebox.Services.Interfaces
         SubProcesso ObterSubProcessoId(string subprocessoId);
 
         Processo SalvarProcessoPartida(int idPartida);
-        Processo SalvarProcessoClassificacao(Campeonatos campeonato);
-        Processo SalvarProcessoRodada(Campeonatos campeonato, int rodada);
+        Processo SalvarProcessoClassificacao(Models.Enums.EnumCampeonato campeonato);
+        Processo SalvarProcessoRodada(Models.Enums.EnumCampeonato campeonato, int rodada);
 
         Processo AgendarProcesso(string id, DateTime hora);
 
-        void GerarImagem(ref Processo processo, ref SubProcesso sub);
-        void GerarAudio(ref Processo processo, ref SubProcesso sub);
-        void GerarVideo(ref Processo processo, ref SubProcesso sub);
-        void PublicarVideo(ref Processo processo, ref SubProcesso sub);
-        void AbrirPasta(Processo processo);
+        Task GerarImagem(Processo processo, SubProcesso sub);
+        Task GerarAudio(Processo processo, SubProcesso sub);
+        Task GerarVideo(Processo processo, SubProcesso sub);
+        Task PublicarVideo(Processo processo, SubProcesso sub);
+        Task AbrirPasta(Processo processo);
 
         void AtualizarStatus(ref Processo processo, ref SubProcesso subProcesso, StatusProcesso status);
 

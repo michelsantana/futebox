@@ -4,14 +4,14 @@ namespace Futebox.Models
 {
     public class ProcessoClassificacaoArgs
     {
-        public Campeonatos campeonato { get; set; }
-        public ProcessoClassificacaoArgs(Campeonatos c)
+        public Enums.EnumCampeonato campeonato { get; set; }
+        public ProcessoClassificacaoArgs(Enums.EnumCampeonato c)
         {
             campeonato = c;
         }
         public ProcessoClassificacaoArgs(int c)
         {
-            campeonato = (Campeonatos)c;
+            campeonato = (Enums.EnumCampeonato)c;
         }
         public ProcessoClassificacaoArgs()
         {
@@ -21,16 +21,16 @@ namespace Futebox.Models
 
     public class ProcessoRodadaArgs
     {
-        public Campeonatos campeonato { get; set; }
+        public Enums.EnumCampeonato campeonato { get; set; }
         public int rodada { get; set; }
-        public ProcessoRodadaArgs(Campeonatos c, int r)
+        public ProcessoRodadaArgs(Enums.EnumCampeonato c, int r)
         {
             campeonato = c;
             rodada = r;
         }
         public ProcessoRodadaArgs(int c, int r)
         {
-            campeonato = (Campeonatos)c;
+            campeonato = (Enums.EnumCampeonato)c;
             rodada = r;
         }
         public ProcessoRodadaArgs()

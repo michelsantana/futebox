@@ -11,6 +11,7 @@ module.exports = class BatchService {
 
   constructor(settings = new Settings()) {
     this.settings = settings;
+    utils.criarPastaSeNaoExistir(this.settings.pasta);
   }
 
   #ObterArquivoImagem() {

@@ -17,6 +17,7 @@ module.exports = class ImagemService {
   constructor(settings) {
     this.settings = settings;
     this.result = new ServiceResult(Status.blank, 'instance', []);
+    utils.criarPastaSeNaoExistir(this.settings.pasta);
   }
 
   #ObterImagemVideo() {

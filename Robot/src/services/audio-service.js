@@ -17,6 +17,7 @@ module.exports = class AudioService {
 
   constructor(settings) {
     this.settings = settings;
+    utils.criarPastaSeNaoExistir(this.settings.pasta);
   }
 
   #ObterArquivoNaPastaDownloads() {

@@ -14,5 +14,6 @@ namespace Futebox
         public static string TelegramBotToken;
         public static string TelegramNotifyUserId;
         public static bool DEBUGMODE;
+        public static string ChromeDefaultDownloadFolder = "C:/Users/Michel/Downloads/";
     }
 }

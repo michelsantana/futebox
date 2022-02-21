@@ -6,9 +6,6 @@
 
 	<ItemGroup>
 	  <Compile Remove="Services\FutebotService.Audio.cs" />
-	  <Compile Remove="Services\InstagramService.cs" />
-	  <Compile Remove="Services\Interfaces\IYoutubeService.cs" />
-	  <Compile Remove="Services\YoutubeService.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

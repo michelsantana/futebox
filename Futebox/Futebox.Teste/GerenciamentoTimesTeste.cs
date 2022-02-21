@@ -19,6 +19,7 @@ namespace Futebox.Teste
 
         public GerenciamentoTimesTeste(DatabaseFixture db)
         {
+            RegisterMappings.Register();
             _db = db;
         }
         private FootstatsTime GerarUmTimeDoFootstats()

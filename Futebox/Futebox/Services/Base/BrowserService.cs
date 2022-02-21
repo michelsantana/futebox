@@ -110,7 +110,7 @@ namespace Futebox.Services
 
         public string JsFunction(string fn, params string[] args)
         {
-            var script = File.ReadAllText("js/puppeteer.js");
+            var script = File.ReadAllText($"{Settings.ApplicationsRoot}/js/puppeteer.js");
             var fnArgs = args?.Length > 0 ? args.Select(_ => $"'{_}'") : new string[] { };
             var fnArgsStr = string.Join(",", fnArgs);
             var fnExecutionStr = $"\n\n{fn}({fnArgsStr})";
@@ -120,6 +120,27 @@ namespace Futebox.Services
         public async Task<Page> NewPage()
         {
             return await _browser.NewPageAsync();
+        }
+
+        public async Task RedigitarTextoCampo(string seletor, string texto, Page page)
+        {
+            await page.ClickAsync(seletor);
+            WaitForMs(700);
+
+            await page.Keyboard.DownAsync("Control");
+            WaitForMs(700);
+
+            await page.Keyboard.PressAsync("A");
+            WaitForMs(700);
+
+            await page.Keyboard.UpAsync("Control");
+            WaitForMs(700);
+
+            await page.Keyboard.DownAsync("Backspace");
+            WaitForMs(700);
+
+            await page.Keyboard.TypeAsync(texto);
+            WaitForMs(700);
         }
 
         public void Dispose()

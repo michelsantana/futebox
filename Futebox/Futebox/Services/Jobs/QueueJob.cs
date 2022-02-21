@@ -120,7 +120,7 @@ namespace Futebox.Services.Jobs
                 {
                     sbNotificacao.AppendLine(EyeLog.Log($"[ERROR][{jobkey.Name}]"));
                     sbNotificacao.AppendLine(EyeLog.Log($"{ex.Message}"));
-                    await _notifyService.Notify(sbNotificacao.ToString());
+                    // await _notifyService.Notify(sbNotificacao.ToString());
                 }
             }
             catch (Exception ex)

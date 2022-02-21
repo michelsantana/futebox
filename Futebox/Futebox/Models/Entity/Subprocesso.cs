@@ -3,6 +3,7 @@ using Futebox.Models.Enums;
 using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -74,7 +75,7 @@ namespace Futebox.Models
                 nomeDoArquivoAudio = $"{processoId}.mp3",
                 nomeDoArquivoImagem = $"{RedeSocialFinalidade.YoutubeShorts}.png",
                 nomeDoArquivoVideo= $"{RedeSocialFinalidade.YoutubeShorts}.mp4",
-                pastaDoArquivo = $"{Settings.ApplicationsRoot}/Arquivos/{processoId}/",
+                pastaDoArquivo = Path.Combine(Settings.ApplicationsRoot, "Arquivos", processoId),
                 roteiro = roteiro,
                 tituloVideo = titulo,
                 descricaoVideo = descricao,
@@ -120,7 +121,7 @@ namespace Futebox.Models
                 nomeDoArquivoAudio = $"{processoId}.mp3",
                 nomeDoArquivoImagem = $"{RedeSocialFinalidade.YoutubeVideo}.png",
                 nomeDoArquivoVideo = $"{RedeSocialFinalidade.YoutubeVideo}.mp4",
-                pastaDoArquivo = $"{Settings.ApplicationsRoot}/Arquivos/{processoId}/",
+                pastaDoArquivo = Path.Combine(Settings.ApplicationsRoot, "Arquivos", processoId),
                 roteiro = roteiro,
                 tituloVideo = titulo,
                 descricaoVideo = descricao,
@@ -164,7 +165,7 @@ namespace Futebox.Models
                 nomeDoArquivoAudio = $"{processoId}.mp3",
                 nomeDoArquivoImagem = $"{RedeSocialFinalidade.InstagramVideo}.png",
                 nomeDoArquivoVideo = $"{RedeSocialFinalidade.InstagramVideo}.mp4",
-                pastaDoArquivo = $"{Settings.ApplicationsRoot}/Arquivos/{processoId}/",
+                pastaDoArquivo = Path.Combine(Settings.ApplicationsRoot, "Arquivos", processoId),
                 roteiro = roteiro,
                 legendaPostagem = legenda,
                 status = StatusProcesso.Criado

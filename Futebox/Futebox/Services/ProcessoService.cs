@@ -245,6 +245,7 @@ namespace Futebox.Services
             }
         }
 
+        
         public Processo AgendarProcesso(string id, DateTime hora)
         {
             var p = _processoRepositorio.GetById(id);
@@ -275,7 +276,7 @@ namespace Futebox.Services
             //AtualizarRoteiro(processo);
             AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoImagem);
             var resultado = await _futebotService.GerarImagem(sub);
-            AtualizarProcessoLog(processo.id, resultado.stack.ToArray());
+            AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
@@ -293,7 +294,7 @@ namespace Futebox.Services
             //AtualizarRoteiro(processo);
             AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoAudio);
             var resultado = await _futebotService.GerarAudio(sub);
-            AtualizarProcessoLog(processo.id, resultado.stack.ToArray());
+            AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
@@ -311,7 +312,7 @@ namespace Futebox.Services
             //AtualizarRoteiro(processo);
             AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoVideo);
             var resultado = _futebotService.GerarVideo(sub);
-            AtualizarProcessoLog(processo.id, resultado.stack.ToArray());
+            AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
@@ -329,7 +330,7 @@ namespace Futebox.Services
             //AtualizarRoteiro(processo);
             AtualizarStatus(ref processo, ref sub, StatusProcesso.Publicando);
             var resultado = await _futebotService.PublicarVideo(sub);
-            AtualizarProcessoLog(processo.id, resultado.stack.ToArray());
+            AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
@@ -354,6 +355,7 @@ namespace Futebox.Services
             if (resultado.status == HttpStatusCode.BadRequest) throw new Exception("Comando inválido");
         }
 
+
         public void AtualizarStatus(ref Processo processo, ref SubProcesso sub, StatusProcesso status)
         {
             //var p = _processoRepositorio.GetById(id);
@@ -366,13 +368,12 @@ namespace Futebox.Services
             sub = _subProcessoRepositorio.Update(sub);
         }
 
-        public void AtualizarProcessoLog(string id, string[] lines)
+        public void AtualizarProcessoLog(Processo processo, string[] lines)
         {
-            var p = _processoRepositorio.GetById(id);
-            p.alteracao = DateTime.Now;
-            p.statusMensagem = $"{p.statusMensagem}\n[UPDATE:{p.alteracao}]\n{string.Join("\n", lines)}";
+            processo.alteracao = DateTime.Now;
+            processo.statusMensagem = $"{processo.statusMensagem}\n[UPDATE:{processo.alteracao}]\n{string.Join("\n", lines)}";
 
-            _processoRepositorio.Update(p);
+            _processoRepositorio.Update(processo);
         }
 
         public Processo AtualizarRoteiro(Processo processo)

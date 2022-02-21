@@ -68,12 +68,15 @@ namespace Futebox
             services.AddSingleton<IProcessoRepositorio, ProcessoRepositorio>();
             services.AddSingleton<ITimeRepositorio, TimeRepositorio>();
 
+            services.AddSingleton<IInstagramService, InstagramService>();
+            services.AddSingleton<IYoutubeService, YoutubeService>();
+
             services.AddSingleton(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
             services.AddQuartz(_ =>
             {
                 _.UseMicrosoftDependencyInjectionScopedJobFactory();
             });
-            
+
             ConfigureMigrations(services);
             ConfigureFluentMapper();
         }

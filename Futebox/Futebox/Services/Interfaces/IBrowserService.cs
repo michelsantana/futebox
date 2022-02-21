@@ -12,5 +12,6 @@ namespace Futebox.Services.Interfaces
         void WaitFor(int seconds);
         void WaitForMs(int milliseconds);
         string JsFunction(string fn, params string[] args);
+        Task RedigitarTextoCampo(string seletor, string texto, Page page);
     }
 }

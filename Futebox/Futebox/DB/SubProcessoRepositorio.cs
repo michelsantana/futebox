@@ -1,10 +1,7 @@
-﻿using Futebox.DB.Interfaces;
-using Futebox.Interfaces.DB;
+﻿using Futebox.Interfaces.DB;
 using Futebox.Models;
 using Futebox.Models.Enums;
-using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace Futebox.DB
 {
@@ -22,19 +19,20 @@ namespace Futebox.DB
 
         public SubProcessoYoutubeVideo Inserir(SubProcessoYoutubeVideo sub)
         {
-            _ytv.Insert(ref sub);
+            if(string.IsNullOrEmpty(sub.id))
+            _ytv.InsertWithId(sub.id, ref sub);
             return sub;
         }
 
         public SubProcessoYoutubeShort Inserir(SubProcessoYoutubeShort sub)
         {
-            _yts.Insert(ref sub);
+            _yts.InsertWithId(sub.id, ref sub);
             return sub;
         }
 
         public SubProcessoInstagramVideo Inserir(SubProcessoInstagramVideo sub)
         {
-            _igv.Insert(ref sub);
+            _igv.InsertWithId(sub.id, ref sub);
             return sub;
         }
 

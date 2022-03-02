@@ -12,10 +12,17 @@ namespace Futebox.Services
     public partial class FutebotService : IFutebotService
     {
         readonly IBrowserService _browserService;
+        readonly IYoutubeService _youtubeService;
+        readonly IInstagramService _instagramService;
 
-        public FutebotService(IBrowserService browserService)
+        public FutebotService(
+            IBrowserService browserService,
+            IYoutubeService youtubeService,
+            IInstagramService instagramService)
         {
             _browserService = browserService;
+            _youtubeService = youtubeService;
+            _instagramService = instagramService;
         }
 
         public RobotResultApi VerificarConfiguracaoYoutubeBrowser()
@@ -74,12 +81,30 @@ namespace Futebox.Services
             }
         }
 
-        public async Task<RobotResultApi> GerarAudio(SubProcesso subProcesso)
+        public async Task<RobotResultApi> GerarAudio(SubProcesso subProcesso, bool buscarDoCache = false)
         {
             var result = new RobotResultApi("GerarAudio");
             result.Add("start");
+
             try
             {
+                var arquivoPastaDownload = Path.Combine(Settings.ChromeDefaultDownloadFolder, subProcesso.nomeDoArquivoAudio);
+
+                if (File.Exists(arquivoPastaDownload))
+                {
+                    FileInfo fi = new FileInfo(arquivoPastaDownload);
+                    if (buscarDoCache || fi.CreationTime > DateTime.Now.AddHours(-8))
+                    {
+                        result.Add("cache");
+                        File.Copy(arquivoPastaDownload, Path.Combine(subProcesso.pastaDoArquivo, subProcesso.nomeDoArquivoAudio), true);
+                        return result.Ok();
+                    }
+                    else
+                    {
+                        File.Move(arquivoPastaDownload, $"{arquivoPastaDownload.Replace(".mp3", "notcache.mp3")}", true);
+                    }
+                }
+
                 var urlIbm = "https://www.ibm.com/demos/live/tts-demo/self-service/home";
 
                 var page = await _browserService.NewPage();
@@ -115,7 +140,6 @@ namespace Futebox.Services
                 result.Add("download start");
 
                 var tentativas = 1;
-                var arquivoPastaDownload = Path.Combine(Settings.ChromeDefaultDownloadFolder, subProcesso.nomeDoArquivoAudio);
                 while (tentativas < 12 * 3)
                 {
                     if (File.Exists(arquivoPastaDownload))
@@ -130,7 +154,7 @@ namespace Futebox.Services
                 await page.WaitForSelectorAsync("#dwlend", new WaitForSelectorOptions { Timeout = 60000 * 5 }); // espera até 5 minutos
                 result.Add("download end");
 
-                File.Move(arquivoPastaDownload, Path.Combine(subProcesso.pastaDoArquivo, subProcesso.nomeDoArquivoAudio), true);
+                File.Copy(arquivoPastaDownload, Path.Combine(subProcesso.pastaDoArquivo, subProcesso.nomeDoArquivoAudio), true);
                 result.Add("file moved");
 
                 await page.CloseAsync();
@@ -197,12 +221,12 @@ namespace Futebox.Services
                 var conteudo = "";
                 if (subProcesso.redeSocial == Models.Enums.RedeSocialFinalidade.InstagramVideo)
                 {
-                    conteudo += $"ffmpeg - loop 1 - i {arquivoImagem} -i {arquivoAudio} -c:v libx264 -c:a copy -shortest {arquivoVideoTemp}\n";
-                    conteudo += $"ffmpeg - i {arquivoVideoTemp} -c:a aac -b:a 256k -ar 44100 -c:v libx264 -b:v 5M -r 30 -pix_fmt yuv420p -preset faster -tune stillimage {arquivoVideo}";
+                    conteudo += $"ffmpeg -loop 1 -i {arquivoImagem} -i {arquivoAudio} -c:v libx264 -c:a copy -shortest {arquivoVideoTemp}\n";
+                    conteudo += $"ffmpeg -i {arquivoVideoTemp} -c:a aac -b:a 256k -ar 44100 -c:v libx264 -b:v 5M -r 30 -pix_fmt yuv420p -preset faster -tune stillimage {arquivoVideo}";
                 }
                 else
                 {
-                    conteudo += $"ffmpeg - loop 1 - i {arquivoImagem} -i {arquivoAudio} -c:v libx264 -c:a copy -shortest {arquivoVideo}";
+                    conteudo += $"ffmpeg -loop 1 -i {arquivoImagem} -i {arquivoAudio} -c:v libx264 -c:a copy -shortest {arquivoVideo}";
                 }
 
                 File.WriteAllText(arquivoShell, conteudo);
@@ -215,6 +239,8 @@ namespace Futebox.Services
                 proc.Start();
                 proc.WaitForExit();
                 result.Add("cmd");
+
+                if (!File.Exists(arquivoVideo)) throw new Exception("File not found");
 
                 result.Add("end");
                 return result.Ok();
@@ -234,98 +260,17 @@ namespace Futebox.Services
 
                 _browserService.WaitForMs(2);
 
-                await PublicarYT(subProcesso);
+                if (subProcesso.redeSocial == Models.Enums.RedeSocialFinalidade.YoutubeVideo) result = await _youtubeService.Upload(subProcesso);
+                if (subProcesso.redeSocial == Models.Enums.RedeSocialFinalidade.YoutubeShorts) result = await _youtubeService.Upload(subProcesso);
+                if (subProcesso.redeSocial == Models.Enums.RedeSocialFinalidade.InstagramVideo) result = await _instagramService.Upload(subProcesso);
 
-                return result.Ok();
+                return result;
             }
             catch (Exception ex)
             {
                 result.Add(EyeLog.Log(ex));
                 return result.Error();
             }
-        }
-
-        private async Task<RobotResultApi> PublicarYT(SubProcesso subProcesso)
-        {
-
-            var result = new RobotResultApi("PublicarVideo");
-            result.Add("start");
-
-            var page = await _browserService.NewPage();
-            result.Add("newpage");
-
-            await page.SetViewportAsync(Viewport(1080, 720));
-            result.Add("viewport");
-
-            await page.GoToAsync("https://studio.youtube.com/channel/UCWs2h6plWKR8xCZM3ljNGRw", WaitUntilNavigation.Networkidle2);
-            result.Add("goto");
-
-            var loginStatus = await page.EvaluateExpressionAsync(_browserService.JsFunction("YTEstaLogado"));
-            if (!loginStatus.ToObject<bool>()) return result.Unauthorized();
-            result.Add("login");
-            _browserService.WaitFor(5);
-
-
-            await page.ClickAsync("#create-icon");
-            _browserService.WaitFor(1);
-
-            await page.ClickAsync("#text-item-0");
-            _browserService.WaitFor(1);
-
-            //await page.Cl(".item.style-scope.ytcp-quick-actions *");
-            //_browserService.WaitFor(1);
-            result.Add("upload.1");
-
-            var campoDoUpload = await page.QuerySelectorAsync("[type=\"file\"]");
-            await campoDoUpload.UploadFileAsync(Path.Combine(subProcesso.pastaDoArquivo, subProcesso.nomeDoArquivoVideo));
-            _browserService.WaitFor(10);
-            result.Add("upload.2");
-
-            await this.RedigitarTextoCampo(".input-container.title #textbox", subProcesso.obterTitulo(), page);
-            _browserService.WaitFor(1);
-            result.Add("title");
-
-            await this.RedigitarTextoCampo(".input-container.description #textbox", subProcesso.obterDescricao(), page);
-            _browserService.WaitFor(1);
-            result.Add("description");
-
-            //await page.ClickAsync(".dropdown.style-scope.ytcp-video-metadata-playlists");
-            //_browserService.WaitFor(1);
-            //result.Add("playlist.1");
-
-            //var clickId = await page.EvaluateExpressionAsync(_browserService.JsFunction("YTSelecionarPlaylist", $"{subProcesso.categoriaVideo}"));
-            //await page.ClickAsync($"{clickId.ToObject<string>()}");
-            //_browserService.WaitFor(1);
-            //result.Add("playlist.2");
-
-            //await page.ClickAsync(".done-button.action-button.style-scope.ytcp-playlist-dialog");
-            //_browserService.WaitFor(1);
-            //result.Add("playlist.3");
-
-            // obter link do video?
-
-            var seletorRodapeJanela = ".button-area.ytcp-uploads-dialog";
-
-            await page.ClickAsync($"{seletorRodapeJanela} #next-button");
-            _browserService.WaitFor(1);
-            await page.ClickAsync($"{seletorRodapeJanela} #next-button");
-            _browserService.WaitFor(1);
-            await page.ClickAsync($"{seletorRodapeJanela} #next-button");
-            _browserService.WaitFor(1);
-            result.Add("next");
-
-            if (true) await page.ClickAsync("[name=\"PRIVATE\"]");
-            _browserService.WaitFor(1);
-
-            await page.ClickAsync($"{seletorRodapeJanela} #done-button");
-            _browserService.WaitFor(4);
-            result.Add("publish");
-
-            await page.CloseAsync();
-            result.Add("close");
-
-            result.Add("end");
-            return result.Ok();
         }
 
         private async Task<RobotResultApi> PublicarIG(SubProcesso subProcesso)

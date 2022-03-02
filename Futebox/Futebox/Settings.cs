@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Futebox
 {
-    public class Settings
+    public static class Settings
     {
         public static string BackendRoot;
         public static string ApplicationsRoot;

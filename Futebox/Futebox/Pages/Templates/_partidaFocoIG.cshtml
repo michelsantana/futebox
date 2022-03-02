@@ -1,0 +1,177 @@
+﻿@model Futebox.Pages.PartidasModel
+@{
+    var isIG = Model.qsPageViewMode == Models.Enums.PageViewModes.igv;
+}
+<style>
+    #content {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        width: 1080px;
+        height: 1350px;
+        outline: 5px solid #f00;
+    }
+
+    #bg {
+        background: url(img/bg.png);
+        background-size: cover;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: stretch;
+    }
+
+    #h {
+        height: 100px;
+        font-size: 48px;
+        text-align: center;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: center;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #f {
+        height: 100px;
+        font-size: 48px;
+        text-align: center;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: center;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #s {
+        display: flex;
+        position: absolute;
+        left: 0;
+        width: 120px;
+        background: #fff6;
+        margin-top: 100px;
+        height: calc(100% - 200px);
+        flex-direction: column;
+    }
+
+        #s span {
+            font-size: 80px;
+            flex: 1;
+            line-height: 1;
+            -webkit-box-pack: center;
+            display: flex;
+            align-self: center;
+            align-items: center;
+            text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;
+        }
+
+    .score .fs-score {
+        font-size: 300px !important;
+        line-height: 1;
+        text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;
+        color: #000;
+    }
+
+    .score > .x {
+        font-size: 80px !important;
+        text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;
+    }
+
+    .name-l,
+    .name-r {
+        font-size: 72px;
+        text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;
+    }
+
+    .logo-l,
+    .logo-r {
+        width: 300px;
+    }
+
+        .logo-l > img,
+        .logo-r > img {
+            max-width: 100%;
+            max-height: 100%;
+            width: initial;
+            height: initial;
+        }
+
+    .wm {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+        opacity: .1;
+        display: flex;
+        margin: 0 auto;
+        align-content: center;
+        justify-content: center;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+
+        .wm > img {
+            width: 50%;
+        }
+</style>
+
+@if (Model.qsPageViewMode == Models.Enums.PageViewModes.padrao)
+{
+    <style>
+        #card {
+            zoom: .5;
+        }
+    </style>
+}
+
+<div id="content" class="card text-center">
+    <div class="wm">
+        <img src="~/img/logo-1.png" />
+    </div>
+    <div id="s" class="fs-sport">
+        @foreach (char c in @Model.partida.campeonato)
+        {
+            <span>@c</span>
+        }
+    </div>
+
+    <div>
+        <div id="h" class="card-header fs-sport">
+            @Model.partida.dataHoraDaPartida
+        </div>
+        <div class="card-body" id="bg">
+            <div class="d-flex justify-content-between flex-column align-items-center">
+                <div class="d-flex justify-content-between align-items-center fs-sport">
+                    <div class="logo-l">
+                        <img src="@(Model.partida.timeMandante.ObterLogoLocal())" />
+                        <div class="name-l">
+                            @(Model.partida.timeMandante.sigla)
+                        </div>
+                    </div>
+                </div>
+                <div class="score d-flex justify-content-between align-items-center">
+                    <div id="placar-1" class="fs-score fs-2">@(string.IsNullOrEmpty(Model.partida.golsMandante) ? "0" : Model.partida.golsMandante)</div>
+                    <div class="x">x</div>
+                    <div id="placar-2" class="fs-score fs-2">@(string.IsNullOrEmpty(Model.partida.golsVisitante) ? "0" : Model.partida.golsVisitante)</div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center fs-sport">
+                    <div class="logo-r">
+                        <div class="name-r">
+                            @(Model.partida.timeVisitante.sigla)
+                        </div>
+                        <img src="@(Model.partida.timeVisitante.ObterLogoLocal())" />
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="f" class="card-footer text-muted fs-sport f">
+            @Model.partida.estadio
+        </div>
+    </div>
+</div>

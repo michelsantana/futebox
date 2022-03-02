@@ -90,3 +90,8 @@ body {
 .fs-score {
     font-family: 'score' !important;
 }
+
+
+.table .today {
+    font-weight: 900;
+}

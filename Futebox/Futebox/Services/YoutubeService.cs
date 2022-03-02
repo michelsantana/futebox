@@ -155,6 +155,7 @@ namespace Futebox.Services
             }
             catch (Exception ex)
             {
+                await Fechar();
                 result.Add(EyeLog.Log(ex));
                 return result.Error();
             }

@@ -34,7 +34,7 @@ namespace Futebox
             Settings.RobotEndpointBaseUrl = Configuration.GetValue<string>("RobotEndpointBaseUrl");
             Settings.TelegramBotToken = DotEnv.Get("TELEGRAM_BOT_TOKEN");
             Settings.TelegramNotifyUserId = DotEnv.Get("TELEGRAM_NOTIFY_USERID");
-            Settings.DEBUGMODE = Configuration.GetValue<bool>("DEBUG");
+            Settings.DEBUGMODE = DotEnv.Get("DEFAULT_DEBUGMODE") == "true";
         }
 
         public IConfiguration Configuration { get; }

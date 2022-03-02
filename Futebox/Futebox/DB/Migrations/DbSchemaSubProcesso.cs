@@ -1,9 +1,4 @@
 ﻿using FluentMigrator;
-using FluentMigrator.Runner.Processors.SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Futebox.DB.Migrations
 {
@@ -31,6 +26,7 @@ namespace Futebox.DB.Migrations
         public const string descricaoVideo = nameof(descricaoVideo);
         public const string playlist = nameof(playlist);
         public const string legendaPostagem = nameof(legendaPostagem);
+        public const string args = nameof(args);
 
         public override void Down()
         {
@@ -64,6 +60,7 @@ namespace Futebox.DB.Migrations
             .WithColumn(descricaoVideo).AsString().Nullable()
             .WithColumn(playlist).AsString().Nullable()
             .WithColumn(legendaPostagem).AsString().Nullable()
+            .WithColumn(args).AsString().Nullable()
             ;
         }
     }

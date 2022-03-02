@@ -1,8 +1,15 @@
 ﻿using Futebox.Models.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace Futebox.Models
 {
-    public class ProcessoClassificacaoArgs
+    public interface IProcessoArgs
+    {
+
+    }
+
+    public class ProcessoClassificacaoArgs : IProcessoArgs
     {
         public Enums.EnumCampeonato campeonato { get; set; }
         public ProcessoClassificacaoArgs(Enums.EnumCampeonato c)
@@ -19,27 +26,19 @@ namespace Futebox.Models
         }
     }
 
-    public class ProcessoRodadaArgs
+    public class ProcessoRodadaArgs : IProcessoArgs
     {
-        public Enums.EnumCampeonato campeonato { get; set; }
+        public EnumCampeonato campeonato { get; set; }
         public int rodada { get; set; }
-        public ProcessoRodadaArgs(Enums.EnumCampeonato c, int r)
-        {
-            campeonato = c;
-            rodada = r;
-        }
-        public ProcessoRodadaArgs(int c, int r)
-        {
-            campeonato = (Enums.EnumCampeonato)c;
-            rodada = r;
-        }
-        public ProcessoRodadaArgs()
-        {
+        public int[] partidas { get; set; }
+        public RedeSocialFinalidade[] social { get; set; }
 
-        }
+        public int linhas { get; set; }
+        public int colunas { get; set; }
+
     }
 
-    public class ProcessoPartidaArgs
+    public class ProcessoPartidaArgs : IProcessoArgs
     {
         public int partidaId { get; set; }
         public ProcessoPartidaArgs(string pid)

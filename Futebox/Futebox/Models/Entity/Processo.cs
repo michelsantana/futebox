@@ -17,11 +17,13 @@ namespace Futebox.Models
         public string notificacao { get; set; }
         public DateTime? agendamento { get; set; }
         public bool agendado { get; set; }
-        public string pastaDosArquivos { get; set; }
 
         public string partidaId { get; set; }
         public string campeonatoId { get; set; }
-        public string rodadaId { get; set; }        
+        public string rodadaId { get; set; }
+
+        public EnumCampeonato campeonatoAsEnum() => string.IsNullOrEmpty(campeonatoId) ? EnumCampeonato.Indefinido : (EnumCampeonato)int.Parse(campeonatoId);
+        public int rodadaAsInt() => string.IsNullOrEmpty(rodadaId) ? -1 : int.Parse(rodadaId);
 
     }
 }

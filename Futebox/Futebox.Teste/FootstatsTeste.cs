@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Futebox.Teste
 {
-    [Collection(nameof(DataBaseCollection))]
+    [Collection(nameof(InjectorCollection))]
     public class FootstatsTeste
     { 
         [Fact]

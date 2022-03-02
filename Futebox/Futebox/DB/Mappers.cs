@@ -87,6 +87,7 @@ namespace Futebox.DB.Mappers
             Map(x => x.roteiro).ToColumn(DbSchemaSubProcesso.roteiro);
             Map(x => x.status).ToColumn(DbSchemaSubProcesso.status);
             Map(x => x.tituloVideo).ToColumn(DbSchemaSubProcesso.tituloVideo);
+            Map(x => x.args).ToColumn(DbSchemaSubProcesso.args);
         }
     }
 
@@ -115,6 +116,7 @@ namespace Futebox.DB.Mappers
             Map(x => x.redeSocial).ToColumn(DbSchemaSubProcesso.redeSocial);
             Map(x => x.roteiro).ToColumn(DbSchemaSubProcesso.roteiro);
             Map(x => x.status).ToColumn(DbSchemaSubProcesso.status);
+            Map(x => x.args).ToColumn(DbSchemaSubProcesso.args);
         }
     }
 

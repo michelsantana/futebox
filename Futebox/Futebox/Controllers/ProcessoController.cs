@@ -66,10 +66,11 @@ namespace Futebox.Controllers
             return _processoService.SalvarProcessoClassificacao((EnumCampeonato)int.Parse(id));
         }
 
-        [HttpPost("rodada/{id}/{rodada}")]
-        public async Task<Processo> AddProcessoRodada(string id, string rodada)
+        [HttpPost("rodada")]
+        public async Task<Processo> AddProcessoRodada([FromBody] ProcessoRodadaArgs args)
         {
-            return _processoService.SalvarProcessoRodada((EnumCampeonato)int.Parse(id), int.Parse(rodada));
+            if (args?.campeonato == 0) throw new Exception();
+            return _processoService.SalvarProcessoRodada(args);
         }
 
         [HttpGet("notificar/{id}")]

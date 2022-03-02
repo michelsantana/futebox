@@ -42,7 +42,14 @@ namespace Futebox.Pages
             //partidas = _calendarioService.ObterPartida(Convert.ToInt32(partidaId))?.ToList();
             partida = _calendarioService.ObterPartida(Convert.ToInt32(partidaId), UsarCache(viewMode));
 
-            return Partial("Templates/_partidaFoco", this);
+            if(viewMode == PageViewModes.igv)
+                return Partial("Templates/_partidaFocoIG", this);
+            if(viewMode == PageViewModes.yts)
+                return Partial("Templates/_partidaFocoYT", this);
+            if (viewMode == PageViewModes.ytv)
+                return Partial("Templates/_partidaFocoYT", this);
+
+            return Partial("Templates/_partidaFocoYT", this);
         }
 
     }

@@ -23,6 +23,12 @@ function IGEstaLogado() {
     return document.querySelectorAll('[aria-label="Nova publicação"]').length > 0;
 }
 
+function IGNaoPermiteNotificacao() {
+    try {
+        document.querySelectorAll('[role="dialog"] [tabindex]')[1].click()
+    } catch (e) {}
+}
+
 function IGSelecionarDimensoes() {
     document.querySelector('[aria-label="Selecionar corte"]').parentElement.parentElement.click();
     setTimeout(() => {

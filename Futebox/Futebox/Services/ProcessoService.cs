@@ -9,6 +9,7 @@ using System.Linq;
 using Futebox.Models.Enums;
 using System.Threading.Tasks;
 using System.Net;
+using System.IO;
 
 namespace Futebox.Services
 {
@@ -177,22 +178,19 @@ namespace Futebox.Services
             }
         }
 
-        public Processo SalvarProcessoRodada(Models.Enums.EnumCampeonato campeonato, int rodada)
+        public Processo SalvarProcessoRodada(ProcessoRodadaArgs args)
         {
-            var partidas = _rodadaService.ObterPartidasDaRodada(campeonato, rodada);
-            return SalvarProcessoRodada(new RedeSocialFinalidade[] { RedeSocialFinalidade.YoutubeVideo }.ToList(), partidas, campeonato, rodada);
+            var partidas = _rodadaService.ObterPartidasDaRodada(args.campeonato, args.rodada);
+            partidas = partidas.Where(_ => args.partidas.Contains(_.idExterno)).ToList();
 
-        }
-        public Processo SalvarProcessoRodada(List<RedeSocialFinalidade> redesSociais, IEnumerable<PartidaVM> partidas, Models.Enums.EnumCampeonato campeonato, int rodada)
-        {
-            var atributos = _rodadaService.ObterAtributosDoVideo(partidas, campeonato, rodada);
+            var atributos = _rodadaService.ObterAtributosDoVideo(partidas, args.campeonato, args.rodada);
             var processo = new Processo()
             {
                 nome = $"{atributos.Item1}",
                 categoria = CategoriaVideo.partida,
                 partidaId = null,
-                campeonatoId = ((int)campeonato).ToString(),
-                rodadaId = rodada.ToString(),
+                campeonatoId = ((int)args.campeonato).ToString(),
+                rodadaId = args.rodada.ToString(),
                 status = StatusProcesso.Criado,
                 agendado = false,
                 agendamento = DateTime.Now.AddMinutes(30),
@@ -201,24 +199,27 @@ namespace Futebox.Services
                 $"\nnome: {atributos.Item1}",
             };
             _processoRepositorio.Insert(ref processo);
-            foreach (var redeSocial in redesSociais)
+
+            foreach (var redeSocial in args.social)
             {
-                SalvarSubProcessoRodada(partidas, rodada, atributos, processo, campeonato, redeSocial);
+                SalvarSubProcessoRodada(partidas, args, atributos, processo, redeSocial);
             }
             return processo;
         }
-        private void SalvarSubProcessoRodada(IEnumerable<PartidaVM> partidas, int rodada, Tuple<string, string> atributos, Processo processo, Models.Enums.EnumCampeonato campeonato, RedeSocialFinalidade redeSocial)
+        private void SalvarSubProcessoRodada(IEnumerable<PartidaVM> partidas, ProcessoRodadaArgs args, Tuple<string, string> atributos, Processo processo, RedeSocialFinalidade redeSocial)
         {
-            var roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, campeonato, rodada);
+            var roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, args.campeonato, args.rodada);
+            var stringfiedArgs = JsonConvert.SerializeObject(args);
             if (redeSocial == RedeSocialFinalidade.YoutubeVideo)
             {
                 var sub = SubProcessoYoutubeVideo.New(processo.id,
                     CategoriaVideo.rodada,
-                    $"{Settings.ApplicationHttpBaseUrl}rodadas?campeonato={(int)campeonato}&rodada={rodada}&viewMode=ytv",
+                    $"",
                     roteiro,
                     atributos.Item1,
                     atributos.Item2 + $"\r\n{ObterDescricaoDefault()}",
-                    "rodada");
+                    "rodada",
+                    stringfiedArgs);
                 _subProcessoRepositorio.Inserir(sub);
             }
 
@@ -226,11 +227,12 @@ namespace Futebox.Services
             {
                 var sub = SubProcessoYoutubeShort.New(processo.id,
                     CategoriaVideo.rodada,
-                    $"{Settings.ApplicationHttpBaseUrl}rodadas?campeonato={(int)campeonato}&rodada={rodada}&viewMode=yts",
+                    $"",
                     roteiro,
                     atributos.Item1,
                     atributos.Item2 + $"\r\n{ObterDescricaoDefault()}",
-                    "rodada");
+                    "rodada",
+                    stringfiedArgs);
                 _subProcessoRepositorio.Inserir(sub);
             }
 
@@ -238,14 +240,15 @@ namespace Futebox.Services
             {
                 var sub = SubProcessoInstagramVideo.New(processo.id,
                     CategoriaVideo.rodada,
-                    $"{Settings.ApplicationHttpBaseUrl}rodadas?campeonato={(int)campeonato}&rodada={rodada}&viewMode=igv",
+                    $"",
                     roteiro,
-                    atributos.Item2 + $"\r\n{ObterDescricaoDefault()}");
+                    atributos.Item2 + $"\r\n{ObterDescricaoDefault()}",
+                    stringfiedArgs);
                 _subProcessoRepositorio.Inserir(sub);
             }
         }
 
-        
+
         public Processo AgendarProcesso(string id, DateTime hora)
         {
             var p = _processoRepositorio.GetById(id);
@@ -359,6 +362,8 @@ namespace Futebox.Services
         public void AtualizarStatus(ref Processo processo, ref SubProcesso sub, StatusProcesso status)
         {
             //var p = _processoRepositorio.GetById(id);
+            if (!Directory.Exists(sub.pastaDoArquivo)) Directory.CreateDirectory(sub.pastaDoArquivo);
+
             processo.alteracao = DateTime.Now;
             processo.status = StatusProcesso.Agendado;
             _processoRepositorio.Update(processo);

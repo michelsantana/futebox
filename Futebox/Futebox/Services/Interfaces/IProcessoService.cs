@@ -16,7 +16,7 @@ namespace Futebox.Services.Interfaces
 
         Processo SalvarProcessoPartida(int idPartida);
         Processo SalvarProcessoClassificacao(Models.Enums.EnumCampeonato campeonato);
-        Processo SalvarProcessoRodada(Models.Enums.EnumCampeonato campeonato, int rodada);
+        Processo SalvarProcessoRodada(ProcessoRodadaArgs args);
 
         Processo AgendarProcesso(string id, DateTime hora);
 

@@ -2,6 +2,7 @@
 {
     public enum EnumCampeonato
     {
+        Indefinido = -1,
         BrasileiraoSerieA = 767,
         BrasileiraoSerieB = 769,
         Libertadores2021 = 771,

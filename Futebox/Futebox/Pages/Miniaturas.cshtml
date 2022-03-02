@@ -1,0 +1,31 @@
+﻿@page
+@model Futebox.Pages.MiniaturasModel
+
+@switch (Model.tipo)
+{
+    case Models.Enums.CategoriaVideo.rodada:
+        @Html.Partial("MiniaturaRodada/_rodadaMiniatura", Model)
+        break;
+    default: break;
+}
+
+
+@section Scripts{
+    <script>
+        function Equality() {
+            $('#mini-container img').each((i, e) => {
+                var w = $(e).width();
+                var h = $(e).height();
+                var g = w < h ? w : h;
+                $(e).width(g);
+                $(e).height(g);
+            })
+        }
+
+        $(document).ready(() => {
+            Equality();
+            $('.text-fit-lg').each((i, e) => $(e).fitText(0.8));
+            $('.text-fit-sm').each((i, e) => $(e).fitText(2.6));
+        })
+    </script>
+}

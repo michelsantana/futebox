@@ -77,7 +77,7 @@ namespace Futebox.Services
                     Args = new string[] {
                     $"--user-data-dir={userProfile}\\AppData\\Local\\Google\\Chrome SxS\\User Data\\",
                     $"--profile-directory=\"Profile 1\"",
-                    $"--remote-debugging-port=21223",
+                    $"--remote-debugging-port=21233",
                     //$"--window-position=0,1080",
                 }
                 });
@@ -92,7 +92,7 @@ namespace Futebox.Services
             {
                 this._browser = await Puppeteer.ConnectAsync(new ConnectOptions
                 {
-                    BrowserURL = "http://127.0.0.1:21223"
+                    BrowserURL = "http://127.0.0.1:21233"
                 });
             }
             catch (Exception ex)

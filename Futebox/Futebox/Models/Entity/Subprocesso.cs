@@ -36,9 +36,18 @@ namespace Futebox.Models
         [JsonConverter(typeof(StringEnumConverter))]
         public CategoriaVideo categoriaVideo { get; set; }
 
+        public string args { get; set; }
+
         public abstract string obterTitulo();
         public abstract string obterDescricao();
         public abstract string obterLegenda();
+
+        private IProcessoArgs _args;
+        public T ToArgs<T>() where T : IProcessoArgs
+        {   
+            if(_args == null) _args = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(this.args);
+            return (T)_args;
+        }
     }
 
     public abstract class YoutubeSubProcessoBase : SubProcesso
@@ -55,32 +64,39 @@ namespace Futebox.Models
 
     public class SubProcessoYoutubeShort : YoutubeSubProcessoBase
     {
+        public const RedeSocialFinalidade social = RedeSocialFinalidade.YoutubeShorts;
         public static SubProcessoYoutubeShort New(string processoId,
             CategoriaVideo categoria,
+#warning remover
             string linkImagemVideo,
             string roteiro,
             string titulo,
             string descricao,
-            string playlist
+            string playlist,
+            string args = null
             )
         {
+            var id = DateTime.Now.ToString("yyyyMMddHHmmssffff");
             return new SubProcessoYoutubeShort()
             {
+                id = id,
                 processoId = processoId,
                 redeSocial = RedeSocialFinalidade.YoutubeShorts,
                 categoriaVideo = categoria,
-                linkDaImagemDoVideo = linkImagemVideo,
-                alturaVideo = 1920,
-                larguraVideo = 1080,
+                //linkDaImagemDoVideo = linkImagemVideo,
+                linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}Miniaturas?t={categoria}&q={args}&w={SocialMediaUtils.Width(social)}&h={SocialMediaUtils.Height(social)}",
+                alturaVideo = SocialMediaUtils.Height(social),
+                larguraVideo = SocialMediaUtils.Width(social),
                 nomeDoArquivoAudio = $"{processoId}.mp3",
-                nomeDoArquivoImagem = $"{RedeSocialFinalidade.YoutubeShorts}.png",
-                nomeDoArquivoVideo= $"{RedeSocialFinalidade.YoutubeShorts}.mp4",
+                nomeDoArquivoImagem = $"{social}.png",
+                nomeDoArquivoVideo = $"{social}.mp4",
                 pastaDoArquivo = Path.Combine(Settings.ApplicationsRoot, "Arquivos", processoId),
                 roteiro = roteiro,
                 tituloVideo = titulo,
                 descricaoVideo = descricao,
                 playlist = playlist,
-                status = StatusProcesso.Criado
+                status = StatusProcesso.Criado,
+                args = args,
             };
         }
 
@@ -102,31 +118,39 @@ namespace Futebox.Models
 
     public class SubProcessoYoutubeVideo : YoutubeSubProcessoBase
     {
+        public const RedeSocialFinalidade social = RedeSocialFinalidade.YoutubeVideo;
+        
         public static SubProcessoYoutubeVideo New(string processoId,
             CategoriaVideo categoria,
+#warning remover
             string linkImagemVideo,
             string roteiro,
             string titulo,
             string descricao,
-            string playlist)
+            string playlist,
+            string args = null)
         {
+            var id = DateTime.Now.ToString("yyyyMMddHHmmssffff");
             return new SubProcessoYoutubeVideo()
             {
+                id = id,
                 processoId = processoId,
-                redeSocial = RedeSocialFinalidade.YoutubeVideo,
+                redeSocial = social,
                 categoriaVideo = categoria,
-                linkDaImagemDoVideo = linkImagemVideo,
-                alturaVideo = 1080,
-                larguraVideo = 1920,
+                //linkDaImagemDoVideo = linkImagemVideo,
+                linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}Miniaturas?t={categoria}&q={args}&w={SocialMediaUtils.Width(social)}&h={SocialMediaUtils.Height(social)}",
+                alturaVideo = SocialMediaUtils.Width(social),
+                larguraVideo = SocialMediaUtils.Height(social),
                 nomeDoArquivoAudio = $"{processoId}.mp3",
-                nomeDoArquivoImagem = $"{RedeSocialFinalidade.YoutubeVideo}.png",
-                nomeDoArquivoVideo = $"{RedeSocialFinalidade.YoutubeVideo}.mp4",
+                nomeDoArquivoImagem = $"{social}.png",
+                nomeDoArquivoVideo = $"{social}.mp4",
                 pastaDoArquivo = Path.Combine(Settings.ApplicationsRoot, "Arquivos", processoId),
                 roteiro = roteiro,
                 tituloVideo = titulo,
                 descricaoVideo = descricao,
                 playlist = playlist,
-                status = StatusProcesso.Criado
+                status = StatusProcesso.Criado,
+                args = args,
             };
         }
 
@@ -148,27 +172,35 @@ namespace Futebox.Models
 
     public class SubProcessoInstagramVideo : InstagramSubProcessoBase
     {
+        public const RedeSocialFinalidade social = RedeSocialFinalidade.InstagramVideo;
+
         public static SubProcessoInstagramVideo New(string processoId,
             CategoriaVideo categoria,
+#warning remover
             string linkImagemVideo,
             string roteiro,
-            string legenda)
+            string legenda,
+            string args = null)
         {
+            var id = DateTime.Now.ToString("yyyyMMddHHmmssffff");
             return new SubProcessoInstagramVideo()
             {
+                id = id,
                 processoId = processoId,
-                redeSocial = RedeSocialFinalidade.InstagramVideo,
+                redeSocial = social,
                 categoriaVideo = categoria,
-                linkDaImagemDoVideo = linkImagemVideo,
-                alturaVideo = 1350,
-                larguraVideo = 1080,
+                //linkDaImagemDoVideo = linkImagemVideo,
+                linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}Miniaturas?t={categoria}&q={args}&w={SocialMediaUtils.Width(social)}&h={SocialMediaUtils.Height(social)}",
+                alturaVideo = SocialMediaUtils.Height(social),
+                larguraVideo = SocialMediaUtils.Width(social),
                 nomeDoArquivoAudio = $"{processoId}.mp3",
-                nomeDoArquivoImagem = $"{RedeSocialFinalidade.InstagramVideo}.png",
-                nomeDoArquivoVideo = $"{RedeSocialFinalidade.InstagramVideo}.mp4",
+                nomeDoArquivoImagem = $"{social}.png",
+                nomeDoArquivoVideo = $"{social}.mp4",
                 pastaDoArquivo = Path.Combine(Settings.ApplicationsRoot, "Arquivos", processoId),
                 roteiro = roteiro,
                 legendaPostagem = legenda,
-                status = StatusProcesso.Criado
+                status = StatusProcesso.Criado,
+                args = args,
             };
         }
 

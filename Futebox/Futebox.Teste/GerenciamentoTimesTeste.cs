@@ -11,13 +11,13 @@ using Xunit;
 
 namespace Futebox.Teste
 {
-    [Collection(nameof(DataBaseCollection))]
+    [Collection(nameof(InjectorCollection))]
     public class GerenciamentoTimesTeste
     {
 
-        private readonly DatabaseFixture _db;
+        private readonly InjectorFixture _db;
 
-        public GerenciamentoTimesTeste(DatabaseFixture db)
+        public GerenciamentoTimesTeste(InjectorFixture db)
         {
             RegisterMappings.Register();
             _db = db;

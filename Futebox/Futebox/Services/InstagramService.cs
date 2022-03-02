@@ -44,6 +44,9 @@ namespace Futebox.Services
 
         public async Task AbrirUpload()
         {
+            await _page.EvaluateExpressionAsync(_browserService.JsFunction("IGNaoPermiteNotificacao"));
+            _browserService.WaitFor(1);
+
             await _page.ClickAsync("[aria-label=\"Nova publicação\"]");
             _browserService.WaitFor(1);
         }
@@ -83,7 +86,7 @@ namespace Futebox.Services
 
         public async Task Fechar()
         {
-            await _page.CloseAsync();
+            await _page?.CloseAsync();
             _page = null;
         }
 
@@ -139,6 +142,7 @@ namespace Futebox.Services
             }
             catch (Exception ex)
             {
+                await Fechar();
                 result.Add(EyeLog.Log(ex));
                 return result.Error();
             }

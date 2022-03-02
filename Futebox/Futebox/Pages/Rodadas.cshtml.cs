@@ -11,8 +11,8 @@ namespace Futebox.Pages
 {
     public class RodadasModel : BaseViewModel
     {
-        IRodadaService _service;
-        public List<PartidaVM> partidas = new List<PartidaVM>();
+        readonly IRodadaService _service;
+
         public EnumCampeonato? campeonatoFoco = null;
         public int? rodadaFoco = null;
         public string nomeCampeonato;
@@ -26,22 +26,20 @@ namespace Futebox.Pages
         public void OnGet(PageViewModes visualizacao, string campeonato, string rodada)
         {
             this.visualizacao = visualizacao;
-            partidas = new List<PartidaVM>();
-            if (!string.IsNullOrEmpty(campeonato))
-                campeonatoFoco = ((EnumCampeonato)int.Parse(campeonato));
-            if (!string.IsNullOrEmpty(rodada))
-                rodadaFoco = (int.Parse(rodada));
+            if (!string.IsNullOrEmpty(campeonato)) campeonatoFoco = ((EnumCampeonato)int.Parse(campeonato));
+            if (!string.IsNullOrEmpty(rodada)) rodadaFoco = (int.Parse(rodada));
         }
 
         public PartialViewResult OnGetRodada(int campeonato, int rodada)
         {
             var enumCampeonato = (EnumCampeonato)campeonato;
             nomeCampeonato = CampeonatoUtils.ObterNomeDoCampeonato(enumCampeonato);
-            partidas = _service.ObterPartidasDaRodada(enumCampeonato, rodada, UsarCache(visualizacao))?.ToList();
             rodadaFoco = rodada;
+
+            var partidas = _service.ObterPartidasDaRodada(enumCampeonato, rodada, UsarCache(visualizacao))?.ToList();
             partidas = partidas.OrderBy(_ => _.dataPartida).ToList();
 
-            return Partial("Templates/_partidaCard", this);
+            return Partial("Rodada/_rodadaListagem", partidas);
         }
     }
 }

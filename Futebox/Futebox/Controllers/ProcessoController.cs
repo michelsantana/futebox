@@ -31,54 +31,29 @@ namespace Futebox.Controllers
             return _processoService.ObterProcesso(id);
         }
 
-        [HttpGet("{id}/{sub}/obter")]
-        public async Task<Dictionary<string, object>> ObterProcesso(string id, string sub)
-        {
-            return new Dictionary<string, object>()
-            {
-                { "processo", _processoService.ObterProcesso(id) },
-                { "subprocesso", _processoService.ObterSubProcessoId(sub) }
-            };
-        }
-
-        [HttpGet("{id}/{sub}/sub")]
-        public async Task<SubProcesso> ObterSubProcesso(string id, string sub)
-        {
-            var subs = _processoService.ObterSubProcessos(id).Find(_ => _.id == sub);
-            return subs;
-        }
-
         [HttpPost("{id}/deletar")]
         public async Task<bool> DeletarProcesso(string id)
         {
             return _processoService.Delete(id);
         }
 
-        [HttpPost("partida/{id}")]
-        public async Task<Processo> AddProcessoPartida(string id)
+        [HttpPost("partida")]
+        public async Task<List<Processo>> AddProcessoPartida([FromBody] ProcessoPartidaArgs[] args)
         {
-            return _processoService.SalvarProcessoPartida(int.Parse(id));
+            throw new NotImplementedException();
         }
 
-        [HttpPost("classificacao/{id}")]
-        public async Task<Processo> AddProcessoClassificacao(string id)
+        [HttpPost("classificacao")]
+        public async Task<List<Processo>> AddProcessoClassificacao([FromBody] ProcessoClassificacaoArgs[] args)
         {
-            return _processoService.SalvarProcessoClassificacao((EnumCampeonato)int.Parse(id));
+            throw new NotImplementedException();
         }
 
         [HttpPost("rodada")]
-        public async Task<Processo> AddProcessoRodada([FromBody] ProcessoRodadaArgs args)
+        public async Task<List<Processo>> AddProcessoRodada([FromBody] ProcessoRodadaArgs[] args)
         {
-            if (args?.campeonato == 0) throw new Exception();
+            if (args == null || args?.Length == 0) throw new Exception();
             return _processoService.SalvarProcessoRodada(args);
-        }
-
-        [HttpGet("notificar/{id}")]
-        public async Task<bool> NotificarProcesso(string id)
-        {
-            var p = _processoService.ObterProcesso(id);
-            _notifyService.Notify(p.notificacao);
-            return true;
         }
 
         [HttpGet("agendar/{id}")]
@@ -90,48 +65,58 @@ namespace Futebox.Controllers
             return true;
         }
 
-        [HttpGet("robo/imagem/{id}/{sub}")]
-        public async Task<bool> GerarImagem(string id, string sub)
-        {
-            var processo = _processoService.ObterProcesso(id);
-            var subprocesso = _processoService.ObterSubProcessoId(sub);
-            _processoService.GerarImagem(processo, subprocesso);
-            return true;
-        }
+        //[HttpGet("notificar/{id}")]
+        //public async Task<bool> NotificarProcesso(string id)
+        //{
+        //    var p = _processoService.ObterProcesso(id);
+        //    _notifyService.Notify(p.notificacao);
+        //    return true;
+        //}
 
-        [HttpGet("robo/audio/{id}/{sub}")]
-        public async Task<bool> GerarAudio(string id, string sub)
-        {
-            var processo = _processoService.ObterProcesso(id);
-            var subprocesso = _processoService.ObterSubProcessoId(sub);
-            _processoService.GerarAudio(processo, subprocesso);
-            return true;
-        }
 
-        [HttpGet("robo/video/{id}/{sub}")]
-        public async Task<bool> GerarVideo(string id, string sub)
-        {
-            var processo = _processoService.ObterProcesso(id);
-            var subprocesso = _processoService.ObterSubProcessoId(sub);
-            _processoService.GerarVideo(processo, subprocesso);
-            return true;
-        }
 
-        [HttpGet("robo/publicar/{id}/{sub}")]
-        public async Task<bool> PublicarVideo(string id, string sub)
-        {
-            var processo = _processoService.ObterProcesso(id);
-            var subprocesso = _processoService.ObterSubProcessoId(sub);
-            _processoService.PublicarVideo(processo, subprocesso);
-            return true;
-        }
+        //[HttpGet("robo/imagem/{id}/{sub}")]
+        //public async Task<bool> GerarImagem(string id, string sub)
+        //{
+        //    var processo = _processoService.ObterProcesso(id);
+        //    var subprocesso = _processoService.ObterSubProcessoId(sub);
+        //    _processoService.GerarImagem(processo, subprocesso);
+        //    return true;
+        //}
 
-        [HttpGet("robo/pasta/{id}")]
-        public async Task<bool> PastaVideo(string id)
-        {
-            var processo = _processoService.ObterProcesso(id);
-            _processoService.AbrirPasta(processo);
-            return true;
-        }
+        //[HttpGet("robo/audio/{id}/{sub}")]
+        //public async Task<bool> GerarAudio(string id, string sub)
+        //{
+        //    var processo = _processoService.ObterProcesso(id);
+        //    var subprocesso = _processoService.ObterSubProcessoId(sub);
+        //    _processoService.GerarAudio(processo, subprocesso);
+        //    return true;
+        //}
+
+        //[HttpGet("robo/video/{id}/{sub}")]
+        //public async Task<bool> GerarVideo(string id, string sub)
+        //{
+        //    var processo = _processoService.ObterProcesso(id);
+        //    var subprocesso = _processoService.ObterSubProcessoId(sub);
+        //    _processoService.GerarVideo(processo, subprocesso);
+        //    return true;
+        //}
+
+        //[HttpGet("robo/publicar/{id}/{sub}")]
+        //public async Task<bool> PublicarVideo(string id, string sub)
+        //{
+        //    var processo = _processoService.ObterProcesso(id);
+        //    var subprocesso = _processoService.ObterSubProcessoId(sub);
+        //    _processoService.PublicarVideo(processo, subprocesso);
+        //    return true;
+        //}
+
+        //[HttpGet("robo/pasta/{id}")]
+        //public async Task<bool> PastaVideo(string id)
+        //{
+        //    var processo = _processoService.ObterProcesso(id);
+        //    _processoService.AbrirPasta(processo);
+        //    return true;
+        //}
     }
 }

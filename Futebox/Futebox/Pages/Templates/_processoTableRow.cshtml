@@ -1,6 +1,6 @@
-﻿@model Tuple<Futebox.Pages.ProcessosModel, int, Futebox.Models.Processo, List<Futebox.Models.SubProcesso>>
+﻿@model Tuple<Futebox.Pages.ProcessosModel, Futebox.Models.Processo>
 @{
-    var processo = Model.Item3;
+    var processo = Model.Item2;
     //var indexStr = $"00000000{Model.Item2}";
     //var index = processo.portaExecucao ?? $"219{indexStr.Substring(indexStr.Length - 2)}";
     var model = Model.Item1;
@@ -37,9 +37,6 @@
 </tr>
 <tr data-row-id="@processo.id" style="border-bottom: 1px solid #cdcdcd">
     <td class="pt-0" colspan="2">
-        @foreach (var s in Model.Item4)
-        {
-            @Html.Partial("Templates/_processoSteps", s)
-        }
+        @Html.Partial("Templates/_processoSteps", processo)
     </td>
 </tr>

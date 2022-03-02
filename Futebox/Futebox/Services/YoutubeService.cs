@@ -106,7 +106,7 @@ namespace Futebox.Services
             return _page;
         }
 
-        public async Task<RobotResultApi> Upload(SubProcesso subProcesso)
+        public async Task<RobotResultApi> Upload(Processo processo)
         {
             var result = new RobotResultApi("PublicarVideo");
             result.Add("start");
@@ -123,18 +123,18 @@ namespace Futebox.Services
                 await AbrirUpload();
                 result.Add("upload.1");
 
-                await EfetuarUploadArquivo(Path.Combine(subProcesso.pastaDoArquivo, subProcesso.nomeDoArquivoVideo));
+                await EfetuarUploadArquivo(Path.Combine(processo.pasta, processo.nomeDoArquivoVideo));
                 result.Add("upload.2");
 
-                await _browserService.RedigitarTextoCampo(".input-container.title #textbox", subProcesso.obterTitulo(), _page);
+                await _browserService.RedigitarTextoCampo(".input-container.title #textbox", processo.obterTitulo(), _page);
                 _browserService.WaitFor(1);
                 result.Add("title");
 
-                await _browserService.RedigitarTextoCampo(".input-container.description #textbox", subProcesso.obterDescricao(), _page);
+                await _browserService.RedigitarTextoCampo(".input-container.description #textbox", processo.obterDescricao(), _page);
                 _browserService.WaitFor(1);
                 result.Add("description");
 
-                await SelecionarPlayList($"{subProcesso.categoriaVideo}");
+                await SelecionarPlayList($"{processo.categoria}");
                 result.Add("playlist.1");
 
                 await ClicarEmProximo();

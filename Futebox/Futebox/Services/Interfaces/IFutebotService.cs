@@ -9,11 +9,11 @@ namespace Futebox.Services.Interfaces
         RobotResultApi VerificarConfiguracaoYoutubeBrowser();
         RobotResultApi VerificarConfiguracaoInstagramBrowser();
 
-        Task<RobotResultApi> GerarImagem(SubProcesso subProcesso);
-        Task<RobotResultApi> GerarAudio(SubProcesso subProcesso, bool buscarDoCache = false);
-        RobotResultApi GerarVideo(SubProcesso subProcesso);
-        Task<RobotResultApi> PublicarVideo(SubProcesso subProcesso);
-        RobotResultApi AbrirPasta(Processo subProcesso);
+        Task<RobotResultApi> GerarImagem(Processo processo);
+        Task<RobotResultApi> GerarAudio(Processo processo, bool buscarDoCache = false);
+        RobotResultApi GerarVideo(Processo processo);
+        Task<RobotResultApi> PublicarVideo(Processo processo);
+        RobotResultApi AbrirPasta(Processo processo);
 
     }
 }

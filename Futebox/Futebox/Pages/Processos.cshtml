@@ -25,9 +25,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var tupple in grupo.ToList().Select(_ => Tuple.Create(_.index, _.entity, Model.subprocessos.FindAll(f=>f.processoId == _.entity.id))))
+                            @foreach (var processo in grupo.ToList().Select(_ => _.entity))
                             {
-                                @Html.Partial("Templates/_processoTableRow", Tuple.Create(Model, tupple.Item1, tupple.Item2, tupple.Item3))
+                                @Html.Partial("Templates/_processoTableRow", Tuple.Create(Model, processo))
                             }
                         </tbody>
                     </table>

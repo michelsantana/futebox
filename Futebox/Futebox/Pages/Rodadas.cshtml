@@ -76,26 +76,40 @@
         view.__defineGetter__('campeonato', () => $('[name=ddlCampeonato]'));
         view.__defineGetter__('rodada', () => $('[name=txtRodada]'));
         view.__defineGetter__('partidas', () => Array.from($('[data-id]:checked')).map(_ => ~~(_.attributes["data-id"].value)));
-        view.__defineGetter__('social', () => Array.from($('[data-social]:checked')).map(_ => ~~(_.attributes["data-social"].value)));
 
-        view.__defineGetter__('colunas', () => $('[name=ddlDimensao]').val().split('x')[0]);
-        view.__defineGetter__('linhas', () => $('[name=ddlDimensao]').val().split('x')[1]);
+        view.__defineGetter__('config', () => $('[data-config]'));
 
         view.__defineGetter__('data', () => {
-            return {
-                campeonato: ~~view.campeonato.val(),
-                rodada: ~~view.rodada.val(),
-                partidas: view.partidas,
-                social: view.social,
-                colunas: view.colunas,
-                linhas: view.linhas,
-            };
+            var config = view.config;
+            var data = { args: [] };
+
+            for (var c of config) {
+                var $config = $(c);
+                var social = ~~($config.find('[data-social]:checked').attr('data-social'));
+                var aspect = $config.find('[name=ddlDimensao]').val();
+                
+                if (social > 0) {
+                    data.args.push({
+                        campeonato: ~~view.campeonato.val(),
+                        rodada: ~~view.rodada.val(),
+                        partidas: view.partidas,
+                        social: social,
+                        colunas: ~~aspect.split('x')[0],
+                        linhas: ~~aspect.split('x')[1],
+                    });
+                }
+            }
+            return data.args;
         });
 
         $(document).ready(() => RestoreCookie());
 
         $(document).on('change', '#chk-all', function (evt) {
             $('[data-id]').each((i, e) => $(e).prop('checked', $('#chk-all').prop('checked')));
+        });
+
+        $(document).on('change', '[data-social]', function (evt) {
+
         });
 
         $(document).on('click', '#btnProcesso', function () { GerarProcesso(); });
@@ -113,12 +127,11 @@
 
             console.log(view.data);
 
-            view.post(`/api/processo/rodada`, view.data, (response) => { $.SendToast(response.id, 'Processo criado!'); });
+            view.post(`/api/processo/rodada`, view.data, (response) => { console.log(response); $.SendToast('ok', 'Processo criado!'); });
         }
 
-        function VisualizarMiniatura() {
-
-            window.open(`/MiniaturaRodada?q=${JSON.stringify(view.data)}&w=1920&h=1080`, '_blank');
+        function VisualizarMiniatura(w, h) {
+            window.open(`/Miniaturas?t=rodada&q=${JSON.stringify(view.data.args[0])}&w=${w}&h=${h}`, '_blank');
         }
 
         $('#rodada').click(() => {

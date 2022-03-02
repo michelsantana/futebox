@@ -16,17 +16,14 @@ namespace Futebox.Services
     public class ProcessoService : IProcessoService
     {
         IProcessoRepositorio _processoRepositorio;
-        ISubProcessoRepositorio _subProcessoRepositorio;
-
         IPartidasService _partidasService;
         IClassificacaoService _classificacaoService;
         IRodadaService _rodadaService;
         IFutebotService _futebotService;
 
-        public ProcessoService(IProcessoRepositorio processoRepositorio, ISubProcessoRepositorio subProcessoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IFutebotService futebotService)
+        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IFutebotService futebotService)
         {
             _processoRepositorio = processoRepositorio;
-            _subProcessoRepositorio = subProcessoRepositorio;
             _partidasService = partidasService;
             _classificacaoService = classificacaoService;
             _rodadaService = rodadaService;
@@ -43,209 +40,40 @@ namespace Futebox.Services
             return _processoRepositorio.GetSingle(_ => _.id == id);
         }
 
-        public Processo SalvarProcessoPartida(int idPartida)
+        public List<Processo> SalvarProcessoPartida(ProcessoPartidaArgs[] args)
         {
-            var partidas = _partidasService.ObterPartida(idPartida);
-
-            return SalvarProcessoPartida(partidas);
-
-        }
-        private Processo SalvarProcessoPartida(PartidaVM partida)
-        {
-            var atributos = _partidasService.ObterAtributosDoVideo(partida);
-            var processo = new Processo()
+            var result = new List<Processo>();
+            foreach (var arg in args)
             {
-                nome = $"{atributos.Item1}",
-                categoria = CategoriaVideo.partida,
-                partidaId = partida.idExterno.ToString(),
-                campeonatoId = partida.campeonato,
-                rodadaId = partida.rodada.ToString(),
-                status = StatusProcesso.Criado,
-                agendado = false,
-                agendamento = partida.dataPartida.AddHours(2).AddMinutes(10),
-                notificacao =
-                $"processo: partida" +
-                $"\nnome: {atributos.Item1}",
-            };
-            _processoRepositorio.Insert(ref processo);
-            foreach (var redeSocial in partida.sociais)
-            {
-                SalvarSubProcessoPartida(partida, atributos, processo, redeSocial);
+                var processo = new Processo(arg);
+                _processoRepositorio.Insert(ref processo);
+                result.Add(processo);
             }
-            return processo;
-        }
-        private void SalvarSubProcessoPartida(PartidaVM partida, Tuple<string, string> atributos, Processo processo, RedeSocialFinalidade redeSocial)
-        {
-            var roteiro = _partidasService.ObterRoteiroDaPartida(partida);
-
-            if (redeSocial == RedeSocialFinalidade.YoutubeShorts)
-            {
-                var sub = SubProcessoYoutubeShort.New(processo.id,
-                    CategoriaVideo.partida,
-                    $"{Settings.ApplicationHttpBaseUrl}partidas?partidaId={partida.idExterno}&viewMode=yts",
-                    roteiro,
-                    atributos.Item1,
-                    atributos.Item2 + $"\r\n{ObterDescricaoDefault()}",
-                    "short");
-                _subProcessoRepositorio.Inserir(sub);
-            }
-            if (redeSocial == RedeSocialFinalidade.YoutubeVideo)
-            {
-                var sub = SubProcessoYoutubeVideo.New(processo.id,
-                    CategoriaVideo.partida,
-                    $"{Settings.ApplicationHttpBaseUrl}partidas?partidaId={partida.idExterno}&viewMode=ytv",
-                    roteiro,
-                    atributos.Item1,
-                    atributos.Item2 + $"\r\n{ObterDescricaoDefault()}",
-                    "short");
-                _subProcessoRepositorio.Inserir(sub);
-            }
-            if (redeSocial == RedeSocialFinalidade.InstagramVideo)
-            {
-                var sub = SubProcessoInstagramVideo.New(processo.id,
-                    CategoriaVideo.partida,
-                    $"{Settings.ApplicationHttpBaseUrl}partidas?partidaId={partida.idExterno}&viewMode=igv",
-                    roteiro,
-                    atributos.Item2 + $"\r\n{ObterDescricaoDefault()}");
-                _subProcessoRepositorio.Inserir(sub);
-            }
+            return result;
         }
 
-        public Processo SalvarProcessoClassificacao(Models.Enums.EnumCampeonato campeonato)
+        public List<Processo> SalvarProcessoClassificacao(ProcessoClassificacaoArgs[] args)
         {
-            var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(campeonato, true);
-            return SalvarProcessoClassificacao(new RedeSocialFinalidade[] { RedeSocialFinalidade.YoutubeVideo }.ToList(), classificacao, campeonato);
-        }
-        private Processo SalvarProcessoClassificacao(List<RedeSocialFinalidade> redesSociais, IEnumerable<ClassificacaoVM> classificacao, Models.Enums.EnumCampeonato campeonato)
-        {
-            var atributos = _classificacaoService.ObterAtributosDoVideo(classificacao, campeonato);
-            var processo = new Processo()
+            var result = new List<Processo>();
+            foreach (var arg in args)
             {
-                nome = $"{atributos.Item1}",
-                categoria = CategoriaVideo.partida,
-                partidaId = null,
-                campeonatoId = ((int)campeonato).ToString(),
-                rodadaId = null,
-                status = StatusProcesso.Criado,
-                agendado = false,
-                agendamento = DateTime.Today.AddHours(23).AddMinutes(30),
-                notificacao =
-                $"processo: classificacao" +
-                $"\nnome: {atributos.Item1}",
-            };
-            _processoRepositorio.Insert(ref processo);
-            foreach (var redeSocial in redesSociais)
-            {
-                SalvarSubProcessoClassificacao(classificacao, atributos, processo, campeonato, redeSocial);
+                var processo = new Processo(arg);
+                _processoRepositorio.Insert(ref processo);
+                result.Add(processo);
             }
-            return processo;
-        }
-        private void SalvarSubProcessoClassificacao(IEnumerable<ClassificacaoVM> classificacao, Tuple<string, string> atributos, Processo processo, Models.Enums.EnumCampeonato campeonato, RedeSocialFinalidade redeSocial)
-        {
-            var roteiro = _classificacaoService.ObterRoteiroDaClassificacao(classificacao, campeonato);
-            if (redeSocial == RedeSocialFinalidade.YoutubeVideo)
-            {
-                var sub = SubProcessoYoutubeVideo.New(processo.id,
-                    CategoriaVideo.classificacao,
-                    $"{Settings.ApplicationHttpBaseUrl}classificacao?campeonato={(int)campeonato}&viewMode=ytv",
-                    roteiro,
-                    atributos.Item1,
-                    atributos.Item2 + $"\r\n{ObterDescricaoDefault()}",
-                    "classificacao");
-                _subProcessoRepositorio.Inserir(sub);
-            }
-
-            if (redeSocial == RedeSocialFinalidade.YoutubeShorts)
-            {
-                var sub = SubProcessoYoutubeShort.New(processo.id,
-                    CategoriaVideo.classificacao,
-                    $"{Settings.ApplicationHttpBaseUrl}classificacao?campeonato={(int)campeonato}&viewMode=yts",
-                    roteiro,
-                    atributos.Item1,
-                    atributos.Item2 + $"\r\n{ObterDescricaoDefault()}",
-                    "classificacao");
-                _subProcessoRepositorio.Inserir(sub);
-            }
-
-            if (redeSocial == RedeSocialFinalidade.YoutubeVideo)
-            {
-                var sub = SubProcessoInstagramVideo.New(processo.id,
-                    CategoriaVideo.classificacao,
-                    $"{Settings.ApplicationHttpBaseUrl}classificacao?campeonato={(int)campeonato}&viewMode=igv",
-                    roteiro,
-                    atributos.Item2 + $"\r\n{ObterDescricaoDefault()}");
-                _subProcessoRepositorio.Inserir(sub);
-            }
+            return result;
         }
 
-        public Processo SalvarProcessoRodada(ProcessoRodadaArgs args)
+        public List<Processo> SalvarProcessoRodada(ProcessoRodadaArgs[] args)
         {
-            var partidas = _rodadaService.ObterPartidasDaRodada(args.campeonato, args.rodada);
-            partidas = partidas.Where(_ => args.partidas.Contains(_.idExterno)).ToList();
-
-            var atributos = _rodadaService.ObterAtributosDoVideo(partidas, args.campeonato, args.rodada);
-            var processo = new Processo()
+            var result = new List<Processo>();
+            foreach (var arg in args)
             {
-                nome = $"{atributos.Item1}",
-                categoria = CategoriaVideo.partida,
-                partidaId = null,
-                campeonatoId = ((int)args.campeonato).ToString(),
-                rodadaId = args.rodada.ToString(),
-                status = StatusProcesso.Criado,
-                agendado = false,
-                agendamento = DateTime.Now.AddMinutes(30),
-                notificacao =
-                $"processo: rodada" +
-                $"\nnome: {atributos.Item1}",
-            };
-            _processoRepositorio.Insert(ref processo);
-
-            foreach (var redeSocial in args.social)
-            {
-                SalvarSubProcessoRodada(partidas, args, atributos, processo, redeSocial);
+                var processo = new Processo(arg);
+                _processoRepositorio.Insert(ref processo);
+                result.Add(processo);
             }
-            return processo;
-        }
-        private void SalvarSubProcessoRodada(IEnumerable<PartidaVM> partidas, ProcessoRodadaArgs args, Tuple<string, string> atributos, Processo processo, RedeSocialFinalidade redeSocial)
-        {
-            var roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, args.campeonato, args.rodada);
-            var stringfiedArgs = JsonConvert.SerializeObject(args);
-            if (redeSocial == RedeSocialFinalidade.YoutubeVideo)
-            {
-                var sub = SubProcessoYoutubeVideo.New(processo.id,
-                    CategoriaVideo.rodada,
-                    $"",
-                    roteiro,
-                    atributos.Item1,
-                    atributos.Item2 + $"\r\n{ObterDescricaoDefault()}",
-                    "rodada",
-                    stringfiedArgs);
-                _subProcessoRepositorio.Inserir(sub);
-            }
-
-            if (redeSocial == RedeSocialFinalidade.YoutubeShorts)
-            {
-                var sub = SubProcessoYoutubeShort.New(processo.id,
-                    CategoriaVideo.rodada,
-                    $"",
-                    roteiro,
-                    atributos.Item1,
-                    atributos.Item2 + $"\r\n{ObterDescricaoDefault()}",
-                    "rodada",
-                    stringfiedArgs);
-                _subProcessoRepositorio.Inserir(sub);
-            }
-
-            if (redeSocial == RedeSocialFinalidade.YoutubeVideo)
-            {
-                var sub = SubProcessoInstagramVideo.New(processo.id,
-                    CategoriaVideo.rodada,
-                    $"",
-                    roteiro,
-                    atributos.Item2 + $"\r\n{ObterDescricaoDefault()}",
-                    stringfiedArgs);
-                _subProcessoRepositorio.Inserir(sub);
-            }
+            return result;
         }
 
 
@@ -260,93 +88,84 @@ namespace Futebox.Services
             _processoRepositorio.Update(p);
             _processoRepositorio.Commit();
 
-            var subs = ObterSubProcessos(id);
-            subs.ForEach(_ =>
-            {
-                if (_.status == StatusProcesso.Criado)
-                {
-                    _.status = StatusProcesso.Agendado;
-                    _.alteracao = DateTime.Now;
-                    _subProcessoRepositorio.Update(_);
-                }
-            });
-
             return p;
         }
 
-        public async Task GerarImagem(Processo processo, SubProcesso sub)
+
+        public async Task GerarImagem(Processo processo)
         {
-            //AtualizarRoteiro(processo);
-            AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoImagem);
-            var resultado = await _futebotService.GerarImagem(sub);
+            AtualizarStatus(ref processo, StatusProcesso.GerandoImagem);
+            var resultado = await _futebotService.GerarImagem(processo);
             AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.ImagemOK);
+                AtualizarStatus(ref processo, StatusProcesso.ImagemOK);
             }
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.ImagemErro);
+                AtualizarStatus(ref processo, StatusProcesso.ImagemErro);
                 throw new Exception("GerarImagem"); ;
             }
         }
 
-        public async Task GerarAudio(Processo processo, SubProcesso sub)
+        public async Task GerarAudio(Processo processo)
         {
-            //AtualizarRoteiro(processo);
-            AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoAudio);
-            var resultado = await _futebotService.GerarAudio(sub);
+            AtualizarRoteiro(processo);
+            AtualizarStatus(ref processo, StatusProcesso.GerandoAudio);
+
+            var resultado = await _futebotService.GerarAudio(processo);
             AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.AudioOK);
+                AtualizarStatus(ref processo, StatusProcesso.AudioOK);
             }
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.AudioErro);
+                AtualizarStatus(ref processo, StatusProcesso.AudioErro);
                 throw new Exception("GerarAudio"); ;
             }
         }
 
-        public async Task GerarVideo(Processo processo, SubProcesso sub)
+        public async Task GerarVideo(Processo processo)
         {
-            //AtualizarRoteiro(processo);
-            AtualizarStatus(ref processo, ref sub, StatusProcesso.GerandoVideo);
-            var resultado = _futebotService.GerarVideo(sub);
+            AtualizarAtributos(processo);
+            AtualizarStatus(ref processo, StatusProcesso.GerandoVideo);
+
+            var resultado = _futebotService.GerarVideo(processo);
             AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.VideoOK);
+                AtualizarStatus(ref processo, StatusProcesso.VideoOK);
             }
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.VideoErro);
+                AtualizarStatus(ref processo, StatusProcesso.VideoErro);
                 throw new Exception("GerarVideo"); ;
             }
         }
 
-        public async Task PublicarVideo(Processo processo, SubProcesso sub)
+        public async Task PublicarVideo(Processo processo)
         {
             //AtualizarRoteiro(processo);
-            AtualizarStatus(ref processo, ref sub, StatusProcesso.Publicando);
-            var resultado = await _futebotService.PublicarVideo(sub);
+            AtualizarStatus(ref processo, StatusProcesso.Publicando);
+            var resultado = await _futebotService.PublicarVideo(processo);
             AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.PublicandoOK);
+                AtualizarStatus(ref processo, StatusProcesso.PublicandoOK);
             }
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.PublicandoErro);
+                AtualizarStatus(ref processo, StatusProcesso.PublicandoErro);
                 throw new Exception("PublicarVideo"); ;
             }
             if (resultado.status == HttpStatusCode.BadRequest)
             {
-                AtualizarStatus(ref processo, ref sub, StatusProcesso.Erro);
+                AtualizarStatus(ref processo, StatusProcesso.Erro);
                 throw new Exception("PublicarVideo"); ;
             }
         }
@@ -359,29 +178,25 @@ namespace Futebox.Services
         }
 
 
-        public void AtualizarStatus(ref Processo processo, ref SubProcesso sub, StatusProcesso status)
+        public void AtualizarStatus(ref Processo processo, StatusProcesso status)
         {
             //var p = _processoRepositorio.GetById(id);
-            if (!Directory.Exists(sub.pastaDoArquivo)) Directory.CreateDirectory(sub.pastaDoArquivo);
+            if (!Directory.Exists(processo.pasta)) Directory.CreateDirectory(processo.pasta);
 
             processo.alteracao = DateTime.Now;
-            processo.status = StatusProcesso.Agendado;
+            processo.status = status;
             _processoRepositorio.Update(processo);
-
-            sub.status = status;
-            sub.alteracao = DateTime.Now;
-            sub = _subProcessoRepositorio.Update(sub);
         }
 
         public void AtualizarProcessoLog(Processo processo, string[] lines)
         {
             processo.alteracao = DateTime.Now;
-            processo.statusMensagem = $"{processo.statusMensagem}\n[UPDATE:{processo.alteracao}]\n{string.Join("\n", lines)}";
+            processo.log = $"{processo.log}\n[UPDATE:{processo.alteracao}]\n{string.Join("\n", lines)}";
 
             _processoRepositorio.Update(processo);
         }
 
-        public Processo AtualizarRoteiro(Processo processo)
+        private Processo AtualizarRoteiro(Processo processo)
         {
             switch (processo.categoria)
             {
@@ -395,15 +210,36 @@ namespace Futebox.Services
             return processo;
         }
 
+        private Processo AtualizarAtributos(Processo processo)
+        {
+            Tuple<string, string> atributos = null;
+            switch (processo.categoria)
+            {
+                case CategoriaVideo.partida:
+                    var partida = _partidasService.ObterPartida(processo.ToArgs<ProcessoPartidaArgs>().partida);
+                    atributos = _partidasService.ObterAtributosDoVideo(partida);
+                    break;
+                case CategoriaVideo.classificacao:
+                    var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(processo.ToArgs<ProcessoClassificacaoArgs>().campeonato);
+                    atributos = _classificacaoService.ObterAtributosDoVideo(classificacao, processo.ToArgs<ProcessoClassificacaoArgs>().campeonato);
+                    break;
+                case CategoriaVideo.rodada:
+                    var partidas = _rodadaService.ObterPartidasDaRodada(processo.ToArgs<ProcessoRodadaArgs>().campeonato, processo.ToArgs<ProcessoRodadaArgs>().rodada);
+                    atributos = _rodadaService.ObterAtributosDoVideo(partidas, processo.ToArgs<ProcessoRodadaArgs>().campeonato, processo.ToArgs<ProcessoRodadaArgs>().rodada);
+                    break;
+            }
+
+            processo.alteracao = DateTime.Now;
+            processo.tituloVideo = atributos.Item1;
+            processo.descricaoVideo = atributos.Item2;
+            _processoRepositorio.Update(processo);
+            return processo;
+        }
+
         public bool Delete(string id)
         {
             _processoRepositorio.Delete(id);
             return true;
-        }
-
-        private Processo AtualizarRoteiro(string processo)
-        {
-            return AtualizarRoteiro(ObterProcesso(processo));
         }
 
         private Processo AtualizarRoteiroPartida(Processo processo)
@@ -430,38 +266,6 @@ namespace Futebox.Services
             //processo.roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, args.campeonato, args.rodada);
             //_processoRepositorio.Update(processo);
             return processo;
-        }
-
-        private string ObterDescricaoDefault()
-        {
-            var arr = new string[] {
-                "BRASILEIRÃO", "BRASILEIRÃO 2021",
-                "BRASILEIRAO", "BRASILEIRAO 2021", "#BRASILEIRAO", "#BRASILEIRAO2021",
-                "TABELA BRASILEIRÃO", "TABELA BRASILEIRÃO 2021", "TABELA BRASILEIRAO",
-                "TABELA BRASILEIRAO 2021", "#TABELABRASILEIRAO", "#TABELABRASILEIRAO2021",
-                "TABELA CLASSIFICAÇÃO", "TABELA CLASSIFICAÇÃO 2021", "TABELA CLASSIFICACAO",
-                "TABELA CLASSIFICACAO 2021", "#TABELACLASSIFICACAO", "#TABELACLASSIFICACAO2021",
-                "CLASSIFICAÇÃO DO BRASILEIRÃO","CLASSIFICAÇÃO DO BRASILEIRÃO 2021", "CLASSIFICACAO DO BRASILEIRAO",
-                "CLASSIFICACAO DO BRASILEIRAO 2021","#CLASSIFICACAODOBRASILEIRAO", "#CLASSIFICACAODOBRASILEIRAO2021",
-                "CAMPEONATO BRASILEIRO", "CAMPEONATO BRASILEIRO 2021", "CAMPEONATO BRASILEIRO",
-                "CAMPEONATO BRASILEIRO 2021","#CAMPEONATOBRASILEIRO", "#CAMPEONATOBRASILEIRO2021"
-            };
-            return string.Join("\r\n", arr);
-        }
-
-        public List<SubProcesso> ObterSubProcessos(string processo)
-        {
-            return _subProcessoRepositorio.GetList(processo).ToList();
-        }
-
-        public SubProcesso ObterSubProcessoId(string subprocesso)
-        {
-            return _subProcessoRepositorio.GetById(subprocesso).ToList().Single();
-        }
-
-        public List<SubProcesso> ObterSubProcessos()
-        {
-            return _subProcessoRepositorio.GetAll().ToList();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model Futebox.Models.SubProcesso
+﻿@model Futebox.Models.Processo
 @{
     var s1 = "📅";
     var s2 = "🎞";
@@ -39,15 +39,15 @@
     </div>*@
 <div class="row d-flex align-items-center">
     <div class="col-1">
-        @if (Model.redeSocial == Models.Enums.RedeSocialFinalidade.InstagramVideo)
+        @if (Model.social == Models.Enums.RedeSocialFinalidade.InstagramVideo)
         {
             <img width="100%" src="~/img/redes/ig.png" />
         }
-        @if (Model.redeSocial == Models.Enums.RedeSocialFinalidade.YoutubeShorts)
+        @if (Model.social == Models.Enums.RedeSocialFinalidade.YoutubeShorts)
         {
             <img width="100%" src="~/img/redes/yt.png" />
         }
-        @if (Model.redeSocial == Models.Enums.RedeSocialFinalidade.YoutubeVideo)
+        @if (Model.social == Models.Enums.RedeSocialFinalidade.YoutubeVideo)
         {
             <img width="100%" src="~/img/redes/yt.png" />
         }

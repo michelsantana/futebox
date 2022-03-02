@@ -2,7 +2,7 @@
 
 namespace Futebox.DB.Migrations
 {
-    [Migration(20210930000000)]
+    [Migration(20210930000001)]
     public class DbSchemaProcesso : Migration
     {
         public const string processo = nameof(processo);
@@ -12,14 +12,23 @@ namespace Futebox.DB.Migrations
         public const string nome = nameof(nome);
         public const string categoria = nameof(categoria);
         public const string status = nameof(status);
-        public const string statusMensagem = nameof(statusMensagem);
-        public const string notificacao = nameof(notificacao);
+        public const string log = nameof(log);
         public const string agendamento = nameof(agendamento);
         public const string agendado = nameof(agendado);
-        public const string partidaId = nameof(partidaId);
-        public const string campeonatoId = nameof(campeonatoId);
-        public const string rodadaId = nameof(rodadaId);
-        public const string pastaDosArquivos = nameof(pastaDosArquivos);
+        public const string pasta = nameof(pasta);
+        public const string args = nameof(args);
+
+        public const string linkDaImagemDoVideo = nameof(linkDaImagemDoVideo);
+        public const string larguraVideo = nameof(larguraVideo);
+        public const string alturaVideo = nameof(alturaVideo);
+        public const string nomeDoArquivoAudio = nameof(nomeDoArquivoAudio);
+        public const string nomeDoArquivoImagem = nameof(nomeDoArquivoImagem);
+        public const string nomeDoArquivoVideo = nameof(nomeDoArquivoVideo);
+
+        public const string roteiro = nameof(roteiro);
+        public const string tituloVideo = nameof(tituloVideo);
+        public const string descricaoVideo = nameof(descricaoVideo);
+        public const string social = nameof(social);
 
         public override void Down()
         {
@@ -34,17 +43,24 @@ namespace Futebox.DB.Migrations
             .WithColumn(alteracao).AsDateTime().Nullable()
 
             .WithColumn(nome).AsString().NotNullable()
-            .WithColumn(categoria).AsString().Nullable()
+            .WithColumn(categoria).AsInt32().Nullable()
             .WithColumn(status).AsInt32().NotNullable()
-            .WithColumn(statusMensagem).AsString().Nullable()
-            .WithColumn(notificacao).AsString().Nullable()
+            .WithColumn(log).AsString().Nullable()
             .WithColumn(agendamento).AsDateTime().Nullable()
             .WithColumn(agendado).AsBoolean().NotNullable()
+            .WithColumn(pasta).AsString().Nullable()
+            .WithColumn(args).AsString().Nullable()
 
-            .WithColumn(partidaId).AsString().Nullable()
-            .WithColumn(campeonatoId).AsString().Nullable()
-            .WithColumn(rodadaId).AsString().Nullable()
-            .WithColumn(pastaDosArquivos).AsString().Nullable()
+            .WithColumn(linkDaImagemDoVideo).AsString().Nullable()
+            .WithColumn(larguraVideo).AsInt32().Nullable()
+            .WithColumn(alturaVideo).AsInt32().Nullable()
+            .WithColumn(nomeDoArquivoAudio).AsString().Nullable()
+            .WithColumn(nomeDoArquivoImagem).AsString().Nullable()
+            .WithColumn(nomeDoArquivoVideo).AsString().Nullable()
+            .WithColumn(roteiro).AsString().Nullable()
+            .WithColumn(tituloVideo).AsString().Nullable()
+            .WithColumn(descricaoVideo).AsString().Nullable()
+            .WithColumn(social).AsInt32().Nullable()
             ;
         }
     }

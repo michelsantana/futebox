@@ -64,7 +64,7 @@ namespace Futebox
             services.AddSingleton<IRodadaService, RodadaService>();
             services.AddSingleton<IAgendamentoService, AgendamentoService>();
             services.AddSingleton<INotifyService, NotifyService>();
-            services.AddSingleton<ISubProcessoRepositorio, SubProcessoRepositorio>();
+            //services.AddSingleton<ISubProcessoRepositorio, SubProcessoRepositorio>();
             services.AddSingleton<IProcessoRepositorio, ProcessoRepositorio>();
             services.AddSingleton<ITimeRepositorio, TimeRepositorio>();
 

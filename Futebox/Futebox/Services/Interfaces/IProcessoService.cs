@@ -10,25 +10,21 @@ namespace Futebox.Services.Interfaces
     {
         List<Processo> ObterProcessos();
         Processo ObterProcesso(string id);
-        List<SubProcesso> ObterSubProcessos();
-        List<SubProcesso> ObterSubProcessos(string processoId);
-        SubProcesso ObterSubProcessoId(string subprocessoId);
 
-        Processo SalvarProcessoPartida(int idPartida);
-        Processo SalvarProcessoClassificacao(Models.Enums.EnumCampeonato campeonato);
-        Processo SalvarProcessoRodada(ProcessoRodadaArgs args);
+        List<Processo> SalvarProcessoPartida(ProcessoPartidaArgs[] args);
+        List<Processo> SalvarProcessoClassificacao(ProcessoClassificacaoArgs[] args);
+        List<Processo> SalvarProcessoRodada(ProcessoRodadaArgs[] args);
+
 
         Processo AgendarProcesso(string id, DateTime hora);
 
-        Task GerarImagem(Processo processo, SubProcesso sub);
-        Task GerarAudio(Processo processo, SubProcesso sub);
-        Task GerarVideo(Processo processo, SubProcesso sub);
-        Task PublicarVideo(Processo processo, SubProcesso sub);
+        Task GerarImagem(Processo processo);
+        Task GerarAudio(Processo processo);
+        Task GerarVideo(Processo processo);
+        Task PublicarVideo(Processo processo);
         Task AbrirPasta(Processo processo);
 
-        void AtualizarStatus(ref Processo processo, ref SubProcesso subProcesso, StatusProcesso status);
-
-        Processo AtualizarRoteiro(Processo processo);
+        void AtualizarStatus(ref Processo processo, StatusProcesso status);
 
         bool Delete(string id);
     }

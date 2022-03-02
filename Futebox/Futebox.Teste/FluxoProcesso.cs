@@ -16,7 +16,7 @@ namespace Futebox.Teste
 
         private readonly InjectorFixture _injector;
         private readonly ProcessoRepositorio _processoRepository;
-        private readonly SubProcessoRepositorio _subProcessoRepository;
+        //private readonly SubProcessoRepositorio _subProcessoRepository;
 
         public FluxoProcesso(InjectorFixture injector)
         {
@@ -26,9 +26,9 @@ namespace Futebox.Teste
             RegisterMappings.Register();
 
             var dbconfig = _injector.GerarConfiguracaoDoBancoDeDados();
-            var ytv = new RepositoryBase<SubProcessoYoutubeVideo>(dbconfig);
-            var yts = new RepositoryBase<SubProcessoYoutubeShort>(dbconfig);
-            var igv = new RepositoryBase<SubProcessoInstagramVideo>(dbconfig);
+            //var ytv = new RepositoryBase<SubProcessoYoutubeVideo>(dbconfig);
+            //var yts = new RepositoryBase<SubProcessoYoutubeShort>(dbconfig);
+            //var igv = new RepositoryBase<SubProcessoInstagramVideo>(dbconfig);
 
             _subProcessoRepository = new SubProcessoRepositorio(ytv, yts, igv);
             _processoRepository = new ProcessoRepositorio(dbconfig);

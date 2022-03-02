@@ -13,7 +13,6 @@ namespace Futebox.Pages
     {
         IProcessoService _processoService;
         public List<Processo> processos = new List<Processo>();
-        public List<SubProcesso> subprocessos = new List<SubProcesso>();
 
         public ProcessosModel(IProcessoService processoService)
         {
@@ -24,7 +23,6 @@ namespace Futebox.Pages
         {
             this.processos = _processoService.ObterProcessos()?.ToList();
             this.processos = this.processos.OrderBy(_ => (_.criacao.Ticks) * -1).ToList();
-            this.subprocessos = _processoService.ObterSubProcessos()?.ToList();
         }
 
         //public PartialViewResult OnGetProcessoTableRow(string processoId)

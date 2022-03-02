@@ -16,6 +16,6 @@ namespace Futebox.Services.Interfaces
         Task ClicarEmPublicar();
         Task Fechar();
         Page GetPage();
-        Task<RobotResultApi> Upload(SubProcesso subProcesso);
+        Task<RobotResultApi> Upload(Processo processo);
     }
 }

@@ -34,9 +34,9 @@ namespace Futebox.Services
             throw new NotImplementedException();
         }
 
-        private ViewPortOptions Viewport(SubProcesso subProcesso)
+        private ViewPortOptions Viewport(Processo processo)
         {
-            return Viewport(subProcesso.larguraVideo, subProcesso.alturaVideo);
+            return Viewport(processo.larguraVideo, processo.alturaVideo);
         }
         private ViewPortOptions Viewport(int largura, int altura)
         {
@@ -47,7 +47,7 @@ namespace Futebox.Services
             };
         }
 
-        public async Task<RobotResultApi> GerarImagem(SubProcesso subProcesso)
+        public async Task<RobotResultApi> GerarImagem(Processo processo)
         {
             var result = new RobotResultApi("GerarAudio");
             result.Add("start");
@@ -56,16 +56,16 @@ namespace Futebox.Services
                 var page = await _browserService.NewPage();
                 result.Add("newpage");
 
-                await page.SetViewportAsync(Viewport(subProcesso));
+                await page.SetViewportAsync(Viewport(processo));
                 result.Add("viewport");
 
-                await page.GoToAsync(subProcesso.linkDaImagemDoVideo, WaitUntilNavigation.Networkidle2);
+                await page.GoToAsync(processo.linkDaImagemDoVideo, WaitUntilNavigation.Networkidle2);
                 result.Add("goto");
 
                 _browserService.WaitForMs(7000);
                 result.Add("waiting");
 
-                await page.ScreenshotAsync(Path.Combine(subProcesso.pastaDoArquivo, subProcesso.nomeDoArquivoImagem));
+                await page.ScreenshotAsync(Path.Combine(processo.pasta, processo.nomeDoArquivoImagem));
                 result.Add("screenshot");
 
                 await page.CloseAsync();
@@ -81,14 +81,14 @@ namespace Futebox.Services
             }
         }
 
-        public async Task<RobotResultApi> GerarAudio(SubProcesso subProcesso, bool buscarDoCache = false)
+        public async Task<RobotResultApi> GerarAudio(Processo processo, bool buscarDoCache = false)
         {
             var result = new RobotResultApi("GerarAudio");
             result.Add("start");
 
             try
             {
-                var arquivoPastaDownload = Path.Combine(Settings.ChromeDefaultDownloadFolder, subProcesso.nomeDoArquivoAudio);
+                var arquivoPastaDownload = Path.Combine(Settings.ChromeDefaultDownloadFolder, processo.nomeDoArquivoAudio);
 
                 if (File.Exists(arquivoPastaDownload))
                 {
@@ -96,7 +96,7 @@ namespace Futebox.Services
                     if (buscarDoCache || fi.CreationTime > DateTime.Now.AddHours(-8))
                     {
                         result.Add("cache");
-                        File.Copy(arquivoPastaDownload, Path.Combine(subProcesso.pastaDoArquivo, subProcesso.nomeDoArquivoAudio), true);
+                        File.Copy(arquivoPastaDownload, Path.Combine(processo.pasta, processo.nomeDoArquivoAudio), true);
                         return result.Ok();
                     }
                     else
@@ -116,7 +116,7 @@ namespace Futebox.Services
                 await page.WaitForSelectorAsync("audio");
                 result.Add("wait");
 
-                await RedigitarTextoCampo("#text-area", subProcesso.roteiro, page);
+                await RedigitarTextoCampo("#text-area", processo.roteiro, page);
 
                 await page.ClickAsync("#slider");
                 _browserService.WaitForMs(700);
@@ -128,7 +128,7 @@ namespace Futebox.Services
                 _browserService.WaitForMs(700);
                 result.Add("config");
 
-                await page.EvaluateExpressionAsync(_browserService.JsFunction("IBMInjetarScriptExtrairAudio", subProcesso.nomeDoArquivoAudio));
+                await page.EvaluateExpressionAsync(_browserService.JsFunction("IBMInjetarScriptExtrairAudio", processo.nomeDoArquivoAudio));
                 result.Add("inject");
 
                 await page.ClickAsync(".play-btn.bx--btn");
@@ -154,7 +154,7 @@ namespace Futebox.Services
                 await page.WaitForSelectorAsync("#dwlend", new WaitForSelectorOptions { Timeout = 60000 * 5 }); // espera até 5 minutos
                 result.Add("download end");
 
-                File.Copy(arquivoPastaDownload, Path.Combine(subProcesso.pastaDoArquivo, subProcesso.nomeDoArquivoAudio), true);
+                File.Copy(arquivoPastaDownload, Path.Combine(processo.pasta, processo.nomeDoArquivoAudio), true);
                 result.Add("file moved");
 
                 await page.CloseAsync();
@@ -191,17 +191,17 @@ namespace Futebox.Services
             _browserService.WaitForMs(700);
         }
 
-        public RobotResultApi GerarVideo(SubProcesso subProcesso)
+        public RobotResultApi GerarVideo(Processo processo)
         {
             var result = new RobotResultApi("GerarVideo");
             result.Add("start");
 
             try
             {
-                var nomeBaseArquivo = Path.Combine(subProcesso.pastaDoArquivo, $"{subProcesso.redeSocial}");
-                var titulo = subProcesso.obterTitulo();
-                var descricao = subProcesso.obterDescricao();
-                var legenda = subProcesso.obterLegenda();
+                var nomeBaseArquivo = Path.Combine(processo.pasta, $"{processo.social}");
+                var titulo = processo.obterTitulo();
+                var descricao = processo.obterDescricao();
+                var legenda = processo.obterDescricao();
 
                 result.Add("var");
 
@@ -211,15 +211,15 @@ namespace Futebox.Services
 
                 result.Add("files");
 
-                var arquivoImagem = Path.Combine($"{subProcesso.pastaDoArquivo}", subProcesso.nomeDoArquivoImagem);
-                var arquivoAudio = Path.Combine($"{subProcesso.pastaDoArquivo}", subProcesso.nomeDoArquivoAudio);
-                var arquivoVideo = Path.Combine($"{subProcesso.pastaDoArquivo}", subProcesso.nomeDoArquivoVideo);
+                var arquivoImagem = Path.Combine($"{processo.pasta}", processo.nomeDoArquivoImagem);
+                var arquivoAudio = Path.Combine($"{processo.pasta}", processo.nomeDoArquivoAudio);
+                var arquivoVideo = Path.Combine($"{processo.pasta}", processo.nomeDoArquivoVideo);
 
-                var arquivoVideoTemp = Path.Combine($"{subProcesso.pastaDoArquivo}", $"{subProcesso.redeSocial}.temp.mp4");
-                var arquivoShell = Path.Combine($"{subProcesso.pastaDoArquivo}", $"{subProcesso.redeSocial}.bat");
+                var arquivoVideoTemp = Path.Combine($"{processo.pasta}", $"{processo.social}.temp.mp4");
+                var arquivoShell = Path.Combine($"{processo.pasta}", $"{processo.social}.bat");
 
                 var conteudo = "";
-                if (subProcesso.redeSocial == Models.Enums.RedeSocialFinalidade.InstagramVideo)
+                if (processo.social == Models.Enums.RedeSocialFinalidade.InstagramVideo)
                 {
                     conteudo += $"ffmpeg -loop 1 -i {arquivoImagem} -i {arquivoAudio} -c:v libx264 -c:a copy -shortest {arquivoVideoTemp}\n";
                     conteudo += $"ffmpeg -i {arquivoVideoTemp} -c:a aac -b:a 256k -ar 44100 -c:v libx264 -b:v 5M -r 30 -pix_fmt yuv420p -preset faster -tune stillimage {arquivoVideo}";
@@ -234,7 +234,7 @@ namespace Futebox.Services
 
                 Process proc = new Process();
                 proc.StartInfo.FileName = arquivoShell;
-                proc.StartInfo.WorkingDirectory = subProcesso.pastaDoArquivo;
+                proc.StartInfo.WorkingDirectory = processo.pasta;
                 proc.StartInfo.UseShellExecute = true;
                 proc.Start();
                 proc.WaitForExit();
@@ -251,7 +251,7 @@ namespace Futebox.Services
                 return result.Error();
             }
         }
-        public async Task<RobotResultApi> PublicarVideo(SubProcesso subProcesso)
+        public async Task<RobotResultApi> PublicarVideo(Processo processo)
         {
             var result = new RobotResultApi("PublicarVideo");
             result.Add("start");
@@ -260,9 +260,9 @@ namespace Futebox.Services
 
                 _browserService.WaitForMs(2);
 
-                if (subProcesso.redeSocial == Models.Enums.RedeSocialFinalidade.YoutubeVideo) result = await _youtubeService.Upload(subProcesso);
-                if (subProcesso.redeSocial == Models.Enums.RedeSocialFinalidade.YoutubeShorts) result = await _youtubeService.Upload(subProcesso);
-                if (subProcesso.redeSocial == Models.Enums.RedeSocialFinalidade.InstagramVideo) result = await _instagramService.Upload(subProcesso);
+                if (processo.social == Models.Enums.RedeSocialFinalidade.YoutubeVideo) result = await _youtubeService.Upload(processo);
+                if (processo.social == Models.Enums.RedeSocialFinalidade.YoutubeShorts) result = await _youtubeService.Upload(processo);
+                if (processo.social == Models.Enums.RedeSocialFinalidade.InstagramVideo) result = await _instagramService.Upload(processo);
 
                 return result;
             }
@@ -273,7 +273,7 @@ namespace Futebox.Services
             }
         }
 
-        private async Task<RobotResultApi> PublicarIG(SubProcesso subProcesso)
+        private async Task<RobotResultApi> PublicarIG(Processo processo)
         {
 
             var result = new RobotResultApi("PublicarVideo");
@@ -296,7 +296,7 @@ namespace Futebox.Services
             result.Add("upload.1");
 
             var campoDoUpload = await page.QuerySelectorAsync("[aria-label=\"Criar nova publicação\"] [type=\"file\"]");
-            await campoDoUpload.UploadFileAsync(Path.Combine(subProcesso.pastaDoArquivo, subProcesso.nomeDoArquivoVideo));
+            await campoDoUpload.UploadFileAsync(Path.Combine(processo.pasta, processo.nomeDoArquivoVideo));
             _browserService.WaitFor(10);
             result.Add("upload.2");
 
@@ -312,7 +312,7 @@ namespace Futebox.Services
             _browserService.WaitFor(1);
             result.Add("next");
 
-            await this.RedigitarTextoCampo("textarea[aria-label=\"Escreva uma legenda...\"]", subProcesso.obterLegenda(), page);
+            await this.RedigitarTextoCampo("textarea[aria-label=\"Escreva uma legenda...\"]", processo.obterDescricao(), page);
             _browserService.WaitFor(1);
             result.Add("caption");
 

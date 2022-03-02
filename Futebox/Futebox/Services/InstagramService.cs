@@ -95,7 +95,7 @@ namespace Futebox.Services
             return _page;
         }
 
-        public async Task<RobotResultApi> Upload(SubProcesso subProcesso)
+        public async Task<RobotResultApi> Upload(Processo processo)
         {
 
             var result = new RobotResultApi("Upload");
@@ -113,7 +113,7 @@ namespace Futebox.Services
                 await AbrirUpload();
                 result.Add("upload.1");
 
-                await EfetuarUploadArquivo(Path.Combine(subProcesso.pastaDoArquivo, subProcesso.nomeDoArquivoVideo));
+                await EfetuarUploadArquivo(Path.Combine(processo.pasta, processo.nomeDoArquivoVideo));
                 result.Add("upload.2");
 
                 await SelecionarDimensaoVideo();
@@ -125,7 +125,7 @@ namespace Futebox.Services
                 await ClicarEmProximo();
                 result.Add("next");
 
-                await _browserService.RedigitarTextoCampo("textarea[aria-label=\"Escreva uma legenda...\"]", subProcesso.obterLegenda(), _page);
+                await _browserService.RedigitarTextoCampo("textarea[aria-label=\"Escreva uma legenda...\"]", processo.obterDescricao(), _page);
                 _browserService.WaitFor(1);
                 result.Add("caption");
 

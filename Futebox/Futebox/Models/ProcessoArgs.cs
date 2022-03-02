@@ -12,18 +12,7 @@ namespace Futebox.Models
     public class ProcessoClassificacaoArgs : IProcessoArgs
     {
         public Enums.EnumCampeonato campeonato { get; set; }
-        public ProcessoClassificacaoArgs(Enums.EnumCampeonato c)
-        {
-            campeonato = c;
-        }
-        public ProcessoClassificacaoArgs(int c)
-        {
-            campeonato = (Enums.EnumCampeonato)c;
-        }
-        public ProcessoClassificacaoArgs()
-        {
-
-        }
+        public RedeSocialFinalidade social { get; set; }
     }
 
     public class ProcessoRodadaArgs : IProcessoArgs
@@ -31,7 +20,7 @@ namespace Futebox.Models
         public EnumCampeonato campeonato { get; set; }
         public int rodada { get; set; }
         public int[] partidas { get; set; }
-        public RedeSocialFinalidade[] social { get; set; }
+        public RedeSocialFinalidade social { get; set; }
 
         public int linhas { get; set; }
         public int colunas { get; set; }
@@ -40,19 +29,9 @@ namespace Futebox.Models
 
     public class ProcessoPartidaArgs : IProcessoArgs
     {
-        public int partidaId { get; set; }
-        public ProcessoPartidaArgs(string pid)
-        {
-            this.partidaId = int.Parse(pid);
+        public EnumCampeonato campeonato { get; set; }
+        public int partida { get; set; }
+        public RedeSocialFinalidade social { get; set; }
 
-        }
-        public ProcessoPartidaArgs(int pid)
-        {
-            this.partidaId = pid;
-        }
-        public ProcessoPartidaArgs()
-        {
-
-        }
     }
 }

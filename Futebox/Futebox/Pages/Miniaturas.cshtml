@@ -4,7 +4,7 @@
 @switch (Model.tipo)
 {
     case Models.Enums.CategoriaVideo.rodada:
-        @Html.Partial("MiniaturaRodada/_rodadaMiniatura", Model)
+        @Html.Partial("Miniaturas/_rodadaMiniatura", Model.rodada)
         break;
     default: break;
 }

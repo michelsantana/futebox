@@ -45,12 +45,12 @@ namespace Futebox.Services.Jobs
             {
                 var jobkey = key;
                 Processo processo;
-                List<SubProcesso> subProcessos;
+                //List<SubProcesso> subProcessos;
                 StringBuilder sbNotificacao = new StringBuilder();
                 try
                 {
                     processo = _processoService.ObterProcesso(data["processo"].ToString());
-                    subProcessos = _processoService.ObterSubProcessos(processo.id);
+                    // subProcessos = _processoService.ObterSubProcessos(processo.id);
 
                     var statusNaoExecutaveis = new StatusProcesso[]
                     {
@@ -74,46 +74,44 @@ namespace Futebox.Services.Jobs
                         StatusProcesso.VideoOK, StatusProcesso.PublicandoErro
                     };
 
-                    foreach (var sub in subProcessos)
+
+                    await _queueService.Executar(async () =>
                     {
-                        await _queueService.Executar(async () =>
+                        if (!statusNaoExecutaveis.Any(_ => _ == processo.status))
                         {
-                            var currentSub = sub;
-                            if (!statusNaoExecutaveis.Any(_ => _ == currentSub.status))
+                            if (statusGerarImagem.Any(_ => _ == processo.status))
                             {
-                                if (statusGerarImagem.Any(_ => _ == currentSub.status))
-                                {
-                                    sbNotificacao.AppendLine(EyeLog.Log($"[IMAGEM][START][{jobkey.Name}]"));
-                                    await _processoService.GerarImagem(processo, currentSub);
-                                    sbNotificacao.AppendLine(EyeLog.Log($"[IMAGEM][COMPLETE][{jobkey.Name}]"));
-                                }
-
-                                if (statusGerarAudio.Any(_ => _ == currentSub.status))
-                                {
-                                    sbNotificacao.AppendLine(EyeLog.Log($"[AUDIO][START][{jobkey.Name}]"));
-                                    await _processoService.GerarAudio(processo, currentSub);
-                                    sbNotificacao.AppendLine(EyeLog.Log($"[AUDIO][COMPLETE][{jobkey.Name}]"));
-                                }
-
-                                if (statusGerarVideo.Any(_ => _ == currentSub.status))
-                                {
-                                    sbNotificacao.AppendLine(EyeLog.Log($"[VIDEO][START][{jobkey.Name}]"));
-                                    await _processoService.GerarVideo(processo, currentSub);
-                                    sbNotificacao.AppendLine(EyeLog.Log($"[VIDEO][COMPLETE][{jobkey.Name}]"));
-                                }
-
-                                if (statusPublicarVideo.Any(_ => _ == currentSub.status))
-                                {
-                                    sbNotificacao.AppendLine(EyeLog.Log($"[PUBLICAR][START][{jobkey.Name}]"));
-                                    await _processoService.PublicarVideo(processo, currentSub);
-                                    sbNotificacao.AppendLine(EyeLog.Log($"[PUBLICAR][COMPLETE][{jobkey.Name}]"));
-                                }
+                                sbNotificacao.AppendLine(EyeLog.Log($"[IMAGEM][START][{jobkey.Name}]"));
+                                await _processoService.GerarImagem(processo);
+                                sbNotificacao.AppendLine(EyeLog.Log($"[IMAGEM][COMPLETE][{jobkey.Name}]"));
                             }
-                        });
-                    }
+
+                            if (statusGerarAudio.Any(_ => _ == processo.status))
+                            {
+                                sbNotificacao.AppendLine(EyeLog.Log($"[AUDIO][START][{jobkey.Name}]"));
+                                await _processoService.GerarAudio(processo);
+                                sbNotificacao.AppendLine(EyeLog.Log($"[AUDIO][COMPLETE][{jobkey.Name}]"));
+                            }
+
+                            if (statusGerarVideo.Any(_ => _ == processo.status))
+                            {
+                                sbNotificacao.AppendLine(EyeLog.Log($"[VIDEO][START][{jobkey.Name}]"));
+                                await _processoService.GerarVideo(processo);
+                                sbNotificacao.AppendLine(EyeLog.Log($"[VIDEO][COMPLETE][{jobkey.Name}]"));
+                            }
+
+                            if (statusPublicarVideo.Any(_ => _ == processo.status))
+                            {
+                                sbNotificacao.AppendLine(EyeLog.Log($"[PUBLICAR][START][{jobkey.Name}]"));
+                                await _processoService.PublicarVideo(processo);
+                                sbNotificacao.AppendLine(EyeLog.Log($"[PUBLICAR][COMPLETE][{jobkey.Name}]"));
+                            }
+                        }
+                    });
+
 
                     sbNotificacao.AppendLine(EyeLog.Log($"[NOTIFY][START][{jobkey.Name}]"));
-                    await _notifyService.Notify(processo.notificacao);
+                    await _notifyService.Notify(processo.nome);
                     sbNotificacao.AppendLine(EyeLog.Log($"[NOTIFY][COMPLETE][{jobkey.Name}]"));
                 }
                 catch (Exception ex)
@@ -131,7 +129,7 @@ namespace Futebox.Services.Jobs
 
         public void Dispose()
         {
-            
+
         }
     }
 }

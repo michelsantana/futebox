@@ -33,12 +33,13 @@ namespace Futebox.Services
             return resultado.Select(_ => _partidasService.ConverterEmPartidaVM(_)).ToList();
         }
 
-        public string ObterRoteiroDaRodada(IEnumerable<PartidaVM> partidas, Models.Enums.EnumCampeonato campeonato, int rodada)
+        public string ObterRoteiroDaRodada(IEnumerable<PartidaVM> partidas, ProcessoRodadaArgs processoRodadaArgs)
         {
             var roteiro = RoteiroDefaults.ObterSaudacao();
-            roteiro += $"Veja agora a programação dos jogos da {rodada}ª rodada do {CampeonatoUtils.ObterNomeDoCampeonato(campeonato)}: ";
+            roteiro += $"Veja agora a programação dos jogos da {processoRodadaArgs.rodada}ª rodada do {CampeonatoUtils.ObterNomeDoCampeonato(processoRodadaArgs.campeonato)}: ";
 
             partidas
+                .Where(_ => processoRodadaArgs.partidas.Contains(_.idExterno))
                 .OrderBy(_ => _.dataPartida)
                 .GroupBy(_ => _.dataPartida.ToString("yyyyMMdd"))
                 .ToList().ForEach(gp =>
@@ -67,18 +68,21 @@ namespace Futebox.Services
                 .Count > 0;
         }
 
-        public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<PartidaVM> partidas, Models.Enums.EnumCampeonato campeonato, int rodada)
+        public Tuple<string, string> ObterAtributosDoVideo(ProcessoRodadaArgs processoRodadaArgs)
         {
-            var camp = CampeonatoUtils.ObterNomeDoCampeonato(campeonato);
+            var camp = CampeonatoUtils.ObterNomeDoCampeonato(processoRodadaArgs.campeonato);
             var data = DateTime.Now.ToString("dd/MM/yyyy");
             var ano = DateTime.Now.ToString("yyyy");
-            var titulo = $"PROGRAMAÇÃO - {rodada}ª RODADA - {camp} {ano} - {data} - ATUALIZADA";
+            var titulo = $"PROGRAMAÇÃO - {processoRodadaArgs.rodada}ª RODADA - {camp} {ano} - {data} - ATUALIZADA";
+
+            titulo = string.IsNullOrEmpty(processoRodadaArgs.titulo) ? titulo : processoRodadaArgs.titulo;
+
             var descricao = "";
 
             var palavraschave = new string[] {
                 $"{camp}",
                 $"RODADA {camp}",
-                $"{rodada}ª RODADA",
+                $"{processoRodadaArgs.rodada}ª RODADA",
                 $"CAMPEONATO {camp}"
             };
 

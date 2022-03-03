@@ -76,9 +76,14 @@
                         <optgroup label='defaults'>
                             <option value='2x2' selected="selected">2 colunas x 2 linhas</option>
                         </optgroup>
-                        
+
                     </select>
-                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura(1920, 1080)" type="button">Simular</button>
+                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura('@(socialYTV)', 1920, 1080)" type="button">Simular</button>
+                </div>
+                <hr />
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Titulo</span>
+                    <input type="text" class="form-control form-control-sm" name="title" value="@($"Classificação {Model.nomeCampeonato} {DateTime.Now.ToString("yyyy")} - Atualizada {DateTime.Now.ToString("dd/MM/yyyy")}")">
                 </div>
             </div>
         </td>
@@ -93,9 +98,14 @@
                         <optgroup label='defaults'>
                             <option value='1x4' selected="selected">1 colunas x 4 linhas</option>
                         </optgroup>
-                       
+
                     </select>
-                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura(1080, 1920)" type="button">Simular</button>
+                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura('@(socialYTS)', 1080, 1920)" type="button">Simular</button>
+                </div>
+                <hr />
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Titulo</span>
+                    <input type="text" class="form-control form-control-sm" name="title" value="@($"Classificação {Model.nomeCampeonato} {DateTime.Now.ToString("yyyy")} - Atualizada {DateTime.Now.ToString("dd/MM/yyyy")}")">
                 </div>
             </div>
         </td>
@@ -110,16 +120,21 @@
                         <optgroup label='defaults'>
                             <option value='1x4' selected="selected">1 colunas x 4 linhas</option>
                         </optgroup>
-                       
+
                     </select>
-                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura(1350, 1920)" type="button">Simular</button>
+                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura('@(socialIGV)', 1350, 1920)" type="button">Simular</button>
+                </div>
+                <hr />
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Titulo</span>
+                    <input type="text" class="form-control form-control-sm" name="title" value="@($"Classificação {Model.nomeCampeonato} {DateTime.Now.ToString("yyyy")} - Atualizada {DateTime.Now.ToString("dd/MM/yyyy")}")">
                 </div>
             </div>
         </td>
     </tr>
     <tr>
         <td colspan="6" align="right">
-            <button id="btnProcesso" class="btn btn-sm btn-dark">Processo</button>
+            <button id="btnProcesso" onclick="GerarProcesso()" class="btn btn-sm btn-dark">Processo</button>
         </td>
     </tr>
 </table>

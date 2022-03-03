@@ -54,7 +54,8 @@ namespace Futebox.Pages
             height = h;
             var partidas = _rodadaService
                 .ObterPartidasDaRodada(args.campeonato, args.rodada, true)
-                .FindAll(_ => args.partidas.Contains(_.idExterno));
+                .FindAll(_ => args.partidas.Contains(_.idExterno))
+                .OrderBy(_ => _.dataPartida).ToList();
 
             rodada = new RodadaHandlerModel(args, width, height, partidas);
         }

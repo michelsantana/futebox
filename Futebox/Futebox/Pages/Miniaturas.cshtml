@@ -1,6 +1,8 @@
 ﻿@page
 @model Futebox.Pages.MiniaturasModel
-
+@{
+    ViewData["Title"] = $"{Model.tipo} Thumb";
+}
 @switch (Model.tipo)
 {
     case Models.Enums.CategoriaVideo.rodada:
@@ -30,7 +32,7 @@
             $('.text-fit-lg').each((i, e) => $(e).fitText(0.8));
             $('.text-fit-sm').each((i, e) => $(e).fitText(2.6));
 
-            TextFitness('.fitness');
+            setTimeout(() => TextFitness.v2('.fitness'), 890);
         })
     </script>
 }

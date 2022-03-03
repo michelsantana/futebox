@@ -15,6 +15,6 @@ namespace Futebox
         public static string TelegramBotToken;
         public static string TelegramNotifyUserId;
         public static string ChromeDefaultDownloadFolder;
-        public static bool DebugMode;
+        public static bool DEBUGMODE;
     }
 }

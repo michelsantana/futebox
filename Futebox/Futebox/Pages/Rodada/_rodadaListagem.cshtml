@@ -94,7 +94,12 @@
                         </optgroup>
                         @Html.Raw(ddl)
                     </select>
-                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura(1920, 1080)" type="button">Simular</button>
+                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura('@(socialYTV)', 1920, 1080)" type="button">Simular</button>
+                </div>
+                <hr />
+                <div class="">
+                    <span class="form-label">Titulo</span>
+                    <input type="text" class="form-control form-control-sm" name="title" value="@($"Jogos {Model.First().rodada}ª Rodada - {Model.First().campeonato} {DateTime.Now.ToString("yyyy")}")">
                 </div>
             </div>
         </td>
@@ -113,7 +118,12 @@
                         </optgroup>
                         @Html.Raw(ddl)
                     </select>
-                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura(1080, 1920)" type="button">Simular</button>
+                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura('@(socialYTS)', 1080, 1920)" type="button">Simular</button>
+                </div>
+                <hr />
+                <div class="">
+                    <span class="form-label">Titulo</span>
+                    <input type="text" class="form-control form-control-sm" name="title" value="@($"Jogos {Model.First().rodada}ª Rodada - {Model.First().campeonato} {DateTime.Now.ToString("yyyy")}")">
                 </div>
             </div>
         </td>
@@ -132,7 +142,12 @@
                         </optgroup>
                         @Html.Raw(ddl)
                     </select>
-                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura(1350, 1920)" type="button">Simular</button>
+                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura('@(socialIGV)', 1350, 1920)" type="button">Simular</button>
+                </div>
+                <hr />
+                <div class="">
+                    <span class="form-label">Titulo</span>
+                    <input type="text" class="form-control form-control-sm" name="title" value="@($"Jogos {Model.First().rodada}ª Rodada - {Model.First().campeonato} {DateTime.Now.ToString("yyyy")}")">
                 </div>
             </div>
         </td>

@@ -9,7 +9,9 @@
         <h1 class="display-4">Gerador de Rodadas</h1>
     </div>
 </div>
+<div id="rodada">
 
+</div>
 <div>
     <div class="row g-5">
         <div class="col-6">
@@ -46,11 +48,6 @@
 </div>
 
 
-<div id="rodada">
-
-</div>
-
-
 @section Scripts {
     <script>
 
@@ -62,7 +59,7 @@
             colunas: 0,
             linhas: 0,
 
-            data: {},
+            data: () => { },
             post: (url, data, success) => $.ajax({
                 type: 'POST',
                 url: url,
@@ -76,30 +73,32 @@
         view.__defineGetter__('rodada', () => $('[name=txtRodada]'));
         view.__defineGetter__('partidas', () => Array.from($('[data-id]:checked')).map(_ => ~~(_.attributes["data-id"].value)));
 
-        view.__defineGetter__('config', () => $('[data-config]'));
+        view.data = (social) => {
+            var config = $('[data-config]');
 
-        view.__defineGetter__('data', () => {
-            var config = view.config;
-            var data = { args: [] };
+            if (social) config = $(`[data-config="${social}"]`);
+
+            var data = [];
 
             for (var c of config) {
                 var $config = $(c);
-                var social = ~~($config.find('[data-social]:checked').attr('data-social'));
+                var $social = $config.find('[data-social]');
                 var aspect = $config.find('[name=ddlDimensao]').val();
+                var titulo = $config.find('[name=title]').val();
 
-                if (social > 0) {
-                    data.args.push({
-                        campeonato: ~~view.campeonato.val(),
-                        rodada: ~~view.rodada.val(),
-                        partidas: view.partidas,
-                        social: social,
-                        colunas: ~~aspect.split('x')[0],
-                        linhas: ~~aspect.split('x')[1],
-                    });
-                }
+                data.push({
+                    campeonato: ~~view.campeonato.val(),
+                    rodada: ~~view.rodada.val(),
+                    partidas: view.partidas,
+                    social: ~~($social.attr('data-social')),
+                    colunas: ~~aspect.split('x')[0],
+                    linhas: ~~aspect.split('x')[1],
+                    titulo: titulo,
+                    checked: $social.prop('checked'),
+                });
             }
-            return data.args;
-        });
+            return data;
+        };
 
         $(document).ready(() => RestoreCookie());
 
@@ -123,12 +122,15 @@
         }
 
         function GerarProcesso() {
-            console.log(view.data);
-            view.post(`/api/processo/rodada`, view.data, (response) => { console.log(response); $.SendToast('ok', 'Processo criado!'); });
+            var data = view.data().filter(_ => _.checked);
+            console.log(data);
+            view.post(`/api/processo/rodada`, data, (response) => { console.log(response); $.SendToast('ok', 'Processo criado!'); });
         }
 
-        function VisualizarMiniatura(w, h) {
-            window.open(`/Miniaturas?t=rodada&q=${JSON.stringify(view.data[0])}&w=${w}&h=${h}`, '_blank');
+        function VisualizarMiniatura(s, w, h) {
+            var data = view.data(s);
+            console.log(data);
+            window.open(`/Miniaturas?t=rodada&q=${JSON.stringify(data[0])}&w=${w}&h=${h}`, '_blank');
         }
 
         $('#rodada').click(() => {

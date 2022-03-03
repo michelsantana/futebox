@@ -52,39 +52,77 @@ namespace Futebox.Services
                 .Select(_ => ConverterEmClassificacaoVM(_));
         }
 
-        public string ObterRoteiroDaClassificacao(IEnumerable<ClassificacaoVM> classificacao, EnumCampeonato campeonato)
+        public string ObterRoteiroDaClassificacao(IEnumerable<ClassificacaoVM> classificacao, ProcessoClassificacaoArgs processoClassificacaoArgs)
         {
 
             var msg = $"{RoteiroDefaults.ObterSaudacao()} "
-                + $"Veja agora a classificação do \"{CampeonatoUtils.ObterNomeDoCampeonato(campeonato)}\": "
-                + $"Lembrando que essa, é a classificação no dia de hoje, {RoteiroDefaults.TraduzirDiaDoMes(DateTime.Now)}: "
-                + $"Bora: "
-                + "Ô ";
+                + $"Veja a classificação do \"{CampeonatoUtils.ObterNomeDoCampeonato(processoClassificacaoArgs.campeonato)}\": "
+                + $"Classificação atualizada hoje, {RoteiroDefaults.TraduzirDiaDoMes(DateTime.Now)}: "
+                + $"Bora: ";
 
             var rnd = new Random();
             var indicePedirLike = rnd.Next(7, classificacao.Count() - 2);
 
-            classificacao.ToList().ForEach(_ =>
+            var range = processoClassificacaoArgs.range ?? new int[] { 0, 99 };
+
+            if (processoClassificacaoArgs.temFases) classificacao = classificacao.Where(_ => _.fase == processoClassificacaoArgs.fase);
+
+            if (processoClassificacaoArgs.classificacaoPorGrupos)
             {
+                var grupos = classificacao.Select(_ => _.grupo).Distinct().ToList();
 
-                msg += $"{_.posicao}º colocado é, {_.time.ObterNomeWatson()}, "
-                + $"com {_.pontos} pontos, em { _.partidasJogadas} jogos: ";
+                grupos
+                    .FindAll(_ => processoClassificacaoArgs.grupos.Contains(_))
+                    .ToList()
+                    .ForEach(g =>
+                        {
+                            msg += $"No Grupo {g}: ";
+                            msg += "Ô ";
+                            var classGrupo = classificacao.ToList().FindAll(_ => _.grupo == g);
 
-                if (~~_.posicao == indicePedirLike)
-                {
-                    msg += "Meus parças: Já deixa aquela deedáda no laique e se inscrévi no canal: Continuando: Ô ";
-                }
-            });
-            msg += "Muitíssimo obrigada a todos que assistiram até aqui: Até o próximo vídeo: ";
+                            classGrupo
+                            .FindAll(_ => _.posicao >= (range[0]) && _.posicao <= (range[1]))
+                            .OrderBy(_ => _.posicao)
+                            .ToList()
+                            .ForEach(_ =>
+                            {
+                                msg += $"{_.posicao}º colocado é, {_.time.ObterNomeWatson()}, "
+                                + $"com {_.pontos} pontos, em { _.partidasJogadas} jogos: ";
+                            });
+                        });
+                msg += "Muitíssimo obrigada a todos que assistiram até aqui: Até o próximo vídeo: ";
+            }
+            else
+            {
+                msg += "Ô ";
+                classificacao
+                    .Where(_ => _.posicao >= (range[0]) && _.posicao <= (range[1]))
+                    .ToList()
+                    .ForEach(_ =>
+                        {
+
+                            msg += $"{_.posicao}º colocado é, {_.time.ObterNomeWatson()}, "
+                            + $"com {_.pontos} pontos, em { _.partidasJogadas} jogos: ";
+
+                            if (~~_.posicao == indicePedirLike)
+                            {
+                                msg += "Meus parças: Já deixa aquela deedáda no laique e se inscrévi no canal: Continuando: Ô ";
+                            }
+                        });
+                msg += "Muitíssimo obrigada a todos que assistiram até aqui: Até o próximo vídeo: ";
+            }
+
             return msg;
         }
 
-        public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<ClassificacaoVM> classificacao, EnumCampeonato campeonato)
+        public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<ClassificacaoVM> classificacao, ProcessoClassificacaoArgs processoClassificacaoArgs)
         {
-            var camp = CampeonatoUtils.ObterNomeDoCampeonato(campeonato);
+            var camp = CampeonatoUtils.ObterNomeDoCampeonato(processoClassificacaoArgs.campeonato);
             var data = DateTime.Now.ToString("dd/MM/yyyy");
             var ano = DateTime.Now.ToString("yyyy");
             var titulo = $"CLASSIFICAÇÃO {camp} {ano} - {data} - ATUALIZADA";
+
+            titulo = string.IsNullOrEmpty(processoClassificacaoArgs.titulo) ? titulo : processoClassificacaoArgs.titulo;
 
             var descricao = "";
 
@@ -140,7 +178,8 @@ namespace Futebox.Services
                 saldoGols = classificacao.saldoDeGols,
                 vitorias = classificacao.vitorias,
                 time = time,
-                grupo = classificacao.grupo
+                grupo = classificacao.grupo,
+                fase = classificacao.fase
             };
             return retorno;
         }

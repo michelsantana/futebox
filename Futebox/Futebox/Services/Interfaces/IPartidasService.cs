@@ -16,7 +16,7 @@ namespace Futebox.Services.Interfaces
         IEnumerable<PartidaVM> ObterPartidasAntigas(string cacheFile);
         string ObterRoteiroDaPartida(PartidaVM partida);
         string ObterRoteiroDaPartida(int idPartida);
-        Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida);
+        Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida, ProcessoPartidaArgs processoPartidaArgs);
         PartidaVM ConverterEmPartidaVM(FootstatsPartida footstatsPartida);
     }
 }

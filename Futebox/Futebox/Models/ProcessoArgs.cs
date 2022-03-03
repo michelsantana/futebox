@@ -17,12 +17,14 @@ namespace Futebox.Models
         public RedeSocialFinalidade social { get; set; }
         
         public string[] grupos { get; set; }
+        public int[] range { get; set; }
 
         public bool temFases { get; set; }
         public bool classificacaoPorGrupos { get; set; }
 
         public int linhas { get; set; }
         public int colunas { get; set; }
+        public string titulo { get; set; }
     }
 
     public class ProcessoRodadaArgs : IProcessoArgs
@@ -34,6 +36,7 @@ namespace Futebox.Models
 
         public int linhas { get; set; }
         public int colunas { get; set; }
+        public string titulo { get; set; }
 
     }
 
@@ -42,6 +45,6 @@ namespace Futebox.Models
         public EnumCampeonato campeonato { get; set; }
         public int partida { get; set; }
         public RedeSocialFinalidade social { get; set; }
-
+        public string titulo { get; set; }
     }
 }

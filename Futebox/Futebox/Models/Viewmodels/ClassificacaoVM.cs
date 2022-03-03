@@ -22,6 +22,7 @@ namespace Futebox.Models
         public int saldoGols { get; set; }
         public string ultimasCinco { get; set; }
         public string corDestaque { get; set; }
+        public string fase { get; set; }
         public Time time { get; set; }
 
     }

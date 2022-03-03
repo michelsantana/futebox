@@ -28,7 +28,8 @@ namespace Futebox
             Settings.ApplicationHttpBaseUrl = Configuration.GetValue<string>("ApplicationHttpBaseUrl");
             Settings.TelegramBotToken = DotEnv.Get("TELEGRAM_BOT_TOKEN");
             Settings.TelegramNotifyUserId = DotEnv.Get("TELEGRAM_NOTIFY_USERID");
-            Settings.DebugMode = DotEnv.Get("DEFAULT_DEBUGMODE") == "true";
+            Settings.DEBUGMODE = DotEnv.Get("DEFAULT_DEBUGMODE") == "true";
+            Settings.ChromeDefaultDownloadFolder = DotEnv.Get("CHROME_DOWNLOAD_FOLDER");
         }
 
         public IConfiguration Configuration { get; }

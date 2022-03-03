@@ -10,7 +10,7 @@ namespace Futebox.Services.Interfaces
         IEnumerable<ClassificacaoVM> ObterClassificacaoPorCampeonato(Models.Enums.EnumCampeonato campeonato, bool usarCache = true);
         IEnumerable<ClassificacaoVM> ObterClassificacaoPorCampeonatoFase(Models.Enums.EnumCampeonato campeonato, string fase, bool usarCache = true);
 
-        string ObterRoteiroDaClassificacao(IEnumerable<ClassificacaoVM> classificacao, Models.Enums.EnumCampeonato campeonato);
-        Tuple<string, string> ObterAtributosDoVideo(IEnumerable<ClassificacaoVM> classificacao, Models.Enums.EnumCampeonato campeonato);
+        string ObterRoteiroDaClassificacao(IEnumerable<ClassificacaoVM> classificacao, ProcessoClassificacaoArgs processoClassificacaoArgs);
+        Tuple<string, string> ObterAtributosDoVideo(IEnumerable<ClassificacaoVM> classificacao, ProcessoClassificacaoArgs processoClassificacaoArgs);
     }
 }

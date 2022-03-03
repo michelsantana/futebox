@@ -84,7 +84,7 @@ namespace Futebox.Services
 
         public async Task SelecionarPrivacidade()
         {
-            if (Settings.DebugMode) await _page.ClickAsync("[name=\"PRIVATE\"]");
+            if (Settings.DEBUGMODE) await _page.ClickAsync("[name=\"PRIVATE\"]");
             _browserService.WaitFor(1);
         }
 
@@ -92,7 +92,7 @@ namespace Futebox.Services
         {
             var seletorRodapeJanela = ".button-area.ytcp-uploads-dialog";
             await _page.ClickAsync($"{seletorRodapeJanela} #done-button");
-            _browserService.WaitFor(4);
+            _browserService.WaitFor(10);
         }
 
         public async Task Fechar()

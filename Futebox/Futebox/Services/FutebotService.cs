@@ -81,7 +81,7 @@ namespace Futebox.Services
             }
         }
 
-        public async Task<RobotResultApi> GerarAudio(Processo processo, bool buscarDoCache = false)
+        public async Task<RobotResultApi> GerarAudio(Processo processo, bool buscarDoCacheDownload = false, bool buscarDoCacheArquivos = false)
         {
             var result = new RobotResultApi("GerarAudio");
             result.Add("start");
@@ -89,19 +89,34 @@ namespace Futebox.Services
             try
             {
                 var arquivoPastaDownload = Path.Combine(Settings.ChromeDefaultDownloadFolder, processo.nomeDoArquivoAudio);
+                var arquivoPastaArquivos = Path.Combine(processo.pasta, processo.nomeDoArquivoAudio);
 
-                if (File.Exists(arquivoPastaDownload))
+                if (buscarDoCacheDownload && File.Exists(arquivoPastaDownload))
                 {
                     FileInfo fi = new FileInfo(arquivoPastaDownload);
-                    if (buscarDoCache || fi.CreationTime > DateTime.Now.AddHours(-8))
+                    if (fi.CreationTime > DateTime.Now.AddHours(-8))
                     {
-                        result.Add("cache");
+                        result.Add("cache.1");
                         File.Copy(arquivoPastaDownload, Path.Combine(processo.pasta, processo.nomeDoArquivoAudio), true);
                         return result.Ok();
                     }
                     else
                     {
                         File.Move(arquivoPastaDownload, $"{arquivoPastaDownload.Replace(".mp3", "notcache.mp3")}", true);
+                    }
+                }
+
+                if (buscarDoCacheArquivos && File.Exists(arquivoPastaArquivos))
+                {
+                    FileInfo fi = new FileInfo(arquivoPastaArquivos);
+                    if (fi.CreationTime > DateTime.Now.AddHours(-8))
+                    {
+                        result.Add("cache.2");
+                        return result.Ok();
+                    }
+                    else
+                    {
+                        File.Move(arquivoPastaArquivos, $"{arquivoPastaArquivos.Replace(".mp3", "notcache.mp3")}", true);
                     }
                 }
 

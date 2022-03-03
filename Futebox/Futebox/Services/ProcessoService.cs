@@ -80,7 +80,8 @@ namespace Futebox.Services
         {
             var p = _processoRepositorio.GetById(id);
             p.agendamento = hora;
-            p.status = StatusProcesso.Agendado;
+            //if(p.status == StatusProcesso.Criado || p.status == StatusProcesso.Erro)
+                p.status = StatusProcesso.Agendado;
             p.agendado = true;
 
             _processoRepositorio.OpenTransaction();
@@ -113,7 +114,7 @@ namespace Futebox.Services
             AtualizarRoteiro(processo);
             AtualizarStatus(ref processo, StatusProcesso.GerandoAudio);
 
-            var resultado = await _futebotService.GerarAudio(processo);
+            var resultado = await _futebotService.GerarAudio(processo, true, true);
             AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
@@ -216,15 +217,14 @@ namespace Futebox.Services
             {
                 case CategoriaVideo.partida:
                     var partida = _partidasService.ObterPartida(processo.ToArgs<ProcessoPartidaArgs>().partida);
-                    atributos = _partidasService.ObterAtributosDoVideo(partida);
+                    atributos = _partidasService.ObterAtributosDoVideo(partida, processo.ToArgs<ProcessoPartidaArgs>());
                     break;
                 case CategoriaVideo.classificacao:
                     var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(processo.ToArgs<ProcessoClassificacaoArgs>().campeonato);
-                    atributos = _classificacaoService.ObterAtributosDoVideo(classificacao, processo.ToArgs<ProcessoClassificacaoArgs>().campeonato);
+                    atributos = _classificacaoService.ObterAtributosDoVideo(classificacao, processo.ToArgs<ProcessoClassificacaoArgs>());
                     break;
                 case CategoriaVideo.rodada:
-                    var partidas = _rodadaService.ObterPartidasDaRodada(processo.ToArgs<ProcessoRodadaArgs>().campeonato, processo.ToArgs<ProcessoRodadaArgs>().rodada);
-                    atributos = _rodadaService.ObterAtributosDoVideo(partidas, processo.ToArgs<ProcessoRodadaArgs>().campeonato, processo.ToArgs<ProcessoRodadaArgs>().rodada);
+                    atributos = _rodadaService.ObterAtributosDoVideo(processo.ToArgs<ProcessoRodadaArgs>());
                     break;
             }
 
@@ -253,7 +253,7 @@ namespace Futebox.Services
         {
             var args = JsonConvert.DeserializeObject<ProcessoClassificacaoArgs>(processo.args);
             var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(args.campeonato, true);
-            processo.roteiro = _classificacaoService.ObterRoteiroDaClassificacao(classificacao, args.campeonato);
+            processo.roteiro = _classificacaoService.ObterRoteiroDaClassificacao(classificacao, args);
             _processoRepositorio.Update(processo);
             return processo;
         }
@@ -262,7 +262,7 @@ namespace Futebox.Services
         {
             var args = JsonConvert.DeserializeObject<ProcessoRodadaArgs>(processo.args);
             var partidas = _rodadaService.ObterPartidasDaRodada(args.campeonato, args.rodada, true);
-            processo.roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, args.campeonato, args.rodada);
+            processo.roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, args);
             _processoRepositorio.Update(processo);
             return processo;
         }

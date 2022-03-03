@@ -125,14 +125,16 @@ namespace Futebox.Services
                 $"{mensagem}";
         }
 
-        public Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida)
+        public Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida, ProcessoPartidaArgs processoPartidaArgs)
         {
             var titulo = $"{partida.timeMandante.nome} x {partida.timeVisitante.nome} " +
                 $"- {partida.dataPartida.ToString("dd/MM/yyyy")}" +
                 $"- {partida.campeonato}! " +
                 $"Quem venceu!? #shorts";
-            var descricao = $"Fala meus parças, agora trarei #shorts com os finais de partida. Espero que gostem!" +
-                $"#short\n#short\n{partida.campeonato}\n{partida.estadio}\n";
+            titulo = string.IsNullOrEmpty(processoPartidaArgs.titulo) ? titulo : processoPartidaArgs.titulo;
+
+            var descricao = $"Fala meus parças resultado da partida. Espero que gostem!";
+
             return Tuple.Create(titulo, descricao);
         }
 

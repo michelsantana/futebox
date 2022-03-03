@@ -44,7 +44,7 @@ namespace Futebox.Services
             await page.Keyboard.UpAsync("Backspace");
             WaitForMs(344);
 
-            await page.Keyboard.TypeAsync(text, new PuppeteerSharp.Input.TypeOptions() { Delay = 138 });
+            await page.Keyboard.TypeAsync(text, new PuppeteerSharp.Input.TypeOptions() { Delay = 800 });
         }
 
         public void WaitFor(int seconds)

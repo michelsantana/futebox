@@ -268,25 +268,43 @@ Calendar();
 
 })(jQuery);
 
-function TextFitness(selector, target = '.fitness-target') {
-    var childTarget = target;
-    $(selector).each((i, el) => {
-        var parentWidth = $(el).width();
-        var parentHeight = $(el).height();
+var TextFitness = {
+    v1: function TextFitness(selector, target = '.fitness-target') {
+        var childTarget = target;
+        $(selector).each((i, el) => {
+            var parentWidth = $(el).width();
+            var parentHeight = $(el).height();
 
-        if (parentHeight < parentWidth) {
-            while ($(el).find(childTarget).height() < parentHeight) {
+            if (parentHeight < parentWidth) {
+                while ($(el).find(childTarget).height() < parentHeight) {
+                    var size = $(el).find(childTarget).attr('font-size') || '1';
+                    $(el).find(childTarget).css('font-size', `${size++}px`);
+                    $(el).find(childTarget).attr('font-size', size);
+                }
+            }
+            else {
+                while ($(el).find(childTarget).width() < parentWidth) {
+                    var size = $(el).find(childTarget).attr('font-size') || '1';
+                    $(el).find(childTarget).css('font-size', `${size++}px`);
+                    $(el).find(childTarget).attr('font-size', size);
+                }
+            }
+        })
+    },
+
+    v2: function TextFitness(selector, target = '.fitness-target') {
+        var childTarget = target;
+        $(selector).each((i, el) => {
+            var parentWidth = $(el).width();
+            var parentHeight = $(el).height();
+
+            var check = () => $(el).find(childTarget).height() < parentHeight && $(el).find(childTarget).width() < parentWidth;
+
+            while (check()) {
                 var size = $(el).find(childTarget).attr('font-size') || '1';
                 $(el).find(childTarget).css('font-size', `${size++}px`);
                 $(el).find(childTarget).attr('font-size', size);
             }
-        }
-        else {
-            while ($(el).find(childTarget).width() < parentWidth) {
-                var size = $(el).find(childTarget).attr('font-size') || '1';
-                $(el).find(childTarget).css('font-size', `${size++}px`);
-                $(el).find(childTarget).attr('font-size', size);
-            }
-        }
-    })
+        })
+    }
 }

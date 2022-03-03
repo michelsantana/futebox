@@ -56,7 +56,6 @@ namespace Futebox.Services.Jobs
                     {
                         StatusProcesso.Criado, StatusProcesso.PublicandoOK,
                     };
-
                     var statusGerarImagem = new StatusProcesso[]
                     {
                         StatusProcesso.Agendado, StatusProcesso.ImagemErro

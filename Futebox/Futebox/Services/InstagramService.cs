@@ -80,8 +80,8 @@ namespace Futebox.Services
 
         public async Task ClicarEmPublicar()
         {
-            if(!Settings.DebugMode) await _page.EvaluateExpressionAsync(_browserService.JsFunction("IGPublicar"));
-            _browserService.WaitFor(10);
+            if(!Settings.DEBUGMODE) await _page.EvaluateExpressionAsync(_browserService.JsFunction("IGPublicar"));
+            _browserService.WaitFor(60);
         }
 
         public async Task Fechar()

@@ -19,7 +19,7 @@ namespace Futebox.Models
                 case Enums.RedeSocialFinalidade.NENHUMA: return 1920;
                 case Enums.RedeSocialFinalidade.YoutubeShorts: return 1080;
                 case Enums.RedeSocialFinalidade.YoutubeVideo: return 1920;
-                case Enums.RedeSocialFinalidade.InstagramVideo: return 1080;
+                case Enums.RedeSocialFinalidade.InstagramVideo: return 1350;
                 default: return 1920;
             }
         }
@@ -31,7 +31,7 @@ namespace Futebox.Models
                 case Enums.RedeSocialFinalidade.NENHUMA: return 1080;
                 case Enums.RedeSocialFinalidade.YoutubeShorts: return 1920;
                 case Enums.RedeSocialFinalidade.YoutubeVideo: return 1080;
-                case Enums.RedeSocialFinalidade.InstagramVideo: return 1080;
+                case Enums.RedeSocialFinalidade.InstagramVideo: return 1920;
                 default: return 1080;
             }
         }

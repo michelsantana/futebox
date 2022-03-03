@@ -40,13 +40,15 @@ namespace Futebox.Controllers
         [HttpPost("partida")]
         public async Task<List<Processo>> AddProcessoPartida([FromBody] ProcessoPartidaArgs[] args)
         {
-            throw new NotImplementedException();
+            if (args == null || args?.Length == 0) throw new Exception();
+            return _processoService.SalvarProcessoPartida(args);
         }
 
         [HttpPost("classificacao")]
         public async Task<List<Processo>> AddProcessoClassificacao([FromBody] ProcessoClassificacaoArgs[] args)
         {
-            throw new NotImplementedException();
+            if (args == null || args?.Length == 0) throw new Exception();
+            return _processoService.SalvarProcessoClassificacao(args);
         }
 
         [HttpPost("rodada")]

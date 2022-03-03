@@ -1,4 +1,4 @@
-﻿@model Futebox.Pages.MiniaturasModel.RodadaHandlerModel
+﻿@model Futebox.Pages.MiniaturasModel.ClassificacaoHandlerModel
 @{
     var debug = false;
 
@@ -17,16 +17,16 @@
     if (debug)
     {
         w = "1920"; h = "1080";
-        colunas = 4; linhas = 2;
+        colunas = 2; linhas = 2;
 
-        w = "1080"; h = "1920";
-        colunas = 2; linhas = 4;
+        //w = "1080"; h = "1920";
+        //colunas = 2; linhas = 4;
 
-        w = "1080"; h = "1350";
-        colunas = 2; linhas = 4;
+        //w = "1080"; h = "1350";
+        //colunas = 2; linhas = 4;
 
-        w = "1080"; h = "1350";
-        colunas = 2; linhas = 3;
+        //w = "1080"; h = "1350";
+        //colunas = 2; linhas = 3;
     }
 }
 @if (debug && false)
@@ -57,11 +57,12 @@
     }
     .mini-col {
         padding: 5px;
-        width: @($"{100/colunas}%");
+        width: @($"{100 / colunas}%");
     }
 </style>
 <style>
     body {
+        
     }
 
     #mini-container {
@@ -105,12 +106,24 @@
         font-weight: bold;
         text-align: center;
         height: 10%;
-        font-size: 70px;
+        display: flex;
+        align-content: flex-start;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
     }
+
+        #mini-footer .fitness-target {
+            display: flex;
+            flex-direction: column;
+            align-content: flex-start;
+            align-items: flex-start;
+        }
 </style>
 <div id="mini-container" class="fs-sport">
     <div id="mini-header" class="fitness">
-        <span class="fitness-target">Jogos da @(Model.args.rodada)<sup>o</sup> Rodada</span>
+        <span class="fitness-target">@($"{Models.CampeonatoUtils.ObterNomeDoCampeonato(Model.args.campeonato)}")</span>
     </div>
     <div id="mini-body">
         @*<table id="mini-table">*@
@@ -119,21 +132,30 @@
             <div class="mini-row" row="@linha">
                 @for (var coluna = 0; coluna < colunas; coluna++)
                 {
-                    { Model.Next(); }
-                    if (Model.Current() != null)
+                    { Model.NextGroup(); }
+                    if (Model.CurrentGroup() != null)
                     {
                         <div class="mini-col" col="@coluna">
-                            @Html.Partial("Miniaturas/_rodadaCard", Model.Current())
+                            @Html.Partial("Miniaturas/_classificacaoCard", Model.classificacao.Where(_ => _.Key == Model.CurrentGroup()))
                         </div>
                     }
-                    @if (Model.Current() == null) break;
+                    @if (Model.CurrentGroup() == null) break;
                 }
             </div>
-            @if (Model.Current() == null) break;
+            @if (Model.CurrentGroup() == null) break;
         }
         @*</table>*@
     </div>
-    <div id="mini-footer" class="fitness">
-        <span class="fitness-target">@($"{Models.CampeonatoUtils.ObterNomeDoCampeonato(Model.args.campeonato)}")</span>
+    <div id="mini-footer">
+        <div class="w-50 h-100 fitness">
+            <div class="fitness-target">
+                @Html.Raw(Model.legenda)
+            </div>
+        </div>
+        <div class="w-50 h-100 fitness">
+            <div class="">
+                
+            </div>
+        </div>
     </div>
 </div>

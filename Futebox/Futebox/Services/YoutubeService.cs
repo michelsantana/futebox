@@ -84,7 +84,7 @@ namespace Futebox.Services
 
         public async Task SelecionarPrivacidade()
         {
-            if (Settings.DEBUGMODE) await _page.ClickAsync("[name=\"PRIVATE\"]");
+            if (Settings.DebugMode) await _page.ClickAsync("[name=\"PRIVATE\"]");
             _browserService.WaitFor(1);
         }
 

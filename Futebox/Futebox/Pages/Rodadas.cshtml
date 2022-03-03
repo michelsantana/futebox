@@ -5,7 +5,6 @@
 }
 
 <div class="row g-5">
-
     <div class="text-center">
         <h1 class="display-4">Gerador de Rodadas</h1>
     </div>
@@ -17,7 +16,7 @@
 
             <div class="mb-3">
                 <label for="ddlCampeonato" class="form-label">Campeonato</label>
-                <select name="ddlCampeonato" class="form-select" aria-label="Default select example">
+                <select name="ddlCampeonato" class="form-select">
                     <option selected>Selecione</option>
                     @foreach (var camp in Models.CampeonatoUtils.ObterCampeonatosAtivos())
                     {
@@ -87,7 +86,7 @@
                 var $config = $(c);
                 var social = ~~($config.find('[data-social]:checked').attr('data-social'));
                 var aspect = $config.find('[name=ddlDimensao]').val();
-                
+
                 if (social > 0) {
                     data.args.push({
                         campeonato: ~~view.campeonato.val(),
@@ -124,14 +123,12 @@
         }
 
         function GerarProcesso() {
-
             console.log(view.data);
-
             view.post(`/api/processo/rodada`, view.data, (response) => { console.log(response); $.SendToast('ok', 'Processo criado!'); });
         }
 
         function VisualizarMiniatura(w, h) {
-            window.open(`/Miniaturas?t=rodada&q=${JSON.stringify(view.data.args[0])}&w=${w}&h=${h}`, '_blank');
+            window.open(`/Miniaturas?t=rodada&q=${JSON.stringify(view.data[0])}&w=${w}&h=${h}`, '_blank');
         }
 
         $('#rodada').click(() => {

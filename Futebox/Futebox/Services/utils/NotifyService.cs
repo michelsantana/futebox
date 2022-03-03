@@ -21,7 +21,7 @@ namespace Futebox.Services
         private static HttpClient _http;
         public Task Notify(string message)
         {
-            if (Settings.DEBUGMODE) return Task.FromResult(0);
+            if (Settings.DebugMode) return Task.FromResult(0);
             _http = _http ?? new HttpClient();
             if (message.Length > messageSize)
                 message = message.Substring(0, messageSize);

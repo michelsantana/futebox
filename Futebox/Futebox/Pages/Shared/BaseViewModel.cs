@@ -17,8 +17,8 @@ namespace Futebox.Pages.Shared
             if (Request.Query.ContainsKey("debug"))
             {
                 var newmode = Request.Query["debug"];
-                if (newmode == "1") Settings.DEBUGMODE = true;
-                if (newmode == "0") Settings.DEBUGMODE = false;
+                if (newmode == "1") Settings.DebugMode = true;
+                if (newmode == "0") Settings.DebugMode = false;
             }
         }
 

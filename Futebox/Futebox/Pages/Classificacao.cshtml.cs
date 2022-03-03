@@ -56,7 +56,7 @@ namespace Futebox.Pages
                     break;
                 case EnumCampeonato.Paulistao2022:
                     IdentificarCoresDestaquePaulistao(partialModel);
-                    partial = "Templates/_tabelaDeClassificacaoLibertadores";
+                    partial = "Classificacao/_classificacaoListagem";
                     break;
                 default:
                     partial = "Templates/_tabelaDeClassificacao";

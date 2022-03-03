@@ -1,0 +1,27 @@
+﻿@model Futebox.Models.PartidaVM
+@if (Model != null)
+{
+    @Html.ScopeStyle($"#scope_{Model.idExterno}", "rodada-card.css")
+
+    <div id="scope_@Model.idExterno" class="w100 h100">
+        <div class="w100 h10 text-fit-sm scope-title1 fitness"><span class='fitness-target'>@(Model.dataPartida.ToString("dd/MM/yyyy HH:mm"))</span></div>
+        <div class="w100 h80">
+            <div class="w100 h10 df1">
+                <div class="h100 w40 df2 fitness"><span class='fitness-target'>@(Model.timeMandante.nome)</span></div>
+                <div class="h100 w20 df2"></div>
+                <div class="h100 w40 df2 fitness"><span class='fitness-target'>@(Model.timeVisitante.nome)</span></div>
+            </div>
+            <div class="w100 h80 df1">
+                <div class="h100 w40 df2"><img style="display:block;" width="95%" height="95%" src="@Model.timeMandante.ObterLogoLocal()" /></div>
+                <div class="h100 w20 df2"><img style="display:block;" width="95%" height="95%" src="~/img/vs.png" /></div>
+                <div class="h100 w40 df2"><img style="display:block;" width="95%" height="95%" src="@Model.timeVisitante.ObterLogoLocal()" /></div>
+            </div>
+            <div class="w100 h10 df1">
+                <div class="h100 w40 df2 fitness"><span class='fitness-target'>@(Model.timeMandante.sigla)</span></div>
+                <div class="h100 w20 df2"></div>
+                <div class="h100 w40 df2 fitness"><span class='fitness-target'>@(Model.timeVisitante.sigla)</span></div>
+            </div>
+        </div>
+        <div class="w100 h10 text-fit-sm scope-footer fitness"><span class='fitness-target'>@(Model.estadio)</span></div>
+    </div>
+}

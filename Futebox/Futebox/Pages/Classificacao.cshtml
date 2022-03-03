@@ -10,49 +10,133 @@
 </div>
 <div id="classificacao"></div>
 
-<div>
-    <hr class="col-3 col-md-2 mb-5">
 
+<div>
     <div class="row g-5">
-        @foreach (var camp in Model.campeonatosAtivos)
-        {
-            if (Futebox.Models.CampeonatoUtils.Config[camp].FasesPossiveis()?.Count() > 0)
-            {
-                @foreach (var fase in Futebox.Models.CampeonatoUtils.Config[camp].FasesPossiveis())
-                {
-                    <div class="co d-flex flex-column">
-                        <h1>@($"{camp} - {fase}")</h1>
-                        <button class="btn btn-primary" onclick="Ver('@((int)camp)', '@fase')">Ver</button>
-                        <button class="btn btn-primary" onclick="GerarVideo('@((int)camp)', '@fase')">Gerar Processo</button>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="co d-flex flex-column">
-                    <h1>@($"{camp}")</h1>
-                    <button class="btn btn-primary" onclick="Ver('@((int)camp)', '')">Ver</button>
-                    <button class="btn btn-primary" onclick="GerarVideo('@((int)camp)', '')">Gerar Processo</button>
-                </div>
-            }
-        }
+        <div class="col-6">
+
+            <div class="mb-3">
+                <label for="ddlCampeonato" class="form-label">Campeonato</label>
+                <select name="ddlCampeonato" class="form-select">
+                    <option selected>Selecione</option>
+                    @foreach (var camp in Model.campeonatosAtivos)
+                    {
+                        if (Futebox.Models.CampeonatoUtils.Config[camp].fases?.Count() > 0)
+                        {
+                            <optgroup label="@camp">
+                                @foreach (var fase in Futebox.Models.CampeonatoUtils.Config[camp].fases)
+                                {
+                                    <option value="@($"{(int)camp},{fase}")">@($"{camp} - {fase}")</option>
+                                }
+                            </optgroup>
+                        }
+                        else
+                        {
+                            <option value="@($"{(int)camp},geral")">@($"{camp} - Geral")</option>
+                        }
+                    }
+                </select>
+            </div>
+            @*<div class="mb-3">
+                    <label for="txtRodada" class="form-label">Numero da rodada</label>
+                    <input type="number" class="form-control" name="txtRodada">
+                </div>*@
+            <button type="button" onclick="Pesquisar()" class="btn btn-primary">🔍 Pesquisar</button>
+        </div>
+        <div class="col-6">
+            <div class="calendar-wrapper">
+                <div id="divCal"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-5">
+        <table>
+        </table>
     </div>
 </div>
 
 @section Scripts{
     <script>
 
-        function Ver(campeonato, fase) {
-            fetch(`/classificacao?handler=Campeonato&campeonato=${campeonato}&fase=${fase}`)
+        var view = {
+            ddlCampeonato: null,
+
+            campeonato: null,
+            temFase: null,
+            fase: null,
+
+            data: {},
+            post: (url, data, success) => $.ajax({
+                type: 'POST',
+                url: url,
+                data: JSON.stringify(data),
+                success: success,
+                contentType: "application/json; charset=utf-8"
+            })
+        };
+
+        view.__defineGetter__('ddlCampeonato', () => $('[name=ddlCampeonato]'));
+        view.__defineGetter__('campeonato', () => view.ddlCampeonato.val().split(',')[0]);
+        view.__defineGetter__('fase', () => view.ddlCampeonato.val().split(',')[1]);
+        view.__defineGetter__('grupos', () => Array.from($('[data-grupo]:checked')).map(_ => (_.attributes["data-grupo"].value)));
+
+        view.__defineGetter__('config', () => $('[data-config]'));
+
+        view.__defineGetter__('data', () => {
+            var config = view.config;
+            var data = { args: [] };
+
+            for (var c of config) {
+                var $config = $(c);
+                var social = ~~($config.find('[data-social]:checked').attr('data-social'));
+                var aspect = $config.find('[name=ddlDimensao]').val();
+
+                if (social > 0) {
+                    data.args.push({
+                        campeonato: ~~view.campeonato,
+                        fase: (view.fase == 'geral' ? null : view.fase),
+                        temFases: (view.fase != 'geral'),
+                        classificacaoPorGrupos: (view.grupos.length > 1),
+                        grupos: view.grupos,
+                        social: social,
+                        colunas: ~~aspect.split('x')[0],
+                        linhas: ~~aspect.split('x')[1],
+                    });
+                }
+            }
+            return data.args;
+        });
+
+        $(document).ready(() => RestoreCookie());
+
+        function Pesquisar() {
+
+            SaveCookie();
+
+            fetch(`/classificacao?handler=Campeonato&campeonato=${view.campeonato}&fase=${view.fase}`)
                 .then((response) => response.text())
                 .then((result) => document.getElementById('classificacao').innerHTML = result);
         }
 
-        function GerarVideo(campeonato, fase) {
-            $.post(`/api/processo/classificacao/${campeonato}?fase=${fase}`, (response) => $.SendToast(response.id, 'Processo criado!'));
+        function VisualizarMiniatura(w, h) {
+            window.open(`/Miniaturas?t=classificacao&q=${JSON.stringify(view.data[0])}&w=${w}&h=${h}`, '_blank');
         }
 
-        $('#classificacao').click(() => $('#classificacao').toggleClass('focus'));
+        function GerarProcesso() {
+            console.log(view.data);
+            view.post(`/api/processo/classificacao`, view.data, (response) => { console.log(response); $.SendToast(response.id, 'Processo criado!') });
+        }
+
+        function SaveCookie() {
+            localStorage.setItem('classificacao', JSON.stringify({ args: [view.ddlCampeonato.val()] }))
+        }
+
+        function RestoreCookie() {
+            var v = JSON.parse(localStorage.getItem('classificacao') || '{ "args":[] }');
+            if (v.args && v.args.length == 1) {
+                view.ddlCampeonato.val(v.args[0]);
+            }
+        }
 
     </script>
     @if ((Model.campeonatoFoco.HasValue))

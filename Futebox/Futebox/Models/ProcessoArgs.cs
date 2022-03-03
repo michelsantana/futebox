@@ -12,7 +12,17 @@ namespace Futebox.Models
     public class ProcessoClassificacaoArgs : IProcessoArgs
     {
         public Enums.EnumCampeonato campeonato { get; set; }
+        public string fase { get; set; }
+
         public RedeSocialFinalidade social { get; set; }
+        
+        public string[] grupos { get; set; }
+
+        public bool temFases { get; set; }
+        public bool classificacaoPorGrupos { get; set; }
+
+        public int linhas { get; set; }
+        public int colunas { get; set; }
     }
 
     public class ProcessoRodadaArgs : IProcessoArgs

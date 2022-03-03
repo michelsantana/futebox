@@ -1,0 +1,103 @@
+﻿#scope {
+    padding: 15px;
+    border: none;
+    box-shadow: 0px 0px 20px 0px #00000024;
+    background: rgb(202,249,202);
+    background: -moz-radial-gradient(circle, rgba(202,249,202,1) 10%, rgba(139,242,129,1) 43%, rgba(97,227,82,1) 70%);
+    background: -webkit-radial-gradient(circle, rgba(202,249,202,1) 10%, rgba(139,242,129,1) 43%, rgba(97,227,82,1) 70%);
+    background: radial-gradient(circle, rgba(202,249,202,1) 10%, rgba(139,242,129,1) 43%, rgba(97,227,82,1) 70%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#caf9ca",endColorstr="#61e352",GradientType=1);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: space-between;
+}
+
+    #scope.w100, #scope .w100 {
+        width: 100%;
+    }
+
+    #scope.h100, #scope .h100 {
+        height: 100%;
+    }
+
+    #scope .h10 {
+        height: 10%;
+    }
+    #scope .h90  {
+        height: 90%;
+    }
+
+    #scope .fitness {
+        white-space: nowrap;
+    }
+
+#scope .cabecalho {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: stretch;
+    align-content: center;
+    flex-direction: row;
+}
+
+#scope .cabecalho div {
+    font-weight: 900;
+}
+
+#scope .negrito {
+    font-weight: 900;
+}
+
+#scope .corpo {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    flex-direction: row;
+    height: 70px;
+    font-size: 16px;
+    line-height: 2rem;
+}
+
+
+#scope .focus .corpo {
+    font-size: 32px;
+    line-height: 2rem;
+}
+
+#scope .corpo .clube {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+#scope .flex-1 {
+    flex: 1;
+}
+
+#scope .flex-2 {
+    flex: 2;
+}
+
+#scope .flex-6 {
+    flex: 6;
+}
+
+#scope .alinhar {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: stretch;
+    align-content: space-between;
+    height: 100%;
+}
+
+#scope .font-16 {
+    font-size: 16px;
+}

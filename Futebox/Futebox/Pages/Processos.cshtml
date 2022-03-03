@@ -97,8 +97,8 @@
         function Log(processo) {
             $('#plog').html('');
             $.get(`/api/processo/${processo}/obter`, s => {
-                console.log(s.statusMensagem);
-                $('#plog').html(`<pre>${s.statusMensagem}</pre>`);
+                console.log(s.log);
+                $('#plog').html(`<pre>${s.log}</pre>`);
                 $('.modal').modal('show');
             }).fail(function () {
 

@@ -10,13 +10,11 @@ namespace Futebox
 {
     public static class Settings
     {
-        public static string BackendRoot;
-        public static string ApplicationsRoot;
+        public static string ApplicationRoot;
         public static string ApplicationHttpBaseUrl;
-        public static string RobotEndpointBaseUrl;
         public static string TelegramBotToken;
         public static string TelegramNotifyUserId;
-        public static bool DEBUGMODE;
-        public static string ChromeDefaultDownloadFolder = "C:/Users/Michel/Downloads/";
+        public static string ChromeDefaultDownloadFolder;
+        public static bool DebugMode;
     }
 }

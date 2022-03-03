@@ -8,6 +8,20 @@ namespace Futebox.Models
 {
     public class CampeonatoUtils
     {
+        public struct CampeonatoConfig
+        {
+            public string[] fases { get; set; }
+            public bool classificacaoPorGrupo { get; set; }
+        }
+
+        public static Dictionary<Enums.EnumCampeonato, CampeonatoConfig> Config = new Dictionary<Enums.EnumCampeonato, CampeonatoConfig>()
+        {
+            { Enums.EnumCampeonato.BrasileiraoSerieA, new CampeonatoConfig() },
+            { Enums.EnumCampeonato.BrasileiraoSerieB, new CampeonatoConfig() },
+            { Enums.EnumCampeonato.Libertadores2021, new CampeonatoConfig() },
+            { Enums.EnumCampeonato.Paulistao2022, new CampeonatoConfig() { classificacaoPorGrupo = true, fases = new string[] { "Primeira Fase", "Quartas de Final", "Semifinal", "Final" } } }
+        };
+
         public static Campeonato GetPaulistao()
         {
             return new Campeonato()
@@ -31,14 +45,6 @@ namespace Futebox.Models
                 origem_ext_id = "789"
             };
         }
-
-        public static Dictionary<Enums.EnumCampeonato, Campeonato> Config = new Dictionary<Enums.EnumCampeonato, Campeonato>()
-        {
-            { Enums.EnumCampeonato.BrasileiraoSerieA, null },
-            { Enums.EnumCampeonato.BrasileiraoSerieB, null },
-            { Enums.EnumCampeonato.Libertadores2021, null },
-            { Enums.EnumCampeonato.Paulistao2022, GetPaulistao() }
-        };
 
         public static string ObterNomeDoCampeonato(Enums.EnumCampeonato campeonato) =>
             campeonato == Enums.EnumCampeonato.BrasileiraoSerieA ? "Brasileirão Série A" :

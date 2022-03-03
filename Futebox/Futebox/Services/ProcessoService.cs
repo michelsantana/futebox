@@ -76,7 +76,6 @@ namespace Futebox.Services
             return result;
         }
 
-
         public Processo AgendarProcesso(string id, DateTime hora)
         {
             var p = _processoRepositorio.GetById(id);
@@ -244,27 +243,27 @@ namespace Futebox.Services
 
         private Processo AtualizarRoteiroPartida(Processo processo)
         {
-            //var args = JsonConvert.DeserializeObject<ProcessoPartidaArgs>(processo.args);
-            //processo.roteiro = _partidasService.ObterRoteiroDaPartida(args.partidaId);
-            //_processoRepositorio.Update(processo);
+            var args = JsonConvert.DeserializeObject<ProcessoPartidaArgs>(processo.args);
+            processo.roteiro = _partidasService.ObterRoteiroDaPartida(args.partida);
+            _processoRepositorio.Update(processo);
             return processo;
         }
 
         private Processo AtualizarRoteiroClassificacao(Processo processo)
         {
-            //var args = JsonConvert.DeserializeObject<ProcessoClassificacaoArgs>(processo.args);
-            //var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(args.campeonato, true);
-            //processo.roteiro = _classificacaoService.ObterRoteiroDaClassificacao(classificacao, args.campeonato);
-            //_processoRepositorio.Update(processo);
+            var args = JsonConvert.DeserializeObject<ProcessoClassificacaoArgs>(processo.args);
+            var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(args.campeonato, true);
+            processo.roteiro = _classificacaoService.ObterRoteiroDaClassificacao(classificacao, args.campeonato);
+            _processoRepositorio.Update(processo);
             return processo;
         }
 
         private Processo AtualizarRoteiroRodada(Processo processo)
         {
-            //var args = JsonConvert.DeserializeObject<ProcessoRodadaArgs>(processo.args);
-            //var partidas = _rodadaService.ObterPartidasDaRodada(args.campeonato, args.rodada, true);
-            //processo.roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, args.campeonato, args.rodada);
-            //_processoRepositorio.Update(processo);
+            var args = JsonConvert.DeserializeObject<ProcessoRodadaArgs>(processo.args);
+            var partidas = _rodadaService.ObterPartidasDaRodada(args.campeonato, args.rodada, true);
+            processo.roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, args.campeonato, args.rodada);
+            _processoRepositorio.Update(processo);
             return processo;
         }
     }

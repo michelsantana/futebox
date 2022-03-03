@@ -110,7 +110,7 @@ namespace Futebox.Services
 
         public string JsFunction(string fn, params string[] args)
         {
-            var script = File.ReadAllText($"{Settings.ApplicationsRoot}/js/puppeteer.js");
+            var script = File.ReadAllText($"{Settings.ApplicationRoot}/js/puppeteer.js");
             var fnArgs = args?.Length > 0 ? args.Select(_ => $"'{_}'") : new string[] { };
             var fnArgsStr = string.Join(",", fnArgs);
             var fnExecutionStr = $"\n\n{fn}({fnArgsStr})";

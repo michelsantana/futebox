@@ -56,6 +56,7 @@ namespace Futebox.Models
             status = HttpStatusCode.Unused;
             stack = new List<string>();
             index = 0;
+            this.metodo = metodo;
         }
         public void Add(string mensagem)
         {

@@ -21,7 +21,5 @@ namespace Futebox.Models
         public int? quantidadeDeRodadas { get; set; }
         public string nomeDaTaca { get; set; }
         public string apelido { get; set; }
-
-        public string[] FasesPossiveis() => new string[] { "Primeira Fase", "Quartas de Final", "Semifinal", "Final" };
     }
 }

@@ -9,7 +9,7 @@ namespace Futebox
         {
             try
             {
-                string folder = $"{Settings.ApplicationsRoot}/log";
+                string folder = $"{Settings.ApplicationRoot}/log";
                 string file = $"{folder}/{DateTime.Now.ToString("yyyyMMdd")}.txt";
                 if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
                 if (!File.Exists(file)) File.WriteAllText(file, "");
@@ -36,7 +36,7 @@ namespace Futebox
                     ex = ex?.InnerException;
                 } while (ex?.InnerException != null);
 
-                string folder = $"{Settings.ApplicationsRoot}/log";
+                string folder = $"{Settings.ApplicationRoot}/log";
                 string file = $"{folder}/{DateTime.Now.ToString("yyyyMMdd")}.txt";
                 if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
                 if (!File.Exists(file)) File.WriteAllText(file, "");
@@ -56,7 +56,7 @@ namespace Futebox
         {
             try
             {
-                string folder = $"{Settings.ApplicationsRoot}/log";
+                string folder = $"{Settings.ApplicationRoot}/log";
                 string file = $"{folder}/{DateTime.Now.ToString("yyyyMMdd")}.txt";
                 if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
                 if (!File.Exists(file)) File.WriteAllText(file, "");

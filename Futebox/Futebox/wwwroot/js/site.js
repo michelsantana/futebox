@@ -267,3 +267,26 @@ Calendar();
     };
 
 })(jQuery);
+
+function TextFitness(selector, target = '.fitness-target') {
+    var childTarget = target;
+    $(selector).each((i, el) => {
+        var parentWidth = $(el).width();
+        var parentHeight = $(el).height();
+
+        if (parentHeight < parentWidth) {
+            while ($(el).find(childTarget).height() < parentHeight) {
+                var size = $(el).find(childTarget).attr('font-size') || '1';
+                $(el).find(childTarget).css('font-size', `${size++}px`);
+                $(el).find(childTarget).attr('font-size', size);
+            }
+        }
+        else {
+            while ($(el).find(childTarget).width() < parentWidth) {
+                var size = $(el).find(childTarget).attr('font-size') || '1';
+                $(el).find(childTarget).css('font-size', `${size++}px`);
+                $(el).find(childTarget).attr('font-size', size);
+            }
+        }
+    })
+}

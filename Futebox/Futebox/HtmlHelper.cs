@@ -15,7 +15,7 @@ namespace Futebox
         public static IHtmlContent ScopeStyle(this IHtmlHelper _, string scope, string style)
         {
             var exists = stylesContents.ContainsKey(style);
-            var stylePath = Path.Combine(Settings.ApplicationsRoot, "wwwroot", "css", style);
+            var stylePath = Path.Combine(Settings.ApplicationRoot, "wwwroot", "css", style);
 
             if (!exists && File.Exists(stylePath)) stylesContents.Add(style, Tuple.Create(DateTime.Now.AddSeconds(20), File.ReadAllText(stylePath)));
             var styleContent = stylesContents[style];

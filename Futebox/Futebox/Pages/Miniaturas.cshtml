@@ -6,6 +6,9 @@
     case Models.Enums.CategoriaVideo.rodada:
         @Html.Partial("Miniaturas/_rodadaMiniatura", Model.rodada)
         break;
+    case Models.Enums.CategoriaVideo.classificacao:
+        @Html.Partial("Miniaturas/_classificacaoMiniatura", Model.classificacao)
+        break;
     default: break;
 }
 
@@ -26,6 +29,8 @@
             Equality();
             $('.text-fit-lg').each((i, e) => $(e).fitText(0.8));
             $('.text-fit-sm').each((i, e) => $(e).fitText(2.6));
+
+            TextFitness('.fitness');
         })
     </script>
 }

@@ -64,7 +64,7 @@ namespace Futebox.Models
             this.nomeDoArquivoAudio = $"{rodadaArgs.social}.mp3";
             this.nomeDoArquivoImagem = $"{rodadaArgs.social}.png";
             this.nomeDoArquivoVideo = $"{rodadaArgs.social}.mp4";
-            this.pasta = $"{Settings.ApplicationsRoot}/{Guid.NewGuid()}";
+            this.pasta = $"{Settings.ApplicationRoot}/arquivos/{Guid.NewGuid()}";
             this.social = rodadaArgs.social;
             this.status = StatusProcesso.Criado;
         }
@@ -83,7 +83,7 @@ namespace Futebox.Models
             this.nomeDoArquivoAudio = $"{classificacaoArgs.social}.mp3";
             this.nomeDoArquivoImagem = $"{classificacaoArgs.social}.png";
             this.nomeDoArquivoVideo = $"{classificacaoArgs.social}.mp4";
-            this.pasta = $"{Guid.NewGuid()}";
+            this.pasta = $"{Settings.ApplicationRoot}/arquivos/{Guid.NewGuid()}";
             this.social = classificacaoArgs.social;
             this.status = StatusProcesso.Criado;
         }
@@ -102,7 +102,7 @@ namespace Futebox.Models
             this.nomeDoArquivoAudio = $"{partidaArgs.social}.mp3";
             this.nomeDoArquivoImagem = $"{partidaArgs.social}.png";
             this.nomeDoArquivoVideo = $"{partidaArgs.social}.mp4";
-            this.pasta = $"{Guid.NewGuid()}";
+            this.pasta = $"{Settings.ApplicationRoot}/arquivos/{Guid.NewGuid()}";
             this.social = partidaArgs.social;
             this.status = StatusProcesso.Criado;
         }

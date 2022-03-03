@@ -1,0 +1,125 @@
+﻿@model ClassificacaoModel.PartialModel
+@{
+    Dictionary<string, string> classes = new Dictionary<string, string>()
+{
+        {"azul", "badge bg-info"},
+        {"laranja", "badge bg-warning"},
+        {"verde", "badge bg-success"},
+        {"branco", "badge bg-white"},
+        {"vermelho", "badge bg-danger"},
+    };
+    var ObterDestaque = new Func<string, string>((s) => string.IsNullOrEmpty(s) ? "" : classes.ContainsKey(s) ? classes[s] : classes["branco"]);
+}
+@{
+    var socialIGV = (int)Futebox.Models.Enums.RedeSocialFinalidade.InstagramVideo;
+    var socialYTV = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeVideo;
+    var socialYTS = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeShorts;
+}
+<hr />
+
+
+<div class="row">
+    @foreach (var grupo in Model.classificacao.GroupBy(_ => _.grupo))
+    {
+        <div class="col-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" data-grupo="@(grupo.Key)">
+                            </div>
+                        </td>
+                        <td colspan="4">Grupo @grupo.Key</td>
+                    </tr>
+                    <tr>
+                        <td class="">#</td>
+                        <td class="">Clube</td>
+                        <td class="">PTS</td>
+                        <td class="">PJ</td>
+                        <td class="">VIT</td>
+                    </tr>
+                </thead>
+                @foreach (var time in grupo)
+                {
+                    <tr class="corpo">
+                        <td class="">
+                            @(time.posicao)º
+                        </td>
+                        <td class="">
+                            <div>
+                                <img width="32" src='@(time.time.ObterLogoLocal())' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" />
+                                <div class="">@time.clube</div>
+                            </div>
+                        </td>
+                        <td class="">@time.pontos</td>
+                        <td class="">@time.partidasJogadas</td>
+                        <td class="">@time.vitorias</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+</div>
+<hr />
+
+<table class="table table-striped table-borderless table-responsive">
+    <tr>
+        <td colspan="2">
+            <div data-config="@(socialYTV)">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="social-@(socialYTV)" data-social="@(socialYTV)">
+                    <label class="form-check-label" for="social-@(socialYTV)">Youtube Videos</label>
+                </div>
+                <div class="input-group input-group-sm">
+                    <select name='ddlDimensao' class='form-select form-select-sm'>
+                        <optgroup label='defaults'>
+                            <option value='2x2' selected="selected">2 colunas x 2 linhas</option>
+                        </optgroup>
+                        
+                    </select>
+                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura(1920, 1080)" type="button">Simular</button>
+                </div>
+            </div>
+        </td>
+        <td colspan="2">
+            <div data-config="@(socialYTS)">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="social-@(socialYTS)" data-social="@(socialYTS)">
+                    <label class="form-check-label" for="social-@(socialYTS)">Youtube Shorts</label>
+                </div>
+                <div class="input-group input-group-sm">
+                    <select name='ddlDimensao' class='form-select form-select-sm'>
+                        <optgroup label='defaults'>
+                            <option value='1x4' selected="selected">1 colunas x 4 linhas</option>
+                        </optgroup>
+                       
+                    </select>
+                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura(1080, 1920)" type="button">Simular</button>
+                </div>
+            </div>
+        </td>
+        <td colspan="2">
+            <div data-config="@(socialIGV)">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="social-@(socialIGV)" data-social="@(socialIGV)">
+                    <label class="form-check-label" for="social-@(socialIGV)">Instagram Videos</label>
+                </div>
+                <div class="input-group input-group-sm">
+                    <select name='ddlDimensao' class='form-select form-select-sm'>
+                        <optgroup label='defaults'>
+                            <option value='1x4' selected="selected">1 colunas x 4 linhas</option>
+                        </optgroup>
+                       
+                    </select>
+                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura(1350, 1920)" type="button">Simular</button>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6" align="right">
+            <button id="btnProcesso" class="btn btn-sm btn-dark">Processo</button>
+        </td>
+    </tr>
+</table>

@@ -14,12 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Futebox.DB.Mappers;
-using System;
-using System.IO;
 using Quartz;
-using Quartz.Core;
-using Quartz.Impl;
 
 namespace Futebox
 {
@@ -28,13 +23,12 @@ namespace Futebox
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            Settings.BackendRoot = Directory.GetCurrentDirectory();
-            Settings.ApplicationsRoot = Configuration.GetValue<string>("ApplicationsRoot");
+            
+            Settings.ApplicationRoot = Configuration.GetValue<string>("ApplicationsRoot");
             Settings.ApplicationHttpBaseUrl = Configuration.GetValue<string>("ApplicationHttpBaseUrl");
-            Settings.RobotEndpointBaseUrl = Configuration.GetValue<string>("RobotEndpointBaseUrl");
             Settings.TelegramBotToken = DotEnv.Get("TELEGRAM_BOT_TOKEN");
             Settings.TelegramNotifyUserId = DotEnv.Get("TELEGRAM_NOTIFY_USERID");
-            Settings.DEBUGMODE = DotEnv.Get("DEFAULT_DEBUGMODE") == "true";
+            Settings.DebugMode = DotEnv.Get("DEFAULT_DEBUGMODE") == "true";
         }
 
         public IConfiguration Configuration { get; }

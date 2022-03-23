@@ -31,7 +31,6 @@ namespace Futebox.Pages
             qsPartidaId = partidaId;
 
             partidas = _calendarioService.ObterPartidasPeriodo(UsarCache(viewMode))?.ToList();
-            //partidas = _calendarioService.ObterPartidasAntigas("FootstatsPartida20211110").ToList();
         }
 
         public PartialViewResult OnGetFocoPartida(string partidaId, PageViewModes viewMode)

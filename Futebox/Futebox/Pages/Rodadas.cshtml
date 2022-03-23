@@ -151,28 +151,20 @@
 
 
     </script>
-    @if ((Model.campeonatoFoco.HasValue && Model.rodadaFoco.HasValue))
-    {
-        <script>
-    Focar('@((int)Model.campeonatoFoco)', '@((int)Model.rodadaFoco)');
-    $('#rodada').addClass('focus');
-    $('#txtRodada').val('@((int)Model.rodadaFoco)')
-        </script>
-    }
     @foreach (var camp in Models.CampeonatoUtils.ObterCampeonatosAtivos())
     {
         <script>
-    $(() => {
-        var camp = '@((int)camp)';
-        $.get(`/api/rodada/ultimarodada/${camp}`, (response) => {
-            for (var r of response) {
-                var s = r.split(',');
-                var li = $(`<option value="${s[1]}">${s[0]} - ${s[1]}ª Rodada</option>`);
-                $(`#rodada-${camp}`).append(li);
-            }
-            //$(`#rodada-${camp}`).val();
-        });
-    })
+            $(() => {
+                var camp = '@((int)camp)';
+                $.get(`/api/rodada/ultimarodada/${camp}`, (response) => {
+                    for (var r of response) {
+                        var s = r.split(',');
+                        var li = $(`<option value="${s[1]}">${s[0]} - ${s[1]}ª Rodada</option>`);
+                        $(`#rodada-${camp}`).append(li);
+                    }
+                    //$(`#rodada-${camp}`).val();
+                });
+            });
         </script>
     }
 }

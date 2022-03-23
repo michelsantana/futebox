@@ -101,7 +101,7 @@ namespace Futebox.Models
             this.categoria = CategoriaVideo.partida;
             this.larguraVideo = SocialMediaUtils.Width(partidaArgs.social);
             this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(partidaArgs.social)}&h={SocialMediaUtils.Height(partidaArgs.social)}";
-            this.nome = !string.IsNullOrEmpty(partidaArgs.titulo) ? partidaArgs.titulo : $"{categoria} - {partidaArgs.campeonato}";
+            this.nome = !string.IsNullOrEmpty(partidaArgs.titulo) ? partidaArgs.titulo : $"{categoria}";
             this.nomeDoArquivoAudio = $"{DateTime.Now.ToString("MMddHHmmss")}-{partidaArgs.social}.mp3";
             this.nomeDoArquivoImagem = $"{partidaArgs.social}.png";
             this.nomeDoArquivoVideo = $"{partidaArgs.social}.mp4";

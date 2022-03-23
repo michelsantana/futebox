@@ -105,8 +105,7 @@ namespace Futebox.Services
 
         public string ObterRoteiroDaPartida(int idPartida)
         {
-            var partidas = ObterPartidasHoje(true);
-            var partida = partidas.First(_ => _.idExterno == idPartida);
+            var partida = ObterPartida(idPartida);
             return ObterRoteiroDaPartida(partida);
         }
 

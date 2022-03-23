@@ -97,3 +97,8 @@ body {
 .table .today {
     font-weight: 900;
 }
+
+.fitness-target {
+    display: inline;
+    white-space: nowrap;
+}

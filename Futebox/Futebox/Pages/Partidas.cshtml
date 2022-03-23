@@ -11,10 +11,11 @@
         var percentage = (DateTime.Now - start).TotalSeconds * 100 / total;
         return (percentage < 0 ? 0 : percentage > 100 ? 100 : percentage).ToString().Replace(",", ".");
 
-//var b = dt.Ticks;
-//var max = dt.AddHours(2).Ticks;
-//var p = ((DateTime.Now.Ticks - b) / max) * 2 * 100;
-};
+    };
+
+    var socialIGV = (int)Futebox.Models.Enums.RedeSocialFinalidade.InstagramVideo;
+    var socialYTV = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeVideo;
+    var socialYTS = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeShorts;
 }
 
 
@@ -41,7 +42,7 @@
         @foreach (var p in Model.partidas.OrderBy(_ => _.dataPartida))
         {
             <div class="col-3 mb-2">
-                
+
                 <div id="content" class="card text-center">
                     <div class="card-header fs-sport f">
                         @(p.dataPartida.ToString("ddd, d MMM yyyy - HH:mm"))<br />
@@ -79,9 +80,17 @@
                     <div class="card-footer fs-sport f">
                         estádio @p.estadio
                     </div>
-                    <div class="card-footer">
-                        <button onclick="Foco('@p.idExterno')" class="btn btn-outline-primary">👁</button>
-                        <button onclick="GerarVideo('@p.idExterno')" class="btn btn-outline-danger">⚙</button>
+                    <div class="card-footer" data-config="@(socialYTS)">
+                        <label class="form-check-label" for="social-@(socialYTS)">Youtube Shorts</label>
+                        <label class="form-check-label" for="social-@(socialYTS)">'@(p.timeMandante.nome) x @(p.timeVisitante.nome) @(p.campeonato) - @(DateTime.Now.ToString("dd/MM/yyyy")) #shorts'</label>
+                        <button onclick="VisualizarMiniatura('@p.idExterno', '@(socialYTS)', '1080', '1920')" class="btn btn-outline-primary">👁</button>
+                        <button onclick="GerarProcesso('@p.idExterno', '@(socialYTS)', '@(p.timeMandante.nome) x @(p.timeVisitante.nome) @(p.campeonato) - @(DateTime.Now.ToString("dd/MM/yyyy")) #shorts')" class="btn btn-outline-danger">⚙</button>
+                    </div>
+                    <div class="card-footer" data-config="@(socialIGV)">
+                        <label class="form-check-label" for="social-@(socialIGV)">Instagram Vídeo</label>
+                        <label class="form-check-label" for="social-@(socialIGV)">'@(p.timeMandante.nome) x @(p.timeVisitante.nome) @(p.campeonato) - @(DateTime.Now.ToString("dd/MM/yyyy"))'</label>
+                        <button onclick="VisualizarMiniatura('@p.idExterno', '@(socialIGV)', '1350', '1920')" class="btn btn-outline-primary">👁</button>
+                        <button onclick="GerarProcesso('@p.idExterno', '@(socialIGV)', '@(p.timeMandante.nome) x @(p.timeVisitante.nome) @(p.campeonato) - @(DateTime.Now.ToString("dd/MM/yyyy"))')" class="btn btn-outline-danger">⚙</button>
                     </div>
                 </div>
             </div>
@@ -93,30 +102,34 @@
 
 @section Scripts{
     <script>
-        function Foco(partida) {
-            var viewMode = '@Model.qsPageViewMode';
-            fetch(`/partidas?handler=FocoPartida&partidaId=${partida}&viewMode=${viewMode}`)
-                .then((response) => {
-                    return response.text();
-                })
-                .then((result) => {
-                    document.getElementById('card').innerHTML = result;
-                });
+
+        var view = {
+            post: (url, data, success) => $.ajax({
+                type: 'POST',
+                url: url,
+                data: JSON.stringify(data),
+                success: success,
+                contentType: "application/json; charset=utf-8"
+            }),
+            data: (s, p, t) => {
+                return {
+                    social: ~~s,
+                    partida: ~~p,
+                    titulo: t
+                }
+            }
+        };
+
+        function VisualizarMiniatura(p, s, w, h) {
+            window.open(`/Miniaturas?t=partida&q=${JSON.stringify(view.data(s, p))}&w=${w}&h=${h}`, '_blank');
         }
 
-        function GerarVideo(partida) {
-            $.post(`/api/processo/partida/${partida}`, (response) => {
+        function GerarProcesso(p, s, t) {
+            debugger
+            view.post(`/api/processo/partida`, [view.data(s, p, t)], (response) => {
                 $.SendToast(response.id, 'Processo criado!');
             });
         }
-
-        function EsconderPlacar() {
-            $('#card').find('')
-        }
-
-        $('#card').click(() => {
-            $('#card').html('');
-        });
 
         var percent = (start, end) => {
             var today = new Date();
@@ -143,10 +156,4 @@
         );
 
     </script>
-    @if (Model.qsPartidaId != null)
-    {
-        <script>
-            Foco('@Model.qsPartidaId');
-        </script>
-    }
 }

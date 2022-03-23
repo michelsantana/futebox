@@ -14,6 +14,7 @@ namespace Futebox.Pages
 
         IRodadaService _rodadaService;
         IClassificacaoService _classificacaoService;
+        IPartidasService _partidaService;
 
         public CategoriaVideo tipo;
 
@@ -22,11 +23,13 @@ namespace Futebox.Pages
 
         public RodadaHandlerModel rodada;
         public ClassificacaoHandlerModel classificacao;
+        public PartidaHandlerModel partida;
 
-        public MiniaturasModel(IRodadaService rodadaService, IClassificacaoService classificacaoService)
+        public MiniaturasModel(IRodadaService rodadaService, IClassificacaoService classificacaoService, IPartidasService partidaService)
         {
             _rodadaService = rodadaService;
             _classificacaoService = classificacaoService;
+            _partidaService = partidaService;
         }
 
         public void OnGet(CategoriaVideo t, string q, int w, int h)
@@ -35,6 +38,7 @@ namespace Futebox.Pages
             switch (tipo)
             {
                 case CategoriaVideo.partida:
+                    PartidaHandler(q, w, h);
                     break;
                 case CategoriaVideo.classificacao:
                     ClassificacaoHandler(q, w, h);
@@ -60,6 +64,16 @@ namespace Futebox.Pages
             rodada = new RodadaHandlerModel(args, width, height, partidas);
         }
 
+        public void PartidaHandler(string q, int w, int h)
+        {
+            var args = JsonConvert.DeserializeObject<ProcessoPartidaArgs>(q);
+            width = w;
+            height = h;
+            var partidaVm = _partidaService.ObterPartida(args.partida, false);
+
+            partida = new PartidaHandlerModel(args, width, height, partidaVm);
+        }
+
         public void ClassificacaoHandler(string q, int w, int h)
         {
             var args = JsonConvert.DeserializeObject<ProcessoClassificacaoArgs>(q);
@@ -68,9 +82,9 @@ namespace Futebox.Pages
 
             List<ClassificacaoVM> data = null;
             if (args.temFases)
-                data = _classificacaoService.ObterClassificacaoPorCampeonatoFase(args.campeonato, args.fase).ToList();
+                data = _classificacaoService.ObterClassificacaoPorCampeonatoFase(args.campeonato, args.fase, false).ToList();
             else
-                data = _classificacaoService.ObterClassificacaoPorCampeonato(args.campeonato).ToList();
+                data = _classificacaoService.ObterClassificacaoPorCampeonato(args.campeonato, false).ToList();
 
             classificacao = new ClassificacaoHandlerModel(args, width, height, args.grupos, data);
         }
@@ -117,6 +131,22 @@ namespace Futebox.Pages
                     .LastOrDefault();
 
                 if (partidaAtual != null) partidaAtualId = partidaAtual.idExterno;
+            }
+        }
+
+        public class PartidaHandlerModel
+        {
+            public ProcessoPartidaArgs args;
+            public int width;
+            public int height;
+            public PartidaVM partida;
+
+            public PartidaHandlerModel(ProcessoPartidaArgs args, int width, int height, PartidaVM partida)
+            {
+                this.args = args;
+                this.width = width;
+                this.height = height;
+                this.partida = partida;
             }
         }
 

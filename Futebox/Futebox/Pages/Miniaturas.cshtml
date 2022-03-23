@@ -11,6 +11,9 @@
     case Models.Enums.CategoriaVideo.classificacao:
         @Html.Partial("Miniaturas/_classificacaoMiniatura", Model.classificacao)
         break;
+    case Models.Enums.CategoriaVideo.partida:
+        @Html.Partial("Miniaturas/_partidaMiniatura", Model.partida)
+        break;
     default: break;
 }
 
@@ -33,6 +36,16 @@
             $('.text-fit-sm').each((i, e) => $(e).fitText(2.6));
 
             setTimeout(() => TextFitness.v2('.fitness'), 890);
+
+            $('.mini-col').each((i, e) => {
+                if ($(e).find('div').length == 0)
+                    $(e).remove();
+            });
+
+            $('.mini-row').each((i, e) => {
+                if ($(e).find('.mini-col').length == 0)
+                    $(e).remove();
+            });
         })
     </script>
 }

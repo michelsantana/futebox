@@ -42,7 +42,6 @@ namespace Futebox.Models
 
     public class ProcessoPartidaArgs : IProcessoArgs
     {
-        public EnumCampeonato campeonato { get; set; }
         public int partida { get; set; }
         public RedeSocialFinalidade social { get; set; }
         public string titulo { get; set; }

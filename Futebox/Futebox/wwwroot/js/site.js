@@ -291,8 +291,24 @@ var TextFitness = {
             }
         })
     },
-
     v2: function TextFitness(selector, target = '.fitness-target') {
+        this.debug();
+        var childTarget = target;
+        $(selector).each((i, el) => {
+            var parentWidth = $(el).width();
+            var parentHeight = $(el).height();
+
+            var check = () => $(el).find(childTarget).height() < parentHeight && $(el).find(childTarget).width() < parentWidth;
+
+            while (check()) {
+                var size = $(el).find(childTarget).attr('font-size') || '1';
+                $(el).find(childTarget).css('font-size', `${size++}px`);
+                $(el).find(childTarget).attr('font-size', size);
+            }
+        })
+    },
+    debug: function TextFitnessDebug(selector = '.-fitness', target = '.-fitness-target') {
+        //debugger;
         var childTarget = target;
         $(selector).each((i, el) => {
             var parentWidth = $(el).width();

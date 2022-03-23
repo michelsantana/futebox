@@ -25,6 +25,12 @@
     #scope .h10 {
         height: 10%;
     }
+    #scope .h60 {
+        height: 60%;
+    }
+    #scope .h80 {
+        height: 80%;
+    }
     #scope .h90  {
         height: 90%;
     }
@@ -101,3 +107,13 @@
 #scope .font-16 {
     font-size: 16px;
 }
+
+    #scope .line{
+        line-height: normal;
+    }
+
+    #scope .df-ac-jc {
+        justify-items: center;
+        align-items: center;
+        display: flex;
+    }

@@ -15,7 +15,7 @@
     @Html.ScopeStyle($"#scope_{Model.First().Key}", "classificacao-card.css")
 
     <div id="scope_@Model.First().Key" class="w100 h100">
-        <div class="cabecalho h10">
+        <div class="cabecalho h10 flex-1">
             <div class="flex-2 h100 text-fit cor text-capitalize fitness"><span class="fitness-target">Grupo @Model.First().Key</span></div>
             <div class="flex-6 h100 text-fit clube text-center fitness"><span class="fitness-target">Clube</span></div>
             <div class="flex-1 h100 text-fit pontos text-center fitness"><span class="fitness-target">PTS</span></div>
@@ -29,28 +29,28 @@
         </div>
         @foreach (var time in Model.SelectMany(_ => _))
         {
-            <div class="corpo h90">
-                <div class="flex-1 text-center">
+            <div class="corpo h90 flex-2">
+                <div class="flex-1 df-ac-jc h80 line text-center">
                     <span class="@ObterDestaque(time.corDestaque)">&nbsp;</span>
                 </div>
-                <div class="flex-1 posicao text-center negrito fitness">
+                <div class="flex-1 df-ac-jc h80 line posicao text-center negrito fitness">
                     <span class="fitness-target">@(time.posicao)º</span>
                 </div>
-                <div class="flex-6 clube text-center negrito">
-                    <div class="emblema flex-1">
+                <div class="flex-6 h80 line clube text-center negrito">
+                    <div class="emblema df-ac-jc h80 line flex-1">
                         <img width="100%" src='@(time.time.ObterLogoLocal())' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" />
                     </div>
                     &nbsp;
-                    <div class="nome flex-6 text-start fitness"><span class="fitness-target">@time.clube</span></div>
+                    <div class="nome flex-6 h80 line text-start fitness"><span class="fitness-target">@time.clube</span></div>
                 </div>
-                <div class="flex-1 text-fit pontos text-center negrito fitness"><span class="fitness-target">@time.pontos</span></div>
-                <div class="flex-1 text-fit partidas text-center negrito fitness"><span class="fitness-target">@time.partidasJogadas</span></div>
-                <div class="flex-1 text-fit text-center fitness"><span class="fitness-target">@time.vitorias</span></div>
-                <div class="flex-1 text-fit text-center fitness"><span class="fitness-target">@time.empates</span></div>
-                <div class="flex-1 text-fit text-center fitness"><span class="fitness-target">@time.derrotas</span></div>
-                <div class="flex-1 text-fit text-center fitness"><span class="fitness-target">@time.golsPro</span></div>
-                <div class="flex-1 text-fit text-center fitness"><span class="fitness-target">@time.golsContra</span></div>
-                <div class="flex-1 text-fit text-center fitness"><span class="fitness-target">@time.saldoGols</span></div>
+                <div class="flex-1 h80 line text-fit pontos text-center negrito fitness"><span class="fitness-target">@time.pontos</span></div>
+                <div class="flex-1 h80 line text-fit partidas text-center negrito fitness"><span class="fitness-target">@time.partidasJogadas</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.vitorias</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.empates</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.derrotas</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.golsPro</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.golsContra</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.saldoGols</span></div>
             </div>
         }
     </div>

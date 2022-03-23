@@ -39,6 +39,7 @@
 
 	<ItemGroup>
 	  <Folder Include="NodeServices\" />
+	  <Folder Include="Pages\Partida\" />
 	</ItemGroup>
 
 </Project>

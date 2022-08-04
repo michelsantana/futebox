@@ -22,6 +22,8 @@ namespace Futebox.Models
         public bool temFases { get; set; }
         public bool classificacaoPorGrupos { get; set; }
 
+        public string viewName { get; set; }
+
         public int linhas { get; set; }
         public int colunas { get; set; }
         public string titulo { get; set; }
@@ -34,6 +36,7 @@ namespace Futebox.Models
         public int[] partidas { get; set; }
         public RedeSocialFinalidade social { get; set; }
 
+        public string viewName { get; set; }
         public int linhas { get; set; }
         public int colunas { get; set; }
         public string titulo { get; set; }
@@ -45,5 +48,6 @@ namespace Futebox.Models
         public int partida { get; set; }
         public RedeSocialFinalidade social { get; set; }
         public string titulo { get; set; }
+        public string viewName { get; set; }
     }
 }

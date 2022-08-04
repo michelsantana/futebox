@@ -82,9 +82,7 @@
         }
 
 </style>
-<div class="wm">
-    <img src="~/img/logo-1.png" />
-</div>
+
 <h1 class="fs-sport text-center sub">Classificação Atualizada!</h1>
 <h1 class="fs-sport text-center titulo">@Model.nomeCampeonato</h1>
 <div class="row">
@@ -165,23 +163,6 @@
                 }
             </tbody>
         </table>
-    </div>
-</div>
-<div class="row">
-    <div class="col-4">
-        <div class="legenda" role="alert">
-            @foreach (var l in Model.legenda)
-            {
-                @Html.Raw(l)<br />
-            }
-        </div>
-    </div>
-    <div class="col-4 text-center">
-        <div class="data fs-sport">
-            @DateTime.Now.ToString("dd/MM/yyyy")
-        </div>
-    </div>
-    <div class="col-4">
     </div>
 </div>
 

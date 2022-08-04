@@ -1,7 +1,7 @@
 ﻿@model ClassificacaoModel.PartialModel
 @{
     Dictionary<string, string> classes = new Dictionary<string, string>()
-{
+    {
         {"azul", "badge bg-info"},
         {"laranja", "badge bg-warning"},
         {"verde", "badge bg-success"},
@@ -14,14 +14,30 @@
     var socialIGV = (int)Futebox.Models.Enums.RedeSocialFinalidade.InstagramVideo;
     var socialYTV = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeVideo;
     var socialYTS = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeShorts;
+    var grouped = Model.classificacao.GroupBy(_ => _.grupo);
+    var deparaGruposXColunas = new Dictionary<int, int>
+    {
+        // Quantidade Grupos x Tamanho Coluna
+        { 1, 12 },
+        { 2, 6 },
+
+        { 3, 4 },
+        { 4, 3 },
+
+        { 5, 4 },
+        { 6, 4 },
+
+        { 7, 3 },
+        { 8, 3 },
+    };
 }
 <hr />
 
 
 <div class="row">
-    @foreach (var grupo in Model.classificacao.GroupBy(_ => _.grupo))
+    @foreach (var grupo in grouped)
     {
-        <div class="col-3">
+        <div class="col-@(deparaGruposXColunas[grouped.Count()])">
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -72,35 +88,12 @@
                     <label class="form-check-label" for="social-@(socialYTV)">Youtube Videos</label>
                 </div>
                 <div class="input-group input-group-sm">
-                    <select name='ddlDimensao' class='form-select form-select-sm'>
+                    <select name='viewName' class='form-select form-select-sm'>
                         <optgroup label='defaults'>
-                            <option value='2x2' selected="selected">2 colunas x 2 linhas</option>
+                            <option value='_classificacaoSemGrupos' selected="selected">Padrão (class. s/g)</option>
                         </optgroup>
-
                     </select>
                     <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura('@(socialYTV)', 1920, 1080)" type="button">Simular</button>
-                </div>
-                <hr />
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">Titulo</span>
-                    <input type="text" class="form-control form-control-sm" name="title" value="@($"Classificação {Model.nomeCampeonato} {DateTime.Now.ToString("yyyy")} - Atualizada {DateTime.Now.ToString("dd/MM/yyyy")}")">
-                </div>
-            </div>
-        </td>
-        <td colspan="2">
-            <div data-config="@(socialYTS)">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="social-@(socialYTS)" data-social="@(socialYTS)">
-                    <label class="form-check-label" for="social-@(socialYTS)">Youtube Shorts</label>
-                </div>
-                <div class="input-group input-group-sm">
-                    <select name='ddlDimensao' class='form-select form-select-sm'>
-                        <optgroup label='defaults'>
-                            <option value='1x4' selected="selected">1 colunas x 4 linhas</option>
-                        </optgroup>
-
-                    </select>
-                    <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura('@(socialYTS)', 1080, 1920)" type="button">Simular</button>
                 </div>
                 <hr />
                 <div class="input-group input-group-sm">
@@ -116,11 +109,10 @@
                     <label class="form-check-label" for="social-@(socialIGV)">Instagram Videos</label>
                 </div>
                 <div class="input-group input-group-sm">
-                    <select name='ddlDimensao' class='form-select form-select-sm'>
+                    <select name='viewName' class='form-select form-select-sm'>
                         <optgroup label='defaults'>
-                            <option value='1x4' selected="selected">1 colunas x 4 linhas</option>
+                            <option value='_classificacaoSemGrupos' selected="selected">Padrão (class. s/g)</option>                        
                         </optgroup>
-
                     </select>
                     <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura('@(socialIGV)', 1350, 1920)" type="button">Simular</button>
                 </div>

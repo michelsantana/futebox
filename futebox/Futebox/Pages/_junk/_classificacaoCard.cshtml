@@ -1,5 +1,6 @@
-﻿@model IEnumerable<IGrouping<string, Futebox.Models.ClassificacaoVM>>
+﻿@model System.Tuple<IEnumerable<IGrouping<string, Futebox.Models.ClassificacaoVM>>, bool>
 @{
+    
     Dictionary<string, string> classes = new Dictionary<string, string>()
 {
         {"azul", "badge bg-info"},
@@ -9,14 +10,16 @@
         {"vermelho", "badge bg-danger"},
     };
     var ObterDestaque = new Func<string, string>((s) => string.IsNullOrEmpty(s) ? "" : classes.ContainsKey(s) ? classes[s] : classes["branco"]);
+    var group = Model.Item1;
+    var showGroupName = Model.Item2;
 }
 @if (Model != null)
 {
-    @Html.ScopeStyle($"#scope_{Model.First().Key}", "classificacao-card.css")
+    @Html.ScopeStyle($"#scope_{group.First().Key}", "classificacao-card.css")
 
-    <div id="scope_@Model.First().Key" class="w100 h100">
+    <div id="scope_@group.First().Key" class="w100 h100">
         <div class="cabecalho h10 flex-1">
-            <div class="flex-2 h100 text-fit cor text-capitalize fitness"><span class="fitness-target">Grupo @Model.First().Key</span></div>
+            <div class="flex-2 h100 text-fit cor text-capitalize fitness"><span class="fitness-target">@(showGroupName ? $"Grupo {group.First().Key }" : "")</span></div>
             <div class="flex-6 h100 text-fit clube text-center fitness"><span class="fitness-target">Clube</span></div>
             <div class="flex-1 h100 text-fit pontos text-center fitness"><span class="fitness-target">PTS</span></div>
             <div class="flex-1 h100 text-fit partidas text-center fitness"><span class="fitness-target">PJ</span></div>
@@ -27,7 +30,7 @@
             <div class="flex-1 h100 text-fit text-center fitness"><span class="fitness-target">GC</span></div>
             <div class="flex-1 h100 text-fit text-center fitness"><span class="fitness-target">SD</span></div>
         </div>
-        @foreach (var time in Model.SelectMany(_ => _))
+        @foreach (var time in group.SelectMany(_ => _))
         {
             <div class="corpo h90 flex-2">
                 <div class="flex-1 df-ac-jc h80 line text-center">

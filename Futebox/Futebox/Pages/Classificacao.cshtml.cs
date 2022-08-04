@@ -43,22 +43,22 @@ namespace Futebox.Pages
             string partial;
             switch (enumCampeonato)
             {
-                case EnumCampeonato.BrasileiraoSerieA:
-                    IdentificarCoresDestaqueBrasileiraoSerieA(partialModel);
-                    partial = "Templates/_tabelaDeClassificacao";
-                    break;
-                case EnumCampeonato.BrasileiraoSerieB:
-                    IdentificarCoresDestaqueBrasileiraoSerieB(partialModel);
-                    partial = "Templates/_tabelaDeClassificacao";
-                    break;
-                case EnumCampeonato.Libertadores2021:
-                    partial = "Templates/_tabelaDeClassificacaoLibertadores";
-                    break;
                 case EnumCampeonato.Paulistao2022:
                     IdentificarCoresDestaquePaulistao(partialModel);
                     partial = "Classificacao/_classificacaoListagem";
                     break;
+                case EnumCampeonato.BrasileiraoSerieA2022:
+                    partialModel.grupos = false;
+                    IdentificarCoresDestaqueBrasileiraoSerieA(partialModel);
+                    partial = "Classificacao/_classificacaoListagem";
+                    break;
+                case EnumCampeonato.BrasileiraoSerieB2022:
+                    partialModel.grupos = false;
+                    IdentificarCoresDestaqueBrasileiraoSerieB(partialModel);
+                    partial = "Classificacao/_classificacaoListagem";
+                    break;
                 default:
+                    partialModel.grupos = false;
                     partial = "Templates/_tabelaDeClassificacao";
                     break;
             }
@@ -150,6 +150,7 @@ namespace Futebox.Pages
         {
             public string nomeCampeonato { get; set; }
             public string visualizacao { get; set; }
+            public bool grupos { get; set; }
             public List<ClassificacaoVM> classificacao { get; set; }
             public List<string> legenda = new List<string>();
         }

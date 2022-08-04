@@ -62,7 +62,6 @@
 </style>
 <style>
     body {
-        
     }
 
     #mini-container {
@@ -126,25 +125,19 @@
         <span class="fitness-target">@($"{Models.CampeonatoUtils.ObterNomeDoCampeonato(Model.args.campeonato)}")</span>
     </div>
     <div id="mini-body">
-        @*<table id="mini-table">*@
-        @for (var linha = 0; linha < linhas; linha++)
-        {
-            <div class="mini-row" row="@linha">
-                @for (var coluna = 0; coluna < colunas; coluna++)
-                {
-                    { Model.NextGroup(); }
-                    if (Model.CurrentGroup() != null)
-                    {
-                        <div class="mini-col" col="@coluna">
-                            @Html.Partial("Miniaturas/_classificacaoCard", Model.classificacao.Where(_ => _.Key == Model.CurrentGroup()))
-                        </div>
-                    }
-                    @if (Model.CurrentGroup() == null) break;
-                }
+
+        <div class="mini-row" row="1">
+
+
+            <div class="mini-col" col="1">
+                @Html.Partial("Miniaturas/_classificacaoCard", Tuple.Create(Model.classificacao, false))
             </div>
-            @if (Model.CurrentGroup() == null) break;
-        }
-        @*</table>*@
+            <div class="mini-col" col="2">
+                @Html.Partial("Miniaturas/_classificacaoCard", Tuple.Create(Model.classificacao, false))
+            </div>
+
+
+        </div>
     </div>
     <div id="mini-footer">
         <div class="w-50 h-100 fitness">
@@ -154,7 +147,7 @@
         </div>
         <div class="w-50 h-100 fitness">
             <div class="">
-                
+
             </div>
         </div>
     </div>

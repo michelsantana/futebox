@@ -97,7 +97,27 @@
     <div id="mini-body">
         <div class="mini-row">
             <div class="mini-col">
-                @Html.Partial("Miniaturas/_partidaCard", Model.partida)
+
+                @Html.ScopeStyle($"#scope_{Model.partida.idExterno}", "partida-card.css")
+
+                <div id="scope_@Model.partida.idExterno" class="w100 h100">
+                    <div class="w100 h100">
+                        <div class="w100 h40 df-col">
+                            <div class="h80 w40 df2"><img style="display:block;" width="95%" height="95%" src="@Model.partida.timeMandante.ObterLogoLocal()" /></div>
+                            <div class="h20 w100 df2 fitness"><span class='fitness-target'>@(Model.partida.timeMandante.sigla)</span></div>
+                        </div>
+                        <div class="w100 h20 df-row">
+                            <div class="h100 w40 df2 fitness"><span class="fitness-target">@Model.partida.golsMandante</span></div>
+                            <div class="h100 w20 df2"><img style="display:block;" width="95%" height="95%" src="~/img/vs.png" /></div>
+                            <div class="h100 w40 df2 fitness"><span class="fitness-target">@Model.partida.golsVisitante</span></div>
+                        </div>
+                        <div class="w100 h40 df-col">
+                            <div class="h20 w100 df2 fitness"><span class='fitness-target'>@(Model.partida.timeVisitante.sigla)</span></div>
+                            <div class="h80 w40 df2"><img style="display:block;" width="95%" height="95%" src="@Model.partida.timeVisitante.ObterLogoLocal()" /></div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

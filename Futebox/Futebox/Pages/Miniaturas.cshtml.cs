@@ -20,6 +20,7 @@ namespace Futebox.Pages
 
         public int width;
         public int height;
+        public string viewName;
 
         public RodadaHandlerModel rodada;
         public ClassificacaoHandlerModel classificacao;
@@ -56,6 +57,7 @@ namespace Futebox.Pages
             var args = JsonConvert.DeserializeObject<ProcessoRodadaArgs>(q);
             width = w;
             height = h;
+            viewName = args.viewName;
             var partidas = _rodadaService
                 .ObterPartidasDaRodada(args.campeonato, args.rodada, true)
                 .FindAll(_ => args.partidas.Contains(_.idExterno))
@@ -69,6 +71,7 @@ namespace Futebox.Pages
             var args = JsonConvert.DeserializeObject<ProcessoPartidaArgs>(q);
             width = w;
             height = h;
+            viewName = args.viewName;
             var partidaVm = _partidaService.ObterPartida(args.partida, false);
 
             partida = new PartidaHandlerModel(args, width, height, partidaVm);
@@ -79,12 +82,27 @@ namespace Futebox.Pages
             var args = JsonConvert.DeserializeObject<ProcessoClassificacaoArgs>(q);
             width = w;
             height = h;
+            viewName = args.viewName;
 
             List<ClassificacaoVM> data = null;
+
             if (args.temFases)
                 data = _classificacaoService.ObterClassificacaoPorCampeonatoFase(args.campeonato, args.fase, false).ToList();
             else
                 data = _classificacaoService.ObterClassificacaoPorCampeonato(args.campeonato, false).ToList();
+
+            if (!CampeonatoUtils.Config[args.campeonato].classificacaoPorGrupo)
+            {
+                var gp1 = data.Take(data.Count / 2).ToList();
+                var gp2 = data.Skip(data.Count / 2).ToList();
+                
+                gp1.ForEach(_ => _.grupo = "A");
+                gp2.ForEach(_ => _.grupo = "B");
+
+                data = new List<ClassificacaoVM>();
+                data.AddRange(gp1);
+                data.AddRange(gp2);
+            }
 
             classificacao = new ClassificacaoHandlerModel(args, width, height, args.grupos, data);
         }
@@ -156,7 +174,8 @@ namespace Futebox.Pages
             public int width;
             public int height;
             public string[] grupos;
-            public IEnumerable<IGrouping<string, ClassificacaoVM>> classificacao;
+            public string viewName;
+            public IEnumerable<ClassificacaoVM> classificacao;
             public string legenda { get; set; }
 
             string currentGroup = null;
@@ -167,10 +186,11 @@ namespace Futebox.Pages
                 this.width = width;
                 this.height = height;
                 this.grupos = grupos;
+                this.viewName = args.viewName;
 
                 if (args.classificacaoPorGrupos) classificacao = classificacao.FindAll(_ => args.grupos.Contains(_.grupo));
 
-                this.classificacao = classificacao.GroupBy(_ => _.grupo);
+                this.classificacao = classificacao;
 
                 IdentificarLegenda();
             }
@@ -182,10 +202,12 @@ namespace Futebox.Pages
                     case EnumCampeonato.Indefinido:
                         legenda = null;
                         break;
-                    case EnumCampeonato.BrasileiraoSerieA:
+                    case EnumCampeonato.BrasileiraoSerieA2021:
+                    case EnumCampeonato.BrasileiraoSerieA2022:
                         legenda = IdentificarCoresDestaqueBrasileiraoSerieA();
                         break;
-                    case EnumCampeonato.BrasileiraoSerieB:
+                    case EnumCampeonato.BrasileiraoSerieB2021:
+                    case EnumCampeonato.BrasileiraoSerieB2022:
                         legenda = IdentificarCoresDestaqueBrasileiraoSerieB();
                         break;
                     case EnumCampeonato.Libertadores2021:
@@ -203,9 +225,9 @@ namespace Futebox.Pages
             private string IdentificarCoresDestaqueBrasileiraoSerieA()
             {
                 var sbBuilder = new StringBuilder();
-                foreach (var group in classificacao)
+                foreach (var time in classificacao)
                 {
-                    foreach (var time in group)
+                    //foreach (var time in group)
                     {
                         if (time.posicao < 5)
                         {
@@ -244,9 +266,9 @@ namespace Futebox.Pages
             private string IdentificarCoresDestaqueBrasileiraoSerieB()
             {
                 var sbBuilder = new StringBuilder();
-                foreach (var group in classificacao)
+                foreach (var time in classificacao)
                 {
-                    foreach (var time in group)
+                    //foreach (var time in group)
                     {
                         if (time.posicao < 5)
                         {
@@ -274,9 +296,9 @@ namespace Futebox.Pages
             private string IdentificarCoresDestaquePaulistao()
             {
                 var sbBuilder = new StringBuilder();
-                foreach (var group in classificacao)
+                foreach (var time in classificacao)
                 {
-                    foreach (var time in group)
+                    //foreach (var time in group)
                     {
                         if (time.posicao == 1 || time.posicao == 2)
                         {

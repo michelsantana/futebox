@@ -9,7 +9,7 @@
         @Html.Partial("Miniaturas/_rodadaMiniatura", Model.rodada)
         break;
     case Models.Enums.CategoriaVideo.classificacao:
-        @Html.Partial("Miniaturas/_classificacaoMiniatura", Model.classificacao)
+        @Html.Partial($"Miniaturas/{Model.classificacao.args.viewName}", Model.classificacao)
         break;
     case Models.Enums.CategoriaVideo.partida:
         @Html.Partial("Miniaturas/_partidaMiniatura", Model.partida)
@@ -32,20 +32,22 @@
 
         $(document).ready(() => {
             Equality();
-            $('.text-fit-lg').each((i, e) => $(e).fitText(0.8));
-            $('.text-fit-sm').each((i, e) => $(e).fitText(2.6));
+            if (window.location.href.indexOf('t=partida') > -1) {
+                $('.text-fit-lg').each((i, e) => $(e).fitText(0.8));
+                $('.text-fit-sm').each((i, e) => $(e).fitText(2.6));
 
-            setTimeout(() => TextFitness.v2('.fitness'), 890);
+                setTimeout(() => TextFitness.v2('.fitness'), 890);
 
-            $('.mini-col').each((i, e) => {
-                if ($(e).find('div').length == 0)
-                    $(e).remove();
-            });
+                $('.mini-col').each((i, e) => {
+                    if ($(e).find('div').length == 0)
+                        $(e).remove();
+                });
 
-            $('.mini-row').each((i, e) => {
-                if ($(e).find('.mini-col').length == 0)
-                    $(e).remove();
-            });
+                $('.mini-row').each((i, e) => {
+                    if ($(e).find('.mini-col').length == 0)
+                        $(e).remove();
+                });
+            }
         })
     </script>
 }

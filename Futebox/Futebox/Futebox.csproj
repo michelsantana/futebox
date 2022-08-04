@@ -9,6 +9,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Remove="Pages\Miniaturas\_classificacaoTabela.cshtml" />
 	  <Content Remove="Pages\Templates\_partidaCardFoco.cshtml" />
 	</ItemGroup>
 

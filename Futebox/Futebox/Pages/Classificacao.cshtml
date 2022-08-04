@@ -92,7 +92,7 @@
             for (var c of config) {
                 var $config = $(c);
                 var $social = $config.find('[data-social]');
-                var aspect = $config.find('[name=ddlDimensao]').val();
+                var viewName = $config.find('[name=viewName]').val();
 
                 data.push({
                     campeonato: ~~view.campeonato,
@@ -101,8 +101,7 @@
                     classificacaoPorGrupos: (view.grupos.length > 1),
                     grupos: view.grupos,
                     social: ~~($social.attr('data-social')),
-                    colunas: ~~aspect.split('x')[0],
-                    linhas: ~~aspect.split('x')[1],
+                    viewName: viewName,
                     checked: $social.prop('checked'),
                 });
             }

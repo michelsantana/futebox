@@ -32,6 +32,12 @@ namespace Futebox.Services
                 _cache.DefinirConteudo(cacheName, resultado, 3);
             }
 
+            //if (CampeonatoUtils.Config[campeonato].classificacaoPorGrupo && CampeonatoUtils.Config[campeonato].grupoFicticio)
+            //{
+            //    resultado.Take(resultado.Count / 2).ToList().ForEach(_ => _.grupo = "FAKE1");
+            //    resultado.Skip(resultado.Count / 2).ToList().ForEach(_ => _.grupo = "FAKE2");
+            //}
+
             return resultado
                 .Select(_ => ConverterEmClassificacaoVM(_));
         }
@@ -46,7 +52,14 @@ namespace Futebox.Services
                 _cache.DefinirConteudo(cacheName, resultado, 3);
             }
 
-            resultado = resultado.GroupBy(_ => _.fase).First(_ => _.Key == fase).ToList();
+            if (CampeonatoUtils.Config[campeonato].fases?.Count() > 1)
+                resultado = resultado.GroupBy(_ => _.fase).First(_ => _.Key == fase).ToList();
+
+            //if (CampeonatoUtils.Config[campeonato].classificacaoPorGrupo && CampeonatoUtils.Config[campeonato].grupoFicticio)
+            //{
+            //    resultado.Take(resultado.Count / 2).ToList().ForEach(_ => _.grupo = "FAKE1");
+            //    resultado.Skip(resultado.Count / 2).ToList().ForEach(_ => _.grupo = "FAKE2");
+            //}
 
             return resultado
                 .Select(_ => ConverterEmClassificacaoVM(_));

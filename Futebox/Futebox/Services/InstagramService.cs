@@ -80,8 +80,12 @@ namespace Futebox.Services
 
         public async Task ClicarEmPublicar()
         {
-            if(!Settings.DEBUGMODE) await _page.EvaluateExpressionAsync(_browserService.JsFunction("IGPublicar"));
-            _browserService.WaitFor(60);
+            if (!Settings.DEBUGMODE)
+            {
+                await _page.EvaluateExpressionAsync(_browserService.JsFunction("IGPublicar"));
+                await _page.WaitForSelectorAsync("[role=\"dialog\"][aria-label*=\"compartilhada\"]", new WaitForSelectorOptions() { Timeout = (120 * 1000) });
+            }
+            _browserService.WaitFor(1);
         }
 
         public async Task Fechar()

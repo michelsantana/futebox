@@ -3,10 +3,12 @@
     public enum EnumCampeonato
     {
         Indefinido = -1,
-        BrasileiraoSerieA = 767,
-        BrasileiraoSerieB = 769,
+        BrasileiraoSerieA2021 = 767,
+        BrasileiraoSerieB2021 = 769,
         Libertadores2021 = 771,
-        Paulistao2022 = 789
+        Paulistao2022 = 789,
+        BrasileiraoSerieA2022 = 803,
+        BrasileiraoSerieB2022 = 804,
     }
 
     public enum OrigemDado

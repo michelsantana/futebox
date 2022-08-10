@@ -92,6 +92,7 @@
             for (var c of config) {
                 var $config = $(c);
                 var $social = $config.find('[data-social]');
+                var $dataExecucao = $config.find('[name=dataExecucao]');
                 var viewName = $config.find('[name=viewName]').val();
 
                 data.push({
@@ -103,6 +104,7 @@
                     social: ~~($social.attr('data-social')),
                     viewName: viewName,
                     checked: $social.prop('checked'),
+                    dataExecucao: $dataExecucao.val()
                 });
             }
             return data;

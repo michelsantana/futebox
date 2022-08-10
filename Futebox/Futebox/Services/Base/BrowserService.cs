@@ -8,10 +8,21 @@ using System.Threading.Tasks;
 
 namespace Futebox.Services
 {
-    public class BrowserService : IBrowserService
+    public class BrowserService : IBrowserService, IDisposable
     {
-
-        protected Browser _browser;
+        private Browser _browserInstance;
+        protected Browser _browser
+        {
+            get
+            {
+                if (_browserInstance == null) _browserInstance = OpenBrowser().Result;
+                return _browserInstance;
+            }
+            set
+            {
+                _browserInstance = value;
+            }
+        }
 
         public BrowserService()
         {
@@ -25,7 +36,7 @@ namespace Futebox.Services
 
         private void InitialBrowser()
         {
-            Task.WaitAll(Task.Run(() => OpenBrowser()));
+            Task.WaitAll(Task.Run(() => _browser));
         }
 
         protected async Task ClearInputThenWriteText(Page page, string selector, string text)
@@ -64,26 +75,24 @@ namespace Futebox.Services
 
         protected async Task<Browser> OpenBrowser(bool headless = false)
         {
-            if (this._browser == null) await TryAttatch();
-            if (this._browser == null)
+            var userProfile = Environment.GetEnvironmentVariable("USERPROFILE");
+            var b = await Puppeteer.LaunchAsync(new LaunchOptions
             {
-                var userProfile = Environment.GetEnvironmentVariable("USERPROFILE");
-                this._browser = await Puppeteer.LaunchAsync(new LaunchOptions
-                {
-                    ExecutablePath = $"{userProfile}\\AppData\\Local\\Google\\Chrome SxS\\Application\\chrome.exe",
-                    Headless = headless,
-                    UserDataDir = $"{userProfile}\\AppData\\Local\\Google\\Chrome SxS\\User Data",
-                    DefaultViewport = GetDefaultViewPort(),
-                    Args = new string[] {
+                ExecutablePath = $"{userProfile}\\AppData\\Local\\Google\\Chrome SxS\\Application\\chrome.exe",
+                Headless = headless,
+                UserDataDir = $"{userProfile}\\AppData\\Local\\Google\\Chrome SxS\\User Data",
+                DefaultViewport = GetDefaultViewPort(),
+                Args = new string[] {
                     $"--user-data-dir={userProfile}\\AppData\\Local\\Google\\Chrome SxS\\User Data\\",
                     $"--profile-directory=\"Profile 1\"",
-                    $"--remote-debugging-port=21233",
-                    //$"--window-position=0,1080",
                 }
-                });
-            }
+            });
 
-            return this._browser;
+            b.Disconnected += (Object sender, EventArgs eargs) =>
+            {
+                this.Dispose();
+            };
+            return b;
         }
 
         protected async Task TryAttatch()

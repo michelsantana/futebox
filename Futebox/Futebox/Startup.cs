@@ -66,6 +66,10 @@ namespace Futebox
             services.AddSingleton<IInstagramService, InstagramService>();
             services.AddSingleton<IYoutubeService, YoutubeService>();
 
+            services.AddSingleton<IAgendaRepositorio, AgendaRepositorio>();
+            services.AddSingleton<IExecucaoProcessoService, ExecucaoProcessoService>();
+
+
             services.AddSingleton(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
             services.AddQuartz(_ =>
             {

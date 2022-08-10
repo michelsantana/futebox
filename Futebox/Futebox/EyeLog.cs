@@ -47,7 +47,7 @@ namespace Futebox
             }
             catch (Exception exx)
             {
-                if (tryTimes < 5) return Log(ex, tryTimes++);
+                if (tryTimes < 5) return Log(ex, (tryTimes++));
                 else throw exx;
             }
         }

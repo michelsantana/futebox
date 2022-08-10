@@ -100,6 +100,22 @@ namespace Futebox.DB
             }
         }
 
+        public virtual TEntity UpdateReturn(TEntity entity)
+        {
+            try
+            {
+                entity.alteracao = DateTime.Now;
+                _dbContext.DeleteMultiple<TEntity>(_ => _.id == entity.id, _transaction);
+                _dbContext.Insert(entity, _transaction);
+                return entity;
+            }
+            catch (Exception ex)
+            {
+                EyeLog.Log(ex);
+                throw ex;
+            }
+        }
+
         public virtual bool Delete(string id)
         {
             var entity = GetById(id);
@@ -127,12 +143,12 @@ namespace Futebox.DB
         {
             try
             {
-                return _dbContext.Select(predicate).First();
+                return _dbContext.Select(predicate)?.First();
             }
             catch (Exception ex)
             {
                 EyeLog.Log(ex);
-                throw ex;
+                return null;
             }
         }
 

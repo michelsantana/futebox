@@ -32,7 +32,7 @@ function IGNaoPermiteNotificacao() {
 function IGSelecionarDimensoes() {
     document.querySelector('[aria-label="Selecionar corte"]').parentElement.parentElement.click();
     setTimeout(() => {
-        Array.from(document.querySelectorAll('[aria-label="Cortar"] button'))
+        Array.from(document.querySelectorAll('[type=button]'))
             .filter((_) => _.innerHTML.indexOf('>Original<') > -1)
             .forEach((_) => _.click());
     }, 1000);

@@ -27,6 +27,11 @@ namespace Futebox.Models
         public int linhas { get; set; }
         public int colunas { get; set; }
         public string titulo { get; set; }
+        public DateTime? dataExecucao { get; set; }
+        public ProcessoClassificacaoArgs()
+        {
+            dataExecucao = dataExecucao ?? DateTime.Now;
+        }
     }
 
     public class ProcessoRodadaArgs : IProcessoArgs

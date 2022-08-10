@@ -70,7 +70,7 @@ namespace Futebox.Services
 
             var msg = $"{RoteiroDefaults.ObterSaudacao()} "
                 + $"Veja a classificação do \"{CampeonatoUtils.ObterNomeDoCampeonato(processoClassificacaoArgs.campeonato)}\": "
-                + $"Classificação atualizada hoje, {RoteiroDefaults.TraduzirDiaDoMes(DateTime.Now)}: "
+                + $"Classificação atualizada {RoteiroDefaults.ObterHojeAmanhaOntem(processoClassificacaoArgs.dataExecucao.Value)}, {RoteiroDefaults.TraduzirDiaDoMes(processoClassificacaoArgs.dataExecucao.Value)}: "
                 + $"Bora: ";
 
             var rnd = new Random();

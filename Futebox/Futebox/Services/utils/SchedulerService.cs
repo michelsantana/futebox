@@ -1,6 +1,7 @@
 ﻿using Futebox.Services.Interfaces;
 using Quartz;
 using Quartz.Impl;
+using Quartz.Impl.Matchers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace Futebox.Services
         static StdSchedulerFactory _factory;
         static IScheduler _scheduler;
         readonly IServiceProvider _serviceProvider;
+        
+        JobKey Key(string key) => new JobKey(key, "geral");
 
         public SchedulerService(IServiceProvider serviceProvider)
         {
@@ -35,16 +38,47 @@ namespace Futebox.Services
                 _scheduler.Shutdown();
         }
 
-        public void AddJob(IJobDetail job, ITrigger trigger)
+        public async void AddJob(IJobDetail job, ITrigger trigger)
         {
             job.JobDataMap.Add(nameof(IServiceProvider), _serviceProvider);
             Task.WaitAll(_scheduler.DeleteJob(job.Key));
             Task.WaitAll(_scheduler.ScheduleJob(job, trigger));
         }
 
-        public void RemoveJob(JobKey jobkey)
+        public async void RemoveJob(string jobkey)
         {
-            _scheduler.DeleteJob(jobkey);
+            await _scheduler.DeleteJob(Key(jobkey));
+        }
+
+        public IJobDetail Info(string jobKey)
+        {
+            return _scheduler.GetJobDetail(Key(jobKey)).Result;
+        }
+
+        public async Task<List<IJobDetail>> List()
+        {
+            var list = new List<IJobDetail>();
+            var groups = await _scheduler.GetJobGroupNames();
+            foreach (String groupName in groups)
+            {
+                var keys =
+                    await _scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(groupName));
+                foreach (JobKey jobKey in keys)
+                {
+                    list.Add(await _scheduler.GetJobDetail(jobKey));
+                }
+            }
+            return list;
+        }
+
+        public async Task<List<IJobExecutionContext>> ListRunning()
+        {
+            return (await _scheduler.GetCurrentlyExecutingJobs()).ToList();
+        }
+
+        public async Task Cancelar(string key)
+        {
+            await _scheduler.DeleteJob(Key(key));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Futebox.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -9,6 +10,17 @@ namespace Futebox.Services
     public class HttpHandler : IHttpHandler
     {
         private HttpClient _client = new HttpClient();
+
+        public HttpHandler()
+        {
+
+        }
+
+        public HttpHandler SetTimeoutMinutes(int minutes)
+        {
+            _client.Timeout = TimeSpan.FromMinutes(minutes);
+            return this;
+        }
 
         public HttpResponseMessage Get(string url, Dictionary<string, string> headers = null)
         {
@@ -37,7 +49,5 @@ namespace Futebox.Services
         {
             return await _client.PostAsync(url, content);
         }
-
-
     }
 }

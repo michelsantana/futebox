@@ -16,5 +16,7 @@ namespace Futebox
         public static string TelegramNotifyUserId;
         public static string ChromeDefaultDownloadFolder;
         public static bool DEBUGMODE;
+
+        public static bool ScheduleInitialized { get; internal set; }
     }
 }

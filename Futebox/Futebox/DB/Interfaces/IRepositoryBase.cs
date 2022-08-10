@@ -12,6 +12,7 @@ namespace Futebox.Interfaces.DB
         void Insert(ref TEntity entity);
         void InsertWithId(string id, ref TEntity entity);
         bool Update(TEntity entity);
+        TEntity UpdateReturn(TEntity entity);
         bool Delete(string id);
         IEnumerable<TEntity> GetList(Expression<Func<TEntity, bool>> predicate);
         TEntity GetSingle(Expression<Func<TEntity, bool>> predicate);

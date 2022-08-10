@@ -11,6 +11,30 @@ namespace Futebox.Services
 {
     public class RoteiroDefaults
     {
+
+        public class VerbalizarTempo
+        {
+            public Tempo tempoVerbal { get; set; }
+
+            public VerbalizarTempo(DateTime dataPartida, DateTime? dataExecucao = null)
+            {
+                dataExecucao = dataExecucao ?? DateTime.Now;
+                var exec = Convert.ToInt32(dataExecucao?.ToString("yyyyMM") ?? "0");
+                var referenceDay = Convert.ToInt32(dataPartida.ToString("yyyyMMdd") ?? "0");
+
+                if (exec == referenceDay) this.tempoVerbal = Tempo.presente;
+                if (exec > referenceDay) this.tempoVerbal = Tempo.passado;
+                if (exec < referenceDay) this.tempoVerbal = Tempo.futuro;
+            }
+
+            public enum Tempo
+            {
+                passado,
+                presente,
+                futuro
+            }
+        }
+
         public static string ObterSaudacao()
         {
             return $"Fala torcedôr e torcedôra: Bem vindo ao canal Futibox: ";
@@ -47,14 +71,33 @@ namespace Futebox.Services
             var golsVencedor = partida.timeMandante.sigla == vencedor.sigla ? partida.golsMandante : partida.golsVisitante;
             var golsPerdedor = partida.timeMandante.sigla == perdedor.sigla ? partida.golsMandante : partida.golsVisitante;
 
-            return //$"Hoje " +
-                    $"{vencedor.ObterNomeWatson()} venceu {perdedor.ObterNomeWatson()}: " +
+            return $"{vencedor.ObterNomeWatson()} venceu {perdedor.ObterNomeWatson()}: " +
                     $"por {golsVencedor} a {golsPerdedor} no estádio {partida.estadio}. " +
                     $"Esse foi um jogo do campeonato, {partida.campeonato}: " +
-                    $"e iniciou por volta das {RoteiroDefaults.TraduzirHoras(partida.dataPartida)}. " +
+                    $"e iniciou {RoteiroDefaults.ObterHojeAmanhaOntem(partida.dataPartida)} por volta das {RoteiroDefaults.TraduzirHoras(partida.dataPartida)}. " +
                     $"Pra quem você estava torcendo? deixa aqui nos comentários junto com aquela deedáda no laique.";
         }
-        
+
+        public static string ObterHojeAmanhaOntem(DateTime dataPartida, DateTime? dataReferenciaExecucao = null)
+        {
+            dataReferenciaExecucao = dataReferenciaExecucao ?? DateTime.Now;
+            var yearMonthRef = Convert.ToInt32(dataReferenciaExecucao?.ToString("yyyyMM") ?? "0");
+            var dayRef = Convert.ToInt32(dataReferenciaExecucao?.ToString("dd") ?? "0");
+            var yearMonth = Convert.ToInt32(dataPartida.ToString("yyyyMM") ?? "0");
+            var day = Convert.ToInt32(dataPartida.ToString("dd") ?? "0");
+            if (yearMonthRef == yearMonth)
+            {
+                if (dayRef == day) return "hoje";
+
+                if ((dayRef - 2) == day) return "anteontem";
+                if ((dayRef - 1) == day) return "ontem";
+
+                if ((dayRef + 1) == day) return "amanhã";
+                if ((dayRef + 2) == day) return "depois de amanhã";
+            }
+            return TraduzirDiaDoMes(dataPartida);
+        }
+
         public static string RemoverAcentos(string text)
         {
             StringBuilder sbReturn = new StringBuilder();

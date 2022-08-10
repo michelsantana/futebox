@@ -1,27 +1,45 @@
 ﻿@model IEnumerable<Futebox.Models.PartidaVM>
 @{
-    var ddl = @"
-<optgroup label='4x'>
-<option value='4x2'>4 colunas x 2 linhas</option>
-<option value='4x3'>4 colunas x 3 linhas</option>
-<option value='4x1'>4 colunas x 1 linhas</option>
-</optgroup>
-<optgroup label='3x'>
-<option value='3x2'>3 colunas x 2 linhas</option>
-<option value='3x3'>3 colunas x 3 linhas</option>
-<option value='3x1'>3 colunas x 1 linhas</option>
-</optgroup>
-<optgroup label='2x'>
-<option value='2x2'>2 colunas x 2 linhas</option>
-<option value='2x3'>2 colunas x 3 linhas</option>
-<option value='2x1'>2 colunas x 1 linhas</option>
-</optgroup>
-<optgroup label='1x'>
-<option value='1x2'>1 colunas x 2 linhas</option>
-<option value='1x3'>1 colunas x 3 linhas</option>
-<option value='1x1'>1 colunas x 1 linhas</option>
-</optgroup>
-";
+    var cols = Enumerable.Range(1, 5).OrderByDescending(_ => _);
+    var lines = Enumerable.Range(1, 5).OrderByDescending(_ => _);
+    var calculate = true;
+    var ddl = "";
+    if (calculate)
+        cols.ToList()
+            .ForEach(c =>
+            {
+                ddl += $"<optgroup label='{c}x'>";
+                lines.ToList()
+                    .ForEach(l => ddl += $"<option value='{c}x{l}'>{c} colunas x {l} linhas</option>");
+                ddl += $"</optgroup>";
+            });
+    else
+        ddl = @"
+        <optgroup label='4x'>
+        <option value='4x1'>4 colunas x 1 linhas</option>
+        <option value='4x2'>4 colunas x 2 linhas</option>
+        <option value='4x3'>4 colunas x 3 linhas</option>
+        <option value='4x4'>4 colunas x 4 linhas</option>
+        </optgroup>
+        <optgroup label='3x'>
+        <option value='3x1'>3 colunas x 1 linhas</option>
+        <option value='3x2'>3 colunas x 2 linhas</option>
+        <option value='3x3'>3 colunas x 3 linhas</option>
+        <option value='3x4'>3 colunas x 4 linhas</option>
+        </optgroup>
+        <optgroup label='2x'>
+        <option value='2x1'>2 colunas x 1 linhas</option>
+        <option value='2x2'>2 colunas x 2 linhas</option>
+        <option value='2x3'>2 colunas x 3 linhas</option>
+        <option value='2x4'>2 colunas x 4 linhas</option>
+        </optgroup>
+        <optgroup label='1x'>
+        <option value='1x1'>1 colunas x 1 linhas</option>
+        <option value='1x2'>1 colunas x 2 linhas</option>
+        <option value='1x3'>1 colunas x 3 linhas</option>
+        <option value='1x4'>1 colunas x 4 linhas</option>
+        </optgroup>
+    ";
 
     var socialIGV = (int)Futebox.Models.Enums.RedeSocialFinalidade.InstagramVideo;
     var socialYTV = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeVideo;

@@ -27,6 +27,7 @@ namespace Futebox.Models
         public String tituloVideo { get; set; }
         public String descricaoVideo { get; set; }
         public RedeSocialFinalidade social { get; set; }
+        public string jobKey { get; set; }
 
         public IProcessoArgs _args;
         public T ToArgs<T>() where T : IProcessoArgs
@@ -55,12 +56,12 @@ namespace Futebox.Models
         {
             var json = JsonConvert.SerializeObject(rodadaArgs);
             this.agendado = false;
-            this.agendamento = DateTime.Now.AddMinutes(30);
+            this.agendamento = DateTime.Now.AddMinutes(1);
             this.alturaVideo = SocialMediaUtils.Height(rodadaArgs.social);
             this.args = json;
             this.categoria = CategoriaVideo.rodada;
             this.larguraVideo = SocialMediaUtils.Width(rodadaArgs.social);
-            this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(rodadaArgs.social)}&h={SocialMediaUtils.Height(rodadaArgs.social)}";
+            this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}/Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(rodadaArgs.social)}&h={SocialMediaUtils.Height(rodadaArgs.social)}";
             this.nome = !string.IsNullOrEmpty(rodadaArgs.titulo) ? rodadaArgs.titulo : $"{categoria} - {rodadaArgs.rodada} - {rodadaArgs.campeonato}";
             this.nomeDoArquivoAudio = $"{DateTime.Now.ToString("MMddHHmmss")}-{rodadaArgs.social}.mp3";
             this.nomeDoArquivoImagem = $"{rodadaArgs.social}.png";
@@ -80,7 +81,7 @@ namespace Futebox.Models
             this.args = json;
             this.categoria = CategoriaVideo.classificacao;
             this.larguraVideo = SocialMediaUtils.Width(classificacaoArgs.social);
-            this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(classificacaoArgs.social)}&h={SocialMediaUtils.Height(classificacaoArgs.social)}";
+            this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}/Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(classificacaoArgs.social)}&h={SocialMediaUtils.Height(classificacaoArgs.social)}";
             this.nome = !string.IsNullOrEmpty(classificacaoArgs.titulo) ? classificacaoArgs.titulo : $"{categoria} - {classificacaoArgs.campeonato}";
             this.nomeDoArquivoAudio = $"{DateTime.Now.ToString("MMddHHmmss")}-{classificacaoArgs.social}.mp3";
             this.nomeDoArquivoImagem = $"{classificacaoArgs.social}.png";
@@ -100,7 +101,7 @@ namespace Futebox.Models
             this.args = json;
             this.categoria = CategoriaVideo.partida;
             this.larguraVideo = SocialMediaUtils.Width(partidaArgs.social);
-            this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(partidaArgs.social)}&h={SocialMediaUtils.Height(partidaArgs.social)}";
+            this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}/Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(partidaArgs.social)}&h={SocialMediaUtils.Height(partidaArgs.social)}";
             this.nome = !string.IsNullOrEmpty(partidaArgs.titulo) ? partidaArgs.titulo : $"{categoria}";
             this.nomeDoArquivoAudio = $"{DateTime.Now.ToString("MMddHHmmss")}-{partidaArgs.social}.mp3";
             this.nomeDoArquivoImagem = $"{partidaArgs.social}.png";

@@ -55,7 +55,7 @@ namespace Futebox.Services
         {
             if (!File.Exists(arquivo)) throw new Exception("File not found");
 
-            var campoDoUpload = await _page.QuerySelectorAsync("[aria-label=\"Criar nova publicação\"] [type=\"file\"]");
+            var campoDoUpload = await _page.QuerySelectorAsync("[role=\"dialog\"] [type=\"file\"]");
             await campoDoUpload.UploadFileAsync(arquivo);
             _browserService.WaitFor(10);
         }
@@ -83,7 +83,9 @@ namespace Futebox.Services
             if (!Settings.DEBUGMODE)
             {
                 await _page.EvaluateExpressionAsync(_browserService.JsFunction("IGPublicar"));
-                await _page.WaitForSelectorAsync("[role=\"dialog\"][aria-label*=\"compartilhada\"]", new WaitForSelectorOptions() { Timeout = (120 * 1000) });
+
+                // await _page.WaitForSelectorAsync("[role=\"dialog\"][aria-label*=\"compartilhada\"]", new WaitForSelectorOptions() {  Timeout = (240 * 1000)  });
+                await _page.WaitForXPathAsync("//h1/div[contains(., 'compartilhada')]", new WaitForSelectorOptions() { Timeout = (240 * 1000) });
             }
             _browserService.WaitFor(1);
         }

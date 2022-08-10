@@ -1,0 +1,18 @@
+﻿@model List<Futebox.Models.Agenda>
+@{
+    var agendas = Model;
+}
+<table class="table table-bordered table-striped">
+    @foreach (var agenda in agendas)
+    {
+        <tr data-row-id="@agenda.id">
+            <td>@(agenda.id)</td>
+            <td>@(agenda.processoId)</td>
+            <td>@(agenda.descricao)</td>
+            <td>@(agenda.status)</td>
+            <td>@(agenda.agendamento)</td>
+            <td>@(agenda.criacao)</td>
+            <td>@(agenda.alteracao)</td>
+        </tr>
+    }
+</table>

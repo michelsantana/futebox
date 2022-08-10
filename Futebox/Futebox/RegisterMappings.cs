@@ -15,6 +15,7 @@ namespace Futebox
                 config.AddMap(new TimeMap());
                 config.AddMap(new ProcessoMap());
                 config.AddMap(new CampeonatoMap());
+                config.AddMap(new AgendaMap());
                 //config.AddMap(new InstagramSubProcessoMap<SubProcessoInstagramVideo>());
                 //config.AddMap(new YoutubeSubProcessoMap<SubProcessoYoutubeVideo>());
                 //config.AddMap(new YoutubeSubProcessoMap<SubProcessoYoutubeShort>());

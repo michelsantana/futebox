@@ -67,6 +67,21 @@ namespace Futebox.DB.Mappers
         }
     }
 
+    public class AgendaMap : DommelEntityMap<Agenda>
+    {
+        public AgendaMap()
+        {
+            ToTable(DbSchemaAgenda.agenda);
+            Map(x => x.id).ToColumn(DbSchemaAgenda.id);
+            Map(x => x.processoId).ToColumn(DbSchemaAgenda.processoId);
+            Map(x => x.criacao).ToColumn(DbSchemaAgenda.criacao);
+            Map(x => x.alteracao).ToColumn(DbSchemaAgenda.alteracao);
+            Map(x => x.descricao).ToColumn(DbSchemaAgenda.descricao);
+            Map(x => x.status).ToColumn(DbSchemaAgenda.status);
+            Map(x => x.agendamento).ToColumn(DbSchemaAgenda.agendamento);
+        }
+    }
+
     public class CampeonatoMap : DommelEntityMap<Campeonato>
     {
         public CampeonatoMap()

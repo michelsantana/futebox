@@ -45,12 +45,10 @@ namespace Futebox.Services.Jobs
             {
                 var jobkey = key;
                 Processo processo;
-                //List<SubProcesso> subProcessos;
                 StringBuilder sbNotificacao = new StringBuilder();
                 try
                 {
-                    processo = _processoService.ObterProcesso(data["processo"].ToString());
-                    // subProcessos = _processoService.ObterSubProcessos(processo.id);
+                    processo = await _processoService.Obter(data["processo"].ToString());
 
                     var statusNaoExecutaveis = new StatusProcesso[]
                     {

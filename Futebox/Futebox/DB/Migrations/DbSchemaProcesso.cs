@@ -29,6 +29,7 @@ namespace Futebox.DB.Migrations
         public const string tituloVideo = nameof(tituloVideo);
         public const string descricaoVideo = nameof(descricaoVideo);
         public const string social = nameof(social);
+        public const string jobKey = nameof(jobKey);
 
         public override void Down()
         {
@@ -61,6 +62,7 @@ namespace Futebox.DB.Migrations
             .WithColumn(tituloVideo).AsString().Nullable()
             .WithColumn(descricaoVideo).AsString().Nullable()
             .WithColumn(social).AsInt32().Nullable()
+            .WithColumn(jobKey).AsString().Nullable()
             ;
         }
     }

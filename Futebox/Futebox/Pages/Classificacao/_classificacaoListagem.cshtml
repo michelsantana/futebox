@@ -13,7 +13,7 @@
 @{
     var socialIGV = (int)Futebox.Models.Enums.RedeSocialFinalidade.InstagramVideo;
     var socialYTV = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeVideo;
-    var socialYTS = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeShorts;
+    //var socialYTS = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeShorts;
     var grouped = Model.classificacao.GroupBy(_ => _.grupo);
     var deparaGruposXColunas = new Dictionary<int, int>
     {
@@ -100,6 +100,11 @@
                     <span class="input-group-text">Titulo</span>
                     <input type="text" class="form-control form-control-sm" name="title" value="@($"Classificação {Model.nomeCampeonato} {DateTime.Now.ToString("yyyy")} - Atualizada {DateTime.Now.ToString("dd/MM/yyyy")}")">
                 </div>
+                <hr />
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Titulo</span>
+                    <input type="date" class="form-control form-control-sm" name="dataExecucao" value="@(DateTime.Now.ToString("yyyy-MM-dd"))">
+                </div>
             </div>
         </td>
         <td colspan="2">
@@ -111,7 +116,7 @@
                 <div class="input-group input-group-sm">
                     <select name='viewName' class='form-select form-select-sm'>
                         <optgroup label='defaults'>
-                            <option value='_classificacaoSemGrupos' selected="selected">Padrão (class. s/g)</option>                        
+                            <option value='_classificacaoSemGrupos' selected="selected">Padrão (class. s/g)</option>
                         </optgroup>
                     </select>
                     <button class="btn btn-outline-secondary" onclick="VisualizarMiniatura('@(socialIGV)', 1350, 1920)" type="button">Simular</button>
@@ -120,6 +125,11 @@
                 <div class="input-group input-group-sm">
                     <span class="input-group-text">Titulo</span>
                     <input type="text" class="form-control form-control-sm" name="title" value="@($"Classificação {Model.nomeCampeonato} {DateTime.Now.ToString("yyyy")} - Atualizada {DateTime.Now.ToString("dd/MM/yyyy")}")">
+                </div>
+                <hr />
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Titulo</span>
+                    <input type="date" class="form-control form-control-sm" name="dataExecucao" value="@(DateTime.Now.ToString("yyyy-MM-dd"))">
                 </div>
             </div>
         </td>

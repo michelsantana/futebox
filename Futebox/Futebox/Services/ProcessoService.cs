@@ -4,7 +4,6 @@ using Futebox.Services.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Futebox.Models.Enums;
 using System.Threading.Tasks;
@@ -20,129 +19,140 @@ namespace Futebox.Services
         IClassificacaoService _classificacaoService;
         IRodadaService _rodadaService;
         IFutebotService _futebotService;
+        IAgendamentoService _agendamentoService;
 
-        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IFutebotService futebotService)
+        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IFutebotService futebotService, IAgendamentoService agendamentoService)
         {
             _processoRepositorio = processoRepositorio;
             _partidasService = partidasService;
             _classificacaoService = classificacaoService;
             _rodadaService = rodadaService;
             _futebotService = futebotService;
+            _agendamentoService = agendamentoService;
         }
 
-        public List<Processo> ObterProcessos()
+        public async Task<List<Processo>> ObterProcessos()
         {
             return _processoRepositorio.GetAll()?.ToList();
         }
 
-        public Processo ObterProcesso(string id)
+        public async Task<Processo> Obter(string id)
         {
             return _processoRepositorio.GetSingle(_ => _.id == id);
         }
 
-        public List<Processo> SalvarProcessoPartida(ProcessoPartidaArgs[] args)
+        public async Task<List<Processo>> SalvarProcessoPartida(ProcessoPartidaArgs[] args)
         {
             var result = new List<Processo>();
             foreach (var arg in args)
             {
                 var processo = new Processo(arg);
                 _processoRepositorio.Insert(ref processo);
+                _agendamentoService.Criar(processo.id);
                 result.Add(processo);
             }
             return result;
         }
 
-        public List<Processo> SalvarProcessoClassificacao(ProcessoClassificacaoArgs[] args)
+        public async Task<List<Processo>> SalvarProcessoClassificacao(ProcessoClassificacaoArgs[] args)
         {
             var result = new List<Processo>();
             foreach (var arg in args)
             {
                 var processo = new Processo(arg);
                 _processoRepositorio.Insert(ref processo);
+                Task.WaitAll(new Task[] { _agendamentoService.Criar(processo.id) });
                 result.Add(processo);
             }
             return result;
         }
 
-        public List<Processo> SalvarProcessoRodada(ProcessoRodadaArgs[] args)
+        public async Task<List<Processo>> SalvarProcessoRodada(ProcessoRodadaArgs[] args)
         {
             var result = new List<Processo>();
             foreach (var arg in args)
             {
                 var processo = new Processo(arg);
                 _processoRepositorio.Insert(ref processo);
+                _agendamentoService.Criar(processo.id);
                 result.Add(processo);
             }
             return result;
         }
 
-        public Processo AgendarProcesso(string id, DateTime hora)
+        public async Task<Processo> AgendarProcesso(string id, DateTime hora)
         {
-            var p = _processoRepositorio.GetById(id);
-            p.agendamento = hora;
-            //if(p.status == StatusProcesso.Criado || p.status == StatusProcesso.Erro)
-                p.status = StatusProcesso.Agendado;
-            p.agendado = true;
+            Processo p = null;
+            Task.WaitAll(new Task[]{
+                Task.Run(() =>
+                {
+                    var p = _processoRepositorio.GetById(id);
 
-            _processoRepositorio.OpenTransaction();
-            _processoRepositorio.Update(p);
-            _processoRepositorio.Commit();
+                    p.agendamento = hora;
+                    p.status = StatusProcesso.Agendado;
+                    p.agendado = true;
 
+                    _processoRepositorio.OpenTransaction();
+                    _processoRepositorio.Update(p);
+                    _processoRepositorio.Commit();
+                }),
+                Task.Run(() =>_agendamentoService.Agendar(id, hora))
+            });
             return p;
         }
 
 
         public async Task GerarImagem(Processo processo)
         {
-            AtualizarStatus(ref processo, StatusProcesso.GerandoImagem);
+            processo = await AtualizarStatus(processo, StatusProcesso.GerandoImagem);
             var resultado = await _futebotService.GerarImagem(processo);
-            AtualizarProcessoLog(processo, resultado.stack.ToArray());
+            await AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
-                AtualizarStatus(ref processo, StatusProcesso.ImagemOK);
+                processo = await AtualizarStatus(processo, StatusProcesso.ImagemOK);
             }
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
-                AtualizarStatus(ref processo, StatusProcesso.ImagemErro);
+                await AtualizarStatus(processo, StatusProcesso.ImagemErro);
                 throw new Exception("GerarImagem"); ;
             }
         }
 
         public async Task GerarAudio(Processo processo)
         {
-            AtualizarRoteiro(processo);
-            AtualizarStatus(ref processo, StatusProcesso.GerandoAudio);
+            await AtualizarRoteiro(processo);
+            processo = await AtualizarStatus(processo, StatusProcesso.GerandoAudio);
 
             var resultado = await _futebotService.GerarAudio(processo, true, true);
-            AtualizarProcessoLog(processo, resultado.stack.ToArray());
+            await AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
-                AtualizarStatus(ref processo, StatusProcesso.AudioOK);
+                processo = await AtualizarStatus(processo, StatusProcesso.AudioOK);
             }
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
-                AtualizarStatus(ref processo, StatusProcesso.AudioErro);
+                await AtualizarStatus(processo, StatusProcesso.AudioErro);
                 throw new Exception("GerarAudio"); ;
             }
         }
 
         public async Task GerarVideo(Processo processo)
         {
-            AtualizarAtributos(processo);
-            AtualizarStatus(ref processo, StatusProcesso.GerandoVideo);
+            await AtualizarAtributos(processo);
+            processo = await AtualizarStatus(processo, StatusProcesso.GerandoVideo);
 
             var resultado = _futebotService.GerarVideo(processo);
-            AtualizarProcessoLog(processo, resultado.stack.ToArray());
+            await AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
-                AtualizarStatus(ref processo, StatusProcesso.VideoOK);
+                processo = await AtualizarStatus(processo, StatusProcesso.VideoOK);
             }
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
-                AtualizarStatus(ref processo, StatusProcesso.VideoErro);
+                await AtualizarStatus(processo, StatusProcesso.VideoErro);
                 throw new Exception("GerarVideo"); ;
             }
         }
@@ -150,22 +160,27 @@ namespace Futebox.Services
         public async Task PublicarVideo(Processo processo)
         {
             //AtualizarRoteiro(processo);
-            AtualizarStatus(ref processo, StatusProcesso.Publicando);
+            processo = await AtualizarStatus(processo, StatusProcesso.Publicando);
             var resultado = await _futebotService.PublicarVideo(processo);
-            AtualizarProcessoLog(processo, resultado.stack.ToArray());
+            await AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
             {
-                AtualizarStatus(ref processo, StatusProcesso.PublicandoOK);
+                processo = await AtualizarStatus(processo, StatusProcesso.PublicandoOK);
             }
             if (resultado.status == HttpStatusCode.InternalServerError)
             {
-                AtualizarStatus(ref processo, StatusProcesso.PublicandoErro);
+                await AtualizarStatus(processo, StatusProcesso.PublicandoErro);
                 throw new Exception("PublicarVideo"); ;
             }
             if (resultado.status == HttpStatusCode.BadRequest)
             {
-                AtualizarStatus(ref processo, StatusProcesso.Erro);
+                await AtualizarStatus(processo, StatusProcesso.Erro);
+                throw new Exception("PublicarVideo"); ;
+            }
+            if (resultado.status == HttpStatusCode.Unauthorized)
+            {
+                await AtualizarStatus(processo, StatusProcesso.Erro);
                 throw new Exception("PublicarVideo"); ;
             }
         }
@@ -178,17 +193,17 @@ namespace Futebox.Services
         }
 
 
-        public void AtualizarStatus(ref Processo processo, StatusProcesso status)
+        public async Task<Processo> AtualizarStatus(Processo processo, StatusProcesso status)
         {
             //var p = _processoRepositorio.GetById(id);
             if (!Directory.Exists(processo.pasta)) Directory.CreateDirectory(processo.pasta);
 
             processo.alteracao = DateTime.Now;
             processo.status = status;
-            _processoRepositorio.Update(processo);
+            return _processoRepositorio.UpdateReturn(processo);
         }
 
-        public void AtualizarProcessoLog(Processo processo, string[] lines)
+        public async Task AtualizarProcessoLog(Processo processo, string[] lines)
         {
             processo.alteracao = DateTime.Now;
             processo.log = $"{processo.log}\n[UPDATE:{processo.alteracao}]\n{string.Join("\n", lines)}";
@@ -196,7 +211,7 @@ namespace Futebox.Services
             _processoRepositorio.Update(processo);
         }
 
-        private Processo AtualizarRoteiro(Processo processo)
+        private async Task<Processo> AtualizarRoteiro(Processo processo)
         {
             switch (processo.categoria)
             {
@@ -210,7 +225,7 @@ namespace Futebox.Services
             return processo;
         }
 
-        private Processo AtualizarAtributos(Processo processo)
+        private async Task<Processo> AtualizarAtributos(Processo processo)
         {
             Tuple<string, string> atributos = null;
             switch (processo.categoria)
@@ -235,7 +250,7 @@ namespace Futebox.Services
             return processo;
         }
 
-        public bool Delete(string id)
+        public async Task<bool> Delete(string id)
         {
             _processoRepositorio.Delete(id);
             return true;

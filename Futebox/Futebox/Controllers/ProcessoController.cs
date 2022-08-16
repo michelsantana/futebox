@@ -55,6 +55,13 @@ namespace Futebox.Controllers
             return await _processoService.SalvarProcessoRodada(args);
         }
 
+        [HttpPost("jogosdia")]
+        public async Task<List<Processo>> AddProcessoJogosDia([FromBody] ProcessoJogosDiaArgs[] args)
+        {
+            if (args == null || args?.Length == 0) throw new Exception();
+            return await _processoService.SalvarProcessoJogosDia(args);
+        }
+
         [HttpPost("{id}/executar")]
         public async Task<RobotResultApi> ExecutarProcesso(string id)
         {

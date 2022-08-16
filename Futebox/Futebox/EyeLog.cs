@@ -32,7 +32,7 @@ namespace Futebox
                 var message = "";
                 do
                 {
-                    message += $"\n{ex.Message}";
+                    message += $"\n{ex?.Message}";
                     ex = ex?.InnerException;
                 } while (ex?.InnerException != null);
 

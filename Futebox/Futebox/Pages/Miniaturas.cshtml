@@ -35,7 +35,10 @@
 
         $(document).ready(() => {
             Equality();
-            if (window.location.href.indexOf('t=partida') > -1) {
+            if (
+                window.location.href.toLowerCase().indexOf('t=partida') > -1 ||
+                window.location.href.toLowerCase().indexOf('t=jogosdia') > -1
+            ) {
                 $('.text-fit-lg').each((i, e) => $(e).fitText(0.8));
                 $('.text-fit-sm').each((i, e) => $(e).fitText(2.6));
 

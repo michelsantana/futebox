@@ -14,6 +14,7 @@ namespace Futebox.Services.Interfaces
         Task<List<Processo>> SalvarProcessoPartida(ProcessoPartidaArgs[] args);
         Task<List<Processo>> SalvarProcessoClassificacao(ProcessoClassificacaoArgs[] args);
         Task<List<Processo>> SalvarProcessoRodada(ProcessoRodadaArgs[] args);
+        Task<List<Processo>> SalvarProcessoJogosDia(ProcessoJogosDiaArgs[] args);
 
         Task<Processo> AgendarProcesso(string id, DateTime hora);
 

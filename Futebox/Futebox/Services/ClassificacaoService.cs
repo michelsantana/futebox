@@ -80,7 +80,8 @@ namespace Futebox.Services
                 $"TABELA {camp}",
                 $"TABELA CLASSIFICAÇÃO",
                 $"CLASSIFICAÇÃO {camp}",
-                $"CAMPEONATO {camp}"
+                $"CAMPEONATO {camp}",
+                $"FUTEBOL",
             };
 
             palavraschave.ToList().ForEach(_ =>
@@ -96,16 +97,16 @@ namespace Futebox.Services
                 descricao += "\n";
                 descricao += $"{semAcento} {ano}";
                 descricao += "\n";
-                descricao += $"#{comAcento.Replace(" ", "")}";
-                descricao += "\n";
-                descricao += $"#{comAcento.Replace(" ", "")}{ano}";
-                descricao += "\n";
+            });
+
+            palavraschave.ToList().ForEach(_ =>
+            {
+                var semAcento = _?.RemoverAcentos2();
                 descricao += $"#{semAcento.Replace(" ", "")}";
                 descricao += "\n";
                 descricao += $"#{semAcento.Replace(" ", "")}{ano}";
                 descricao += "\n";
             });
-
             return Tuple.Create(titulo, descricao);
         }
 

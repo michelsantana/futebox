@@ -49,7 +49,7 @@ namespace Futebox.Pages
                     RodadaHandler(q, w, h);
                     break;
                 case CategoriaVideo.jogosdia:
-                    RodadaHandler(q, w, h);
+                    JogosDiaHandler(q, w, h);
                     break;
                 default:
                     break;
@@ -72,7 +72,7 @@ namespace Futebox.Pages
 
         public void JogosDiaHandler(string q, int w, int h)
         {
-            var args = JsonConvert.DeserializeObject<ProcessoJogosArgs>(q);
+            var args = JsonConvert.DeserializeObject<ProcessoJogosDiaArgs>(q);
             width = w;
             height = h;
             viewName = args.viewName;
@@ -172,7 +172,7 @@ namespace Futebox.Pages
 
         public class JogosDiaHandlerModel
         {
-            public ProcessoJogosArgs args;
+            public ProcessoJogosDiaArgs args;
             public int width;
             public int height;
             public List<PartidaVM> partidas;
@@ -180,7 +180,7 @@ namespace Futebox.Pages
             private int partidaAtualId = 0;
             private PartidaVM partidaAtual = null;
 
-            public JogosDiaHandlerModel(ProcessoJogosArgs args, int width, int height, List<PartidaVM> partidas)
+            public JogosDiaHandlerModel(ProcessoJogosDiaArgs args, int width, int height, List<PartidaVM> partidas)
             {
                 this.args = args;
                 this.width = width;

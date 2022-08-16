@@ -44,23 +44,20 @@
 
             for (var c of config) {
                 var $config = $(c);
-                var $social = $config.find('[data-social]');
                 var aspect = $config.find('[name=ddlDimensao]').val();
                 var titulo = $config.find('[name=title]').val();
 
                 data.push({
                     partidas: view.partidas,
-                    social: ~~($social.attr('data-social')),
+                    social: ~~(social),
                     colunas: ~~aspect.split('x')[0],
                     linhas: ~~aspect.split('x')[1],
                     titulo: titulo,
-                    checked: $social.prop('checked'),
+                    checked: true,
                 });
             }
             return data;
         };
-
-        $(document).ready(() => RestoreCookie());
 
         $(document).on('change', '#chk-all', function (evt) {
             $('[data-id]').each((i, e) => $(e).prop('checked', $('#chk-all').prop('checked')));
@@ -72,9 +69,8 @@
 
         $(document).on('click', '#btnProcesso', function () { GerarProcesso(); });
 
-        function GerarProcesso() {
-            var data = view.data().filter(_ => _.checked);
-            console.log(data);
+        function GerarProcesso(social) {
+            var data = view.data(social);
             view.post(`/api/processo/jogosdia`, data, (response) => { console.log(response); $.SendToast('ok', 'Processo criado!'); });
         }
 
@@ -87,19 +83,6 @@
         $('#rodada').click(() => {
             $('#rodada').toggleClass('focus');
         });
-
-        function SaveCookie() {
-            localStorage.setItem('rodada', JSON.stringify({ args: [view.campeonato.val(), view.rodada.val()] }))
-        }
-
-        function RestoreCookie() {
-            var v = JSON.parse(localStorage.getItem('rodada') || '{ "args":[] }');
-            if (v.args && v.args.length == 2) {
-                view.campeonato.val(v.args[0]);
-                view.rodada.val(v.args[1]);
-            }
-        }
-
 
     </script>
     @foreach (var camp in Models.CampeonatoUtils.ObterCampeonatosAtivos())

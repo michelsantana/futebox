@@ -146,5 +146,61 @@ namespace Futebox.Providers
             return roteiro;
         }
 
+        public string ObterRoteiroDoJogosDoDia(IEnumerable<PartidaVM> partidas, ProcessoJogosDiaArgs args)
+        {
+            var roteiro = ObterSaudacao();
+            roteiro += $"Veja agora a programação dos jogos de {RoteiroDefaults.ObterHojeAmanhaOntem(DateTime.Now)}: ";
+
+            var grupos = partidas.Select(_ => _.campeonato).Distinct().ToList();
+
+            if (grupos.Count > 1)
+            {
+
+                grupos.ForEach(g =>
+                {
+                    roteiro += $"Do {g}:";
+                    partidas
+                        .ToList()
+                        .FindAll(_ => _.campeonato == g)
+                        .ForEach(_ =>
+                        {
+                            roteiro += $"{_.timeMandante.ObterNomeWatson()} e {_.timeVisitante.ObterNomeWatson()}: ";
+
+                            if (IdentificaClassico(_.timeMandante, _.timeVisitante)) roteiro += $"Um clássico do futebol brasileiro: ";
+
+                            roteiro += $"às {RoteiroDefaults.TraduzirHoras(_.dataPartida)}: ";
+                            roteiro += $"no estádio {_.estadio}: ";
+                        });
+                    roteiro += $"Pra qual time você torce?: deixa aqui nos comentários junto com aquela dedada no laique. Até a próxima. ";
+                });
+
+
+            }
+            else
+            {
+                partidas
+               .Where(_ => args.partidas.Contains(_.idExterno))
+               .OrderBy(_ => _.dataPartida)
+               .GroupBy(_ => _.dataPartida.ToString("yyyyMMdd"))
+               .ToList().ForEach(gp =>
+               {
+                   var dia = gp.FirstOrDefault().dataPartida;
+                   roteiro += $"{dia.ToString("D")}: ";
+                   gp.ToList().ForEach(_ =>
+                   {
+                       roteiro += $"{_.timeMandante.ObterNomeWatson()} e {_.timeVisitante.ObterNomeWatson()}: ";
+
+                       if (IdentificaClassico(_.timeMandante, _.timeVisitante)) roteiro += $"Um clássico do futebol brasileiro: ";
+
+                       roteiro += $"às {RoteiroDefaults.TraduzirHoras(_.dataPartida)}: ";
+                       roteiro += $"no estádio {_.estadio}: ";
+                   });
+               });
+                roteiro += $"Pra qual time você torce?: deixa aqui nos comentários junto com aquela dedada no laique. Até a próxima. ";
+                return roteiro;
+            }
+
+            return roteiro;
+        }
     }
 }

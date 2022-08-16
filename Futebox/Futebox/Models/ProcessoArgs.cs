@@ -47,7 +47,7 @@ namespace Futebox.Models
         public string titulo { get; set; }
     }
 
-    public class ProcessoJogosArgs : IProcessoArgs
+    public class ProcessoJogosDiaArgs : IProcessoArgs
     {
         public int[] partidas { get; set; }
         public RedeSocialFinalidade social { get; set; }

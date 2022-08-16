@@ -72,6 +72,26 @@ namespace Futebox.Models
             this.tituloVideo = !string.IsNullOrEmpty(rodadaArgs.titulo) ? tituloVideo : null;
         }
 
+        public Processo(ProcessoJogosDiaArgs jogosDia)
+        {
+            var json = JsonConvert.SerializeObject(jogosDia);
+            this.agendado = false;
+            this.agendamento = DateTime.Now.AddMinutes(1);
+            this.alturaVideo = SocialMediaUtils.Height(jogosDia.social);
+            this.args = json;
+            this.categoria = CategoriaVideo.jogosdia;
+            this.larguraVideo = SocialMediaUtils.Width(jogosDia.social);
+            this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}/Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(jogosDia.social)}&h={SocialMediaUtils.Height(jogosDia.social)}";
+            this.nome = !string.IsNullOrEmpty(jogosDia.titulo) ? jogosDia.titulo : $"{categoria}";
+            this.nomeDoArquivoAudio = $"{DateTime.Now.ToString("MMddHHmmss")}-{jogosDia.social}.mp3";
+            this.nomeDoArquivoImagem = $"{jogosDia.social}.png";
+            this.nomeDoArquivoVideo = $"{jogosDia.social}.mp4";
+            this.pasta = $"{Settings.ApplicationRoot}/arquivos/{Guid.NewGuid()}";
+            this.social = jogosDia.social;
+            this.status = StatusProcesso.Criado;
+            this.tituloVideo = !string.IsNullOrEmpty(jogosDia.titulo) ? tituloVideo : null;
+        }
+
         public Processo(ProcessoClassificacaoArgs classificacaoArgs)
         {
             var json = JsonConvert.SerializeObject(classificacaoArgs);
@@ -111,5 +131,6 @@ namespace Futebox.Models
             this.status = StatusProcesso.Criado;
             this.tituloVideo = !string.IsNullOrEmpty(partidaArgs.titulo) ? tituloVideo : null;
         }
+
     }
 }

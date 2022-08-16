@@ -23,38 +23,15 @@
         <b>@processo.id</b><br />
         @processo.nome<br />
         <span class="badge bg-dark text-white">@processo.categoria</span>
-        @if (processo.social == Models.Enums.RedeSocialFinalidade.InstagramVideo)
-        {
-            <span class="badge bg-pink text-white">@processo.social</span>
-        }
-        @if (processo.social == Models.Enums.RedeSocialFinalidade.YoutubeShorts)
-        {
-            <span class="badge bg-red text-white">@processo.social</span>
-        }
-        @if (processo.social == Models.Enums.RedeSocialFinalidade.YoutubeVideo)
-        {
-            <span class="badge bg-red text-white">@processo.social</span>
-        }
-        @if (statusErroProcesso.Contains(processo.status))
-        {
-            <span class="badge bg-warning text-white">@processo.status</span>
-        }
-        else
-        {
-            <span class="badge bg-success text-white">@processo.status</span>
-        }
+        @Html.SocialBadge(processo.social)
+
+        @Html.StatusBadge(processo.status)
+
         <br />
         <br />
         <b>Job:&nbsp;</b><span class="badge bg-black text-white">@agenda?.processoId</span>
 
-        @if (agenda?.status != null && statusErroAgenda.Contains(agenda.status))
-        {
-            <span class="badge bg-warning text-white">@agenda?.status</span>
-        }
-        else
-        {
-            <span class="badge bg-success text-white">@agenda?.status</span>
-        }
+        @Html.StatusBadge(agenda?.status)
     </td>
     <td width="40%" valign="middle" class="pb-0">
         <div class="row">

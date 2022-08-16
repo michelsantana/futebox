@@ -14,7 +14,8 @@ namespace Futebox.Services.Interfaces
         IEnumerable<PartidaVM> ObterPartidasHoje(bool usarCache = true);
         IEnumerable<PartidaVM> ObterPartidasDoCampeonato(EnumCampeonato campeonato, bool usarCache = true);
         IEnumerable<PartidaVM> ObterPartidasAntigas(string cacheFile);
-        Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida, ProcessoPartidaArgs processoPartidaArgs);
+        Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida, ProcessoPartidaArgs args);
+        Tuple<string, string> ObterAtributosDoVideoJogosDia(ProcessoJogosDiaArgs args);
         PartidaVM ConverterEmPartidaVM(FootstatsPartida footstatsPartida);
     }
 }

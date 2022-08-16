@@ -83,6 +83,19 @@ namespace Futebox.Services
             return result;
         }
 
+        public async Task<List<Processo>> SalvarProcessoJogosDia(ProcessoJogosDiaArgs[] args)
+        {
+            var result = new List<Processo>();
+            foreach (var arg in args)
+            {
+                var processo = new Processo(arg);
+                _processoRepositorio.Insert(ref processo);
+                _agendamentoService.Criar(processo.id);
+                result.Add(processo);
+            }
+            return result;
+        }
+
         public async Task<Processo> AgendarProcesso(string id, DateTime hora)
         {
             Processo p = null;
@@ -243,7 +256,7 @@ namespace Futebox.Services
                 case CategoriaVideo.rodada:
                     return AtualizarRoteiroRodada(processo);
                 case CategoriaVideo.jogosdia:
-                    return AtualizarRoteiroRodada(processo);
+                    return AtualizarRoteiroJogosDia(processo);
             }
             return processo;
         }
@@ -265,7 +278,7 @@ namespace Futebox.Services
                     atributos = _rodadaService.ObterAtributosDoVideo(processo.ToArgs<ProcessoRodadaArgs>());
                     break;
                 case CategoriaVideo.jogosdia:
-                    atributos = _rodadaService.ObterAtributosDoVideo(processo.ToArgs<ProcessoRodadaArgs>());
+                    atributos = _partidasService.ObterAtributosDoVideoJogosDia(processo.ToArgs<ProcessoJogosDiaArgs>());
                     break;
             }
 
@@ -305,6 +318,15 @@ namespace Futebox.Services
             var args = JsonConvert.DeserializeObject<ProcessoRodadaArgs>(processo.args);
             var partidas = _rodadaService.ObterPartidasDaRodada(args.campeonato, args.rodada, true);
             processo.roteiro = _roteiro.ObterRoteiroDaRodada(partidas, args);
+            _processoRepositorio.Update(processo);
+            return processo;
+        }
+
+        private Processo AtualizarRoteiroJogosDia(Processo processo)
+        {
+            var args = JsonConvert.DeserializeObject<ProcessoJogosDiaArgs>(processo.args);
+            var partidas = _partidasService.ObterPartidasHoje(true);
+            processo.roteiro = _roteiro.ObterRoteiroDoJogosDoDia(partidas, args);
             _processoRepositorio.Update(processo);
             return processo;
         }

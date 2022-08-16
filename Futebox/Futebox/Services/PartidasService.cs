@@ -102,15 +102,50 @@ namespace Futebox.Services
             return _cache.ObterConteudoExpirado<List<FootstatsPartida>>(cacheFile).Select(_ => ConverterEmPartidaVM(_));
         }
 
-        public Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida, ProcessoPartidaArgs processoPartidaArgs)
+        public Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida, ProcessoPartidaArgs args)
         {
             var titulo = $"{partida.timeMandante.nome} x {partida.timeVisitante.nome} " +
                 $"- {partida.dataPartida.ToString("dd/MM/yyyy")}" +
                 $"- {partida.campeonato}! " +
                 $"Quem venceu!? #shorts";
-            titulo = string.IsNullOrEmpty(processoPartidaArgs.titulo) ? titulo : processoPartidaArgs.titulo;
+            titulo = string.IsNullOrEmpty(args.titulo) ? titulo : args.titulo;
 
             var descricao = $"Fala meus parças resultado da partida. Espero que gostem!";
+
+            return Tuple.Create(titulo, descricao);
+        }
+
+        public Tuple<string, string> ObterAtributosDoVideoJogosDia(ProcessoJogosDiaArgs args)
+        {
+            var titulo = $"Jogos do dia {DateTime.Now.ToString("dd/MM/yy")}";
+            titulo = string.IsNullOrEmpty(args.titulo) ? titulo : args.titulo;
+
+            var descricao = $"Fala meus parças! Vejam os jogos que teremos hoje!";
+
+            var palavraschave = new string[] {
+                $"BRASILEIRÃO",
+                $"TABELA BRASILEIRÃO",
+                $"TABELA CLASSIFICAÇÃO",
+                $"CLASSIFICAÇÃO BRASILEIRÃO",
+                $"CAMPEONATO BRASILEIRÃO",
+                $"FUTEBOL",
+            };
+            var ano = DateTime.Now.ToString("yyyy");
+
+            palavraschave.ToList().ForEach(_ =>
+            {
+                var comAcento = _;
+                var semAcento = comAcento?.RemoverAcentos2();
+
+                descricao += comAcento;
+                descricao += "\n";
+                descricao += $"{comAcento} {ano}";
+                descricao += "\n";
+                descricao += semAcento;
+                descricao += "\n";
+                descricao += $"{semAcento} {ano}";
+                descricao += "\n";
+            });
 
             return Tuple.Create(titulo, descricao);
         }

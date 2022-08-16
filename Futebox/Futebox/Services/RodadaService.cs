@@ -1,10 +1,8 @@
 ﻿using Futebox.Models;
-using Futebox.Models.Enums;
 using Futebox.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Futebox.Services
 {
@@ -31,42 +29,7 @@ namespace Futebox.Services
                 _cache.DefinirConteudo(cacheName, resultado, 3);
             }
             return resultado.Select(_ => _partidasService.ConverterEmPartidaVM(_)).ToList();
-        }
-
-        public string ObterRoteiroDaRodada(IEnumerable<PartidaVM> partidas, ProcessoRodadaArgs processoRodadaArgs)
-        {
-            var roteiro = RoteiroDefaults.ObterSaudacao();
-            roteiro += $"Veja agora a programação dos jogos da {processoRodadaArgs.rodada}ª rodada do {CampeonatoUtils.ObterNomeDoCampeonato(processoRodadaArgs.campeonato)}: ";
-
-            partidas
-                .Where(_ => processoRodadaArgs.partidas.Contains(_.idExterno))
-                .OrderBy(_ => _.dataPartida)
-                .GroupBy(_ => _.dataPartida.ToString("yyyyMMdd"))
-                .ToList().ForEach(gp =>
-                {
-                    var dia = gp.FirstOrDefault().dataPartida;
-                    roteiro += $"{dia.ToString("D")}: ";
-                    gp.ToList().ForEach(_ =>
-                    {
-                        roteiro += $"{_.timeMandante.ObterNomeWatson()} e {_.timeVisitante.ObterNomeWatson()}: ";
-
-                        if (IdentificaClassico(_.timeMandante, _.timeVisitante)) roteiro += $"Um clássico do futebol brasileiro: ";
-
-                        roteiro += $"às {RoteiroDefaults.TraduzirHoras(_.dataPartida)}: ";
-                        roteiro += $"no estádio {_.estadio}: ";
-                    });
-                });
-            roteiro += $"Pra qual time você torce?: deixa aqui nos comentários junto com aquela deedáda no laique. Até a próxima. ";
-            return roteiro;
-        }
-
-        private bool IdentificaClassico(Time timeMandante, Time timeVisitante)
-        {
-            return ListaDeClassicos.ObterLista()
-                .FindAll(_ =>
-                _.atalho.Any(a => a == timeMandante.sigla) && _.atalho.Any(a => a == timeVisitante.sigla))
-                .Count > 0;
-        }
+        }        
 
         public Tuple<string, string> ObterAtributosDoVideo(ProcessoRodadaArgs processoRodadaArgs)
         {
@@ -89,7 +52,7 @@ namespace Futebox.Services
             palavraschave.ToList().ForEach(_ =>
             {
                 var comAcento = _;
-                var semAcento = RoteiroDefaults.RemoverAcentos(comAcento);
+                var semAcento = comAcento?.RemoverAcentos2();
 
                 descricao += comAcento;
                 descricao += "\n";

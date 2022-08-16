@@ -1,12 +1,11 @@
 ﻿using Futebox.Interfaces.DB;
 using Futebox.Models;
+using Futebox.Models.Enums;
 using Futebox.Services.Interfaces;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Futebox.Models.Enums;
-using Newtonsoft.Json;
 
 namespace Futebox.Services
 {
@@ -101,27 +100,6 @@ namespace Futebox.Services
         public IEnumerable<PartidaVM> ObterPartidasAntigas(string cacheFile)
         {
             return _cache.ObterConteudoExpirado<List<FootstatsPartida>>(cacheFile).Select(_ => ConverterEmPartidaVM(_));
-        }
-
-        public string ObterRoteiroDaPartida(int idPartida)
-        {
-            var partida = ObterPartida(idPartida);
-            return ObterRoteiroDaPartida(partida);
-        }
-
-        public string ObterRoteiroDaPartida(PartidaVM partida)
-        {
-            var empate = int.Parse(partida.golsMandante) == int.Parse(partida.golsVisitante);
-
-            var vencedor = int.Parse(partida.golsMandante) > int.Parse(partida.golsVisitante) ? partida.timeMandante : partida.timeVisitante;
-            var perdedor = int.Parse(partida.golsMandante) < int.Parse(partida.golsVisitante) ? partida.timeMandante : partida.timeVisitante;
-
-            string mensagem =
-                empate ? RoteiroDefaults.ObterTrechoEmpate(partida)
-                    : RoteiroDefaults.ObterTrechoVencedor(partida, vencedor, perdedor);
-
-            return //$"{RoteiroDefaults.ObterSaudacao()}\n" +
-                $"{mensagem}";
         }
 
         public Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida, ProcessoPartidaArgs processoPartidaArgs)

@@ -8,6 +8,9 @@
     case Models.Enums.CategoriaVideo.rodada:
         @Html.Partial("Miniaturas/_rodadaMiniatura", Model.rodada)
         break;
+    case Models.Enums.CategoriaVideo.jogosdia:
+        @Html.Partial("Miniaturas/_jogosDiaMiniatura", Model.jogosDia)
+        break;
     case Models.Enums.CategoriaVideo.classificacao:
         @Html.Partial($"Miniaturas/{Model.classificacao.args.viewName}", Model.classificacao)
         break;

@@ -15,6 +15,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Quartz;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Management;
 
 namespace Futebox
 {
@@ -23,13 +27,15 @@ namespace Futebox
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            
+
             Settings.ApplicationRoot = Configuration.GetValue<string>("ApplicationsRoot");
             Settings.ApplicationHttpBaseUrl = Configuration.GetValue<string>("ApplicationHttpBaseUrl");
             Settings.TelegramBotToken = DotEnv.Get("TELEGRAM_BOT_TOKEN");
             Settings.TelegramNotifyUserId = DotEnv.Get("TELEGRAM_NOTIFY_USERID");
             Settings.DEBUGMODE = DotEnv.Get("DEFAULT_DEBUGMODE") == "true";
             Settings.ChromeDefaultDownloadFolder = DotEnv.Get("CHROME_DOWNLOAD_FOLDER");
+            Settings.IS_IBM = false;
+            Settings.IS_GOOGLE = true;
         }
 
         public IConfiguration Configuration { get; }
@@ -75,9 +81,26 @@ namespace Futebox
             {
                 _.UseMicrosoftDependencyInjectionScopedJobFactory();
             });
-
+            services.AddNodeServices();
             ConfigureMigrations(services);
             ConfigureFluentMapper();
+
+            ManagementClass mngmtClass = new ManagementClass("Win32_Process");
+            foreach (ManagementObject o in mngmtClass.GetInstances())
+            {
+                if (o["Name"].Equals("chrome.exe") && o["CommandLine"].ToString().Contains("SxS"))
+                {
+                    try
+                    {
+                        Console.WriteLine(o["Name"] + " [" + o["CommandLine"] + "]");
+                        var reason = o.InvokeMethod("Terminate", null);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
         }
 
         private void ConfigureMigrations(IServiceCollection services)

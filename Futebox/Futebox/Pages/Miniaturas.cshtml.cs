@@ -25,6 +25,7 @@ namespace Futebox.Pages
         public RodadaHandlerModel rodada;
         public ClassificacaoHandlerModel classificacao;
         public PartidaHandlerModel partida;
+        public JogosDiaHandlerModel jogosDia;
 
         public MiniaturasModel(IRodadaService rodadaService, IClassificacaoService classificacaoService, IPartidasService partidaService)
         {
@@ -47,6 +48,9 @@ namespace Futebox.Pages
                 case CategoriaVideo.rodada:
                     RodadaHandler(q, w, h);
                     break;
+                case CategoriaVideo.jogosdia:
+                    RodadaHandler(q, w, h);
+                    break;
                 default:
                     break;
             }
@@ -64,6 +68,20 @@ namespace Futebox.Pages
                 .OrderBy(_ => _.dataPartida).ToList();
 
             rodada = new RodadaHandlerModel(args, width, height, partidas);
+        }
+
+        public void JogosDiaHandler(string q, int w, int h)
+        {
+            var args = JsonConvert.DeserializeObject<ProcessoJogosArgs>(q);
+            width = w;
+            height = h;
+            viewName = args.viewName;
+            var partidas = _partidaService.ObterPartidasPeriodo(true)
+                .ToList()
+                .FindAll(_ => args.partidas.Contains(_.idExterno))
+                .OrderBy(_ => _.dataPartida).ToList();
+
+            jogosDia = new JogosDiaHandlerModel(args, width, height, partidas);
         }
 
         public void PartidaHandler(string q, int w, int h)
@@ -118,6 +136,51 @@ namespace Futebox.Pages
             private PartidaVM partidaAtual = null;
 
             public RodadaHandlerModel(ProcessoRodadaArgs args, int width, int height, List<PartidaVM> partidas)
+            {
+                this.args = args;
+                this.width = width;
+                this.height = height;
+                this.partidas = partidas;
+            }
+
+            public PartidaVM Current()
+            {
+                return partidaAtual;
+            }
+
+            public void Next(bool infiniteNavigation = false)
+            {
+                if (partidaAtualId == 0) partidaAtual = partidas.First();
+                else partidaAtual = partidas.SkipWhile(x => x.idExterno != partidaAtualId)
+                   .Skip(1)
+                   .DefaultIfEmpty(infiniteNavigation ? partidas[0] : null)
+                   .FirstOrDefault();
+
+                if (partidaAtual != null) partidaAtualId = partidaAtual.idExterno;
+            }
+
+            public void Prev(bool infiniteNavigation = false)
+            {
+                if (partidaAtualId == 0) partidaAtual = partidas.Last();
+                else partidaAtual = partidas.TakeWhile(x => x.idExterno != partidaAtualId)
+                    .DefaultIfEmpty(infiniteNavigation ? partidas[partidas.Count - 1] : null)
+                    .LastOrDefault();
+
+                if (partidaAtual != null) partidaAtualId = partidaAtual.idExterno;
+            }
+        }
+
+        public class JogosDiaHandlerModel
+        {
+            public ProcessoJogosArgs args;
+            public int width;
+            public int height;
+            public List<PartidaVM> partidas;
+
+            private int partidaAtualId = 0;
+            private PartidaVM partidaAtual = null;
+
+            public JogosDiaHandlerModel(ProcessoJogosArgs args, int width, int height, List<PartidaVM> partidas)
             {
                 this.args = args;
                 this.width = width;

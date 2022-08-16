@@ -1,12 +1,4 @@
-﻿using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Futebox
+﻿namespace Futebox
 {
     public static class Settings
     {
@@ -17,6 +9,8 @@ namespace Futebox
         public static string ChromeDefaultDownloadFolder;
         public static bool DEBUGMODE;
 
-        public static bool ScheduleInitialized { get; internal set; }
+        public static bool ScheduleInitialized { get; set; }
+        public static bool IS_IBM { get; set; }
+        public static bool IS_GOOGLE { get; set; }
     }
 }

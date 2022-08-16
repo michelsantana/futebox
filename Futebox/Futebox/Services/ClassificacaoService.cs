@@ -1,11 +1,10 @@
 ﻿using Futebox.Interfaces.DB;
 using Futebox.Models;
+using Futebox.Models.Enums;
 using Futebox.Services.Interfaces;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Futebox.Models.Enums;
 
 namespace Futebox.Services
 {
@@ -65,69 +64,6 @@ namespace Futebox.Services
                 .Select(_ => ConverterEmClassificacaoVM(_));
         }
 
-        public string ObterRoteiroDaClassificacao(IEnumerable<ClassificacaoVM> classificacao, ProcessoClassificacaoArgs processoClassificacaoArgs)
-        {
-
-            var msg = $"{RoteiroDefaults.ObterSaudacao()} "
-                + $"Veja a classificação do \"{CampeonatoUtils.ObterNomeDoCampeonato(processoClassificacaoArgs.campeonato)}\": "
-                + $"Classificação atualizada {RoteiroDefaults.ObterHojeAmanhaOntem(processoClassificacaoArgs.dataExecucao.Value)}, {RoteiroDefaults.TraduzirDiaDoMes(processoClassificacaoArgs.dataExecucao.Value)}: "
-                + $"Bora: ";
-
-            var rnd = new Random();
-            var indicePedirLike = rnd.Next(7, classificacao.Count() - 2);
-
-            var range = processoClassificacaoArgs.range ?? new int[] { 0, 99 };
-
-            if (processoClassificacaoArgs.temFases) classificacao = classificacao.Where(_ => _.fase == processoClassificacaoArgs.fase);
-
-            if (processoClassificacaoArgs.classificacaoPorGrupos)
-            {
-                var grupos = classificacao.Select(_ => _.grupo).Distinct().ToList();
-
-                grupos
-                    .FindAll(_ => processoClassificacaoArgs.grupos.Contains(_))
-                    .ToList()
-                    .ForEach(g =>
-                        {
-                            msg += $"No Grupo {g}: ";
-                            msg += "Ô ";
-                            var classGrupo = classificacao.ToList().FindAll(_ => _.grupo == g);
-
-                            classGrupo
-                            .FindAll(_ => _.posicao >= (range[0]) && _.posicao <= (range[1]))
-                            .OrderBy(_ => _.posicao)
-                            .ToList()
-                            .ForEach(_ =>
-                            {
-                                msg += $"{_.posicao}º colocado é, {_.time.ObterNomeWatson()}, "
-                                + $"com {_.pontos} pontos, em { _.partidasJogadas} jogos: ";
-                            });
-                        });
-                msg += "Muitíssimo obrigada a todos que assistiram até aqui: Até o próximo vídeo: ";
-            }
-            else
-            {
-                msg += "Ô ";
-                classificacao
-                    .Where(_ => _.posicao >= (range[0]) && _.posicao <= (range[1]))
-                    .ToList()
-                    .ForEach(_ =>
-                        {
-
-                            msg += $"{_.posicao}º colocado é, {_.time.ObterNomeWatson()}, "
-                            + $"com {_.pontos} pontos, em { _.partidasJogadas} jogos: ";
-
-                            if (~~_.posicao == indicePedirLike)
-                            {
-                                msg += "Meus parças: Já deixa aquela deedáda no laique e se inscrévi no canal: Continuando: Ô ";
-                            }
-                        });
-                msg += "Muitíssimo obrigada a todos que assistiram até aqui: Até o próximo vídeo: ";
-            }
-
-            return msg;
-        }
-
         public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<ClassificacaoVM> classificacao, ProcessoClassificacaoArgs processoClassificacaoArgs)
         {
             var camp = CampeonatoUtils.ObterNomeDoCampeonato(processoClassificacaoArgs.campeonato);
@@ -150,7 +86,7 @@ namespace Futebox.Services
             palavraschave.ToList().ForEach(_ =>
             {
                 var comAcento = _;
-                var semAcento = RoteiroDefaults.RemoverAcentos(comAcento);
+                var semAcento = comAcento?.RemoverAcentos2();
 
                 descricao += comAcento;
                 descricao += "\n";

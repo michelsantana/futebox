@@ -45,9 +45,19 @@ namespace Futebox.Models
         public int linhas { get; set; }
         public int colunas { get; set; }
         public string titulo { get; set; }
-
     }
 
+    public class ProcessoJogosArgs : IProcessoArgs
+    {
+        public int[] partidas { get; set; }
+        public RedeSocialFinalidade social { get; set; }
+
+        public string viewName { get; set; }
+        public int linhas { get; set; }
+        public int colunas { get; set; }
+        public string titulo { get; set; }
+    }
+    
     public class ProcessoPartidaArgs : IProcessoArgs
     {
         public int partida { get; set; }

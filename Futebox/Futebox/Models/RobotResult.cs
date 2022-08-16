@@ -1,10 +1,5 @@
-﻿using Futebox.Models.Enums;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace Futebox.Models
 {
@@ -23,7 +18,7 @@ namespace Futebox.Models
         }
         public void Add(string mensagem)
         {
-            if(metodo == null) stack.Add($"{index++}. {mensagem}");
+            if (metodo == null) stack.Add($"{index++}. {mensagem}");
             else stack.Add($"{index++}. {metodo} - {mensagem}");
         }
 
@@ -59,5 +54,14 @@ namespace Futebox.Models
         {
             return this.status == HttpStatusCode.Unauthorized;
         }
+    }
+
+    public class NodeServiceResult
+    {
+        public bool status { get; set; }
+        public string[] inputParams { get; set; }
+        public string[] output { get; set; }
+        public string[] steps { get; set; }
+        public object error { get; set; }
     }
 }

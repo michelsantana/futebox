@@ -1,0 +1,121 @@
+﻿@page
+@model Futebox.Pages.JogosDiaModel
+@{
+    ViewData["Title"] = "Rodadas";
+}
+
+<div class="row g-5">
+    <div class="text-center">
+        <h1 class="display-4">Jogos do dia</h1>
+    </div>
+</div>
+<div id="jogos">
+    @Html.Partial("JogosDia/_jogosDiaListagem", Model.partidas)
+</div>
+
+
+@section Scripts {
+    <script>
+
+        var view = {
+            partidas: [],
+            social: [],
+            colunas: 0,
+            linhas: 0,
+
+            data: () => { },
+            post: (url, data, success) => $.ajax({
+                type: 'POST',
+                url: url,
+                data: JSON.stringify(data),
+                success: success,
+                contentType: "application/json; charset=utf-8"
+            })
+        };
+
+        view.__defineGetter__('partidas', () => Array.from($('[data-id]:checked')).map(_ => ~~(_.attributes["data-id"].value)));
+
+        view.data = (social) => {
+            var config = $('[data-config]');
+
+            if (social) config = $(`[data-config="${social}"]`);
+
+            var data = [];
+
+            for (var c of config) {
+                var $config = $(c);
+                var $social = $config.find('[data-social]');
+                var aspect = $config.find('[name=ddlDimensao]').val();
+                var titulo = $config.find('[name=title]').val();
+
+                data.push({
+                    partidas: view.partidas,
+                    social: ~~($social.attr('data-social')),
+                    colunas: ~~aspect.split('x')[0],
+                    linhas: ~~aspect.split('x')[1],
+                    titulo: titulo,
+                    checked: $social.prop('checked'),
+                });
+            }
+            return data;
+        };
+
+        $(document).ready(() => RestoreCookie());
+
+        $(document).on('change', '#chk-all', function (evt) {
+            $('[data-id]').each((i, e) => $(e).prop('checked', $('#chk-all').prop('checked')));
+        });
+
+        $(document).on('change', '[data-social]', function (evt) {
+
+        });
+
+        $(document).on('click', '#btnProcesso', function () { GerarProcesso(); });
+
+        function GerarProcesso() {
+            var data = view.data().filter(_ => _.checked);
+            console.log(data);
+            view.post(`/api/processo/jogosdia`, data, (response) => { console.log(response); $.SendToast('ok', 'Processo criado!'); });
+        }
+
+        function VisualizarMiniatura(s, w, h) {
+            var data = view.data(s);
+            console.log(data);
+            window.open(`/Miniaturas?t=jogosdia&q=${JSON.stringify(data[0])}&w=${w}&h=${h}`, '_blank');
+        }
+
+        $('#rodada').click(() => {
+            $('#rodada').toggleClass('focus');
+        });
+
+        function SaveCookie() {
+            localStorage.setItem('rodada', JSON.stringify({ args: [view.campeonato.val(), view.rodada.val()] }))
+        }
+
+        function RestoreCookie() {
+            var v = JSON.parse(localStorage.getItem('rodada') || '{ "args":[] }');
+            if (v.args && v.args.length == 2) {
+                view.campeonato.val(v.args[0]);
+                view.rodada.val(v.args[1]);
+            }
+        }
+
+
+    </script>
+    @foreach (var camp in Models.CampeonatoUtils.ObterCampeonatosAtivos())
+    {
+        <script>
+            $(() => {
+                var camp = '@((int)camp)';
+                $.get(`/api/rodada/ultimarodada/${camp}`, (response) => {
+                    for (var r of response) {
+                        var s = r.split(',');
+                        var li = $(`<option value="${s[1]}">${s[0]} - ${s[1]}ª Rodada</option>`);
+                        $(`#rodada-${camp}`).append(li);
+                    }
+                    //$(`#rodada-${camp}`).val();
+                });
+            });
+        </script>
+    }
+}

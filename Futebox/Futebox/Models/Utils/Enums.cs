@@ -29,6 +29,7 @@
         partida,
         classificacao,
         rodada,
+        jogosdia,
     }
 
     public enum TipoLink

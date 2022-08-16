@@ -5,6 +5,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Controllers\PartidasController.cs" />
 	  <Compile Remove="Models\Entity\Subprocesso.cs" />
 	  <Compile Remove="Services\FutebotService.Audio.cs" />
 	  <Compile Remove="Services\Jobs\QueueJob.cs" />
@@ -39,6 +40,7 @@
 		<PackageReference Include="Quartz" Version="3.3.3" />
 		<PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.3.3" />
 		<PackageReference Include="RabbitMQ.Client" Version="6.2.2" />
+		<PackageReference Include="System.Management" Version="6.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

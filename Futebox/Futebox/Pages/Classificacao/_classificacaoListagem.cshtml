@@ -1,7 +1,7 @@
 ﻿@model ClassificacaoModel.PartialModel
 @{
     Dictionary<string, string> classes = new Dictionary<string, string>()
-    {
+{
         {"azul", "badge bg-info"},
         {"laranja", "badge bg-warning"},
         {"verde", "badge bg-success"},
@@ -16,7 +16,7 @@
     //var socialYTS = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeShorts;
     var grouped = Model.classificacao.GroupBy(_ => _.grupo);
     var deparaGruposXColunas = new Dictionary<int, int>
-    {
+{
         // Quantidade Grupos x Tamanho Coluna
         { 1, 12 },
         { 2, 6 },
@@ -37,43 +37,57 @@
 <div class="row">
     @foreach (var grupo in grouped)
     {
-        <div class="col-@(deparaGruposXColunas[grouped.Count()])">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <td>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" data-grupo="@(grupo.Key)">
-                            </div>
-                        </td>
-                        <td colspan="4">Grupo @grupo.Key</td>
-                    </tr>
-                    <tr>
-                        <td class="">#</td>
-                        <td class="">Clube</td>
-                        <td class="">PTS</td>
-                        <td class="">PJ</td>
-                        <td class="">VIT</td>
-                    </tr>
-                </thead>
-                @foreach (var time in grupo)
-                {
-                    <tr class="corpo">
-                        <td class="">
-                            @(time.posicao)º
-                        </td>
-                        <td class="">
-                            <div>
-                                <img width="32" src='@(time.time.ObterLogoLocal())' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" />
-                                <div class="">@time.clube</div>
-                            </div>
-                        </td>
-                        <td class="">@time.pontos</td>
-                        <td class="">@time.partidasJogadas</td>
-                        <td class="">@time.vitorias</td>
-                    </tr>
-                }
-            </table>
+        <div class="accordion" id="accord">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading@(grupo.Key)">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse@(grupo.Key)" aria-expanded="true" aria-controls="collapse@(grupo.Key)">
+                        @grupo.Key
+                    </button>
+                </h2>
+                <div id="collapse@(grupo.Key)" class="accordion-collapse collapse show" aria-labelledby="heading@(grupo.Key)" data-bs-parent="#accord">
+                    <div class="accordion-body">
+                        <div class="col-@(deparaGruposXColunas[grouped.Count()])">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" role="switch" data-grupo="@(grupo.Key)">
+                                            </div>
+                                        </td>
+                                        <td colspan="4">Grupo @grupo.Key</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="">#</td>
+                                        <td class="">Clube</td>
+                                        <td class="">Clube</td>
+                                        <td class="">PTS</td>
+                                        <td class="">PJ</td>
+                                        <td class="">VIT</td>
+                                    </tr>
+                                </thead>
+                                @foreach (var time in grupo)
+                                {
+                                    <tr class="corpo">
+                                        <td class="">
+                                            @(time.posicao)º
+                                        </td>
+                                        <td class="">
+                                            <div>
+                                                <img width="32" src='@(time.time.ObterLogoLocal())' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" />
+                                            </div>
+                                        </td>
+                                        <td><div class="">@time.clube</div></td>
+                                        <td class="">@time.pontos</td>
+                                        <td class="">@time.partidasJogadas</td>
+                                        <td class="">@time.vitorias</td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     }
 </div>

@@ -8,8 +8,8 @@
     <button class="btn btn-info" onclick="Jobs()">Jobs</button>
 </div>
 <div class="accordion" id="accord">
-    @foreach (var grupo in Model.processos.OrderByDescending(_ => _.agendamento).Select((_, i) => new { entity = _, index = i })
-    .GroupBy(_ => new { dt = _.entity.criacao.ToString("yyyyMMdd"), format = _.entity.criacao.ToString("dd/MM/yyyy") }))
+    @foreach (var grupo in Model.processos.OrderByDescending(_ => _.Item1.agendamento).Select((_, i) => new { entity = _, index = i })
+  .GroupBy(_ => new { dt = _.entity.Item1.criacao.ToString("yyyyMMdd"), format = _.entity.Item1.criacao.ToString("dd/MM/yyyy") }))
     {
         { show = grupo.Any(_ => _.index == 0); }
         <div class="accordion-item">
@@ -30,7 +30,7 @@
                         <tbody>
                             @foreach (var processo in grupo.ToList().Select(_ => _.entity))
                             {
-                                @Html.Partial("Templates/_processoTableRow", Tuple.Create(Model, processo))
+                                @Html.Partial("Templates/_processoTableRow", Tuple.Create(Model, processo.Item1, processo.Item2))
                             }
                         </tbody>
                     </table>
@@ -60,51 +60,69 @@
 
 @section Scripts{
     <script>
-        function Imagem(processo, sub) {
-            $.get(`/api/processo/robo/imagem/${processo}/${sub}`, s => {
+        function Executar(processo, sub) {
+            $.post(`/api/processo/${processo}/executar`, {}, s => {
                 $.SendToast(s.id, "Executando")
             }).fail(function () {
-
+                $.SendToast(s.id, "FALHOU")
             });
         }
 
-        function Audio(processo, sub) {
-            $.get(`/api/processo/robo/audio/${processo}/${sub}`, s => {
-                $.SendToast(s.id, "Executando")
+        function Agendar(processo) {
+            var row = $(`[data-row-id="${processo}"]`);
+
+            var data = row.find('.data').val();
+            var hora = row.find('.hora').val();
+            var min = row.find('.min').val();
+            var seg = row.find('.seg').val();
+            var dataSplited = data.split('-');
+
+            if (!hora) {
+                $.SendToast(processo, 'Não agendado, falta hora!')
+                return;
+            }
+            $.get(`/api/processo/${processo}/agendar?dia=${dataSplited[2]}&mes=${dataSplited[1]}&ano=${dataSplited[0]}&hr=${hora}&min=${min}&sec=${seg}`).then(_ => {
+                $.SendToast(processo, 'Processo agendado!')
             }).fail(function () {
-
+                $.SendToast(s.id, "FALHOU")
             });
         }
 
-        function Video(processo, sub) {
-            $.get(`/api/processo/robo/video/${processo}/${sub}`, s => {
-                $.SendToast(s.id, "Executando")
+        function AgendarCancelar(processo) {
+            $.get(`/api/processo/${processo}/agendar-cancelar`).then(_ => {
+                $.SendToast(processo, 'Processo cancelado!')
             }).fail(function () {
-
+                $.SendToast(s.id, "FALHOU")
             });
         }
 
-        function Publicar(processo, sub) {
-            $.get(`/api/processo/robo/publicar/${processo}/${sub}`, s => {
-                UpdateRow(processo);
-                $.SendToast(s.id, "Publicando")
+        function Jobs(processoId) {
+            $('#plog').html('');
+            var url = processoId ? `/api/processo/${processoId}/job` : `/api/processo/jobs`;
+            $.get(url, s => {
+                console.log(s);
+                $('#plog').html(`<pre>${JSON.stringify(s)}</pre>`);
+                $('.modal').modal('show');
             }).fail(function () {
-                UpdateRow(processo);
+                $.SendToast(s.id, "FALHOU")
             });
         }
 
-        function Pasta(processo) {
-            $.get(`/api/processo/robo/pasta/${processo}`);
+        function Pasta(pasta) {
+            $.get(`/api/processo/pasta?q=${encodeURIComponent(pasta)}`)
+                .fail(function () {
+                    $.SendToast(s.id, "FALHOU")
+                });
         }
 
         function Log(processo) {
             $('#plog').html('');
-            $.get(`/api/processo/${processo}/obter`, s => {
-                console.log(s.log);
-                $('#plog').html(`<pre>${s.log}</pre>`);
+            $.get(`/api/processo/${processo}/log`, s => {
+                console.log(s);
+                $('#plog').html(`<pre>${s}</pre>`);
                 $('.modal').modal('show');
             }).fail(function () {
-
+                $.SendToast(s.id, "FALHOU")
             });
         }
 
@@ -112,26 +130,47 @@
             if (confirm("Remover?")) {
                 $.post(`/api/processo/${processo}/deletar`, {}, s => {
                     $(`[data-row-id="${processo}"]`).remove();
+                }).fail(function () {
+                    $.SendToast(s.id, "FALHOU")
                 });
             }
         }
 
-        function Agendar(processo) {
-            var row = $(`[data-row-id="${processo}"]`);
-            var data = row.find('.data').val();
-            var hora = row.find('.hora').val();
-            var horaSplited = hora.split(':');
-            var dataSplited = data.split('-');
-            if (!hora) {
-                $.SendToast(processo, 'Não agendado, falta hora!')
-                return;
-            }
-            $.get(`/api/processo/agendar/${processo}?dia=${dataSplited[2]}&mes=${dataSplited[1]}&ano=${dataSplited[0]}&hr=${horaSplited[0]}&min=${horaSplited[1]}`).then(_ => {
-                $.SendToast(processo, 'Processo agendado!')
+        function Imagem(processo) {
+            $.get(`/api/processo/${processo}/imagem`, s => {
+                $.SendToast(s.id, "Executando")
+            }).fail(function () {
+                $.SendToast(s.id, "FALHOU")
             });
         }
 
-        function TodasAegndas() {
+
+        function Audio(processo) {
+            $.get(`/api/processo/${processo}/audio`, s => {
+                $.SendToast(s.id, "Executando")
+            }).fail(function () {
+                $.SendToast(s.id, "FALHOU")
+            });
+        }
+
+        function Video(processo) {
+            $.get(`/api/processo/${processo}/video`, s => {
+                $.SendToast(s.id, "Executando")
+            }).fail(function () {
+                $.SendToast(s.id, "FALHOU")
+            });
+        }
+
+        function Publicar(processo) {
+            $.get(`/api/processo/${processo}/publicar`, s => {
+                // UpdateRow(processo);
+                $.SendToast(s.id, "Publicando")
+            }).fail(function () {
+                // UpdateRow(processo);
+            });
+        }
+
+        function TodasAgendas() {
             fetch(`/processos?handler=TableAgenda`)
                 .then((response) => {
                     return response.text();
@@ -143,16 +182,5 @@
                 });
         }
 
-        function Jobs(processoId) {
-            $('#plog').html('');
-            var url = processoId ? `/api/agenda/processo/${processoId}` : `/api/agenda`;
-            $.get(`/api/processo/jobs`, s => {
-                console.log(s);
-                $('#plog').html(`<pre>${JSON.stringify(s)}</pre>`);
-                $('.modal').modal('show');
-            }).fail(function () {
-
-            });
-        }
     </script>
 }

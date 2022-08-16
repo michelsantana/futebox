@@ -102,3 +102,12 @@ body {
     display: inline;
     white-space: nowrap;
 }
+
+.bg-pink {
+    background: #e825eb;
+}
+
+
+.bg-red {
+    background: #e11818;
+}

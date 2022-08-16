@@ -19,7 +19,7 @@ namespace Futebox.Pages
         IProcessoService _processoService;
         IAgendamentoService _agendamentoService;
 
-        public List<Processo> processos = new List<Processo>();
+        public List<Tuple<Processo, Agenda>> processos = new List<Tuple<Processo, Agenda>>();
 
         public ProcessosModel(IProcessoService processoService, IAgendamentoService agendamentoService)
         {
@@ -29,12 +29,21 @@ namespace Futebox.Pages
 
         public void OnGet()
         {
+            var p = new List<Processo>();
+            var a = new List<Agenda>();
             Promise.All(
-                async () => {
-                    this.processos = (await _processoService.ObterProcessos())?.ToList();
-                    this.processos = this.processos.OrderBy(_ => (_.criacao.Ticks) * -1).ToList();
+                async () =>
+                {
+                    p = (await _processoService.ObterProcessos())?.ToList();
+                    p = p.OrderBy(_ => (_.criacao.Ticks) * -1).ToList();
+                },
+                async () =>
+                {
+                    a = (await _agendamentoService.List())?.ToList();
+                    a = a.OrderBy(_ => (_.criacao.Ticks) * -1).ToList();
                 }
             );
+            processos = p.Select(s => Tuple.Create(s, a.Find(_ => _.processoId == s.id))).ToList();
         }
 
         //public PartialViewResult OnGetTableAgenda(string processoId)

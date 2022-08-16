@@ -8,9 +8,6 @@
         public static string TelegramNotifyUserId;
         public static string ChromeDefaultDownloadFolder;
         public static bool DEBUGMODE;
-
-        public static bool ScheduleInitialized { get; set; }
-        public static bool IS_IBM { get; set; }
-        public static bool IS_GOOGLE { get; set; }
+        public static bool ScheduleInitialized;
     }
 }

@@ -26,5 +26,6 @@ namespace Futebox.Services.Interfaces
         Task<Processo> AtualizarStatus(Processo processo, StatusProcesso status);
 
         Task<bool> Delete(string id);
+        Task<Processo> CancelarAgendamento(string id);
     }
 }

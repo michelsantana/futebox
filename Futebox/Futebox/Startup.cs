@@ -6,10 +6,12 @@ using Futebox.DB;
 using Futebox.DB.Interfaces;
 using Futebox.DB.Migrations;
 using Futebox.Interfaces.DB;
+using Futebox.Providers;
 using Futebox.Services;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.NodeServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,8 +36,7 @@ namespace Futebox
             Settings.TelegramNotifyUserId = DotEnv.Get("TELEGRAM_NOTIFY_USERID");
             Settings.DEBUGMODE = DotEnv.Get("DEFAULT_DEBUGMODE") == "true";
             Settings.ChromeDefaultDownloadFolder = DotEnv.Get("CHROME_DOWNLOAD_FOLDER");
-            Settings.IS_IBM = false;
-            Settings.IS_GOOGLE = true;
+            Settings.ScheduleInitialized = false;
         }
 
         public IConfiguration Configuration { get; }
@@ -56,6 +57,11 @@ namespace Futebox
             services.AddSingleton<IHttpHandler, HttpHandler>();
             services.AddSingleton<ICacheHandler, CacheHandler>();
 
+            services.AddSingleton<IAudioProvider>((_) =>
+                new GoogleAudioProvider(_.GetService<INodeServices>()));
+
+            services.AddSingleton<IRoteiroProvider, GoogleRoteiroProvider>();
+
             services.AddSingleton<IGerenciamentoTimesService, GerenciamentoTimesService>();
             services.AddSingleton<IFootstatsService, FootstatsService>();
             services.AddSingleton<IClassificacaoService, ClassificacaoService>();
@@ -65,7 +71,6 @@ namespace Futebox
             services.AddSingleton<IRodadaService, RodadaService>();
             services.AddSingleton<IAgendamentoService, AgendamentoService>();
             services.AddSingleton<INotifyService, NotifyService>();
-            //services.AddSingleton<ISubProcessoRepositorio, SubProcessoRepositorio>();
             services.AddSingleton<IProcessoRepositorio, ProcessoRepositorio>();
             services.AddSingleton<ITimeRepositorio, TimeRepositorio>();
 
@@ -77,14 +82,16 @@ namespace Futebox
 
 
             services.AddSingleton(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
-            services.AddQuartz(_ =>
-            {
-                _.UseMicrosoftDependencyInjectionScopedJobFactory();
-            });
+            services.AddQuartz(_ => 
+                _.UseMicrosoftDependencyInjectionScopedJobFactory());
             services.AddNodeServices();
             ConfigureMigrations(services);
             ConfigureFluentMapper();
+            DestroyBrowserInstance();
+        }
 
+        private void DestroyBrowserInstance()
+        {
             ManagementClass mngmtClass = new ManagementClass("Win32_Process");
             foreach (ManagementObject o in mngmtClass.GetInstances())
             {

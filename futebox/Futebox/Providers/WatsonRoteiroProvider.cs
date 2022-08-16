@@ -1,12 +1,13 @@
 ﻿using Futebox.Models;
+using Futebox.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Futebox.Services.Roteiros
+namespace Futebox.Providers
 {
-    public class RoteiroIBM : IRoteiro
+    public class WatsonRoteiroProvider : IRoteiroProvider
     {
         private string ObterSaudacao() => $"Fala torcedôr e torcedôra: Bem vindo ao canal Futibox: ";
 

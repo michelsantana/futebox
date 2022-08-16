@@ -1,9 +1,9 @@
 ﻿using Futebox.Models;
 using System.Collections.Generic;
 
-namespace Futebox.Services.Roteiros
+namespace Futebox.Providers
 {
-    public interface IRoteiro
+    public interface IRoteiroProvider
     {
         string ObterRoteiroDaClassificacao(IEnumerable<ClassificacaoVM> classificacao, ProcessoClassificacaoArgs processoClassificacaoArgs);
         string ObterRoteiroDaPartida(PartidaVM partida);

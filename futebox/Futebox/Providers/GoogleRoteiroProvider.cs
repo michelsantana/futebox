@@ -1,12 +1,13 @@
 ﻿using Futebox.Models;
+using Futebox.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Futebox.Services.Roteiros
+namespace Futebox.Providers
 {
-    public class RoteiroGoogle : IRoteiro
+    public class GoogleRoteiroProvider : IRoteiroProvider
     {
         private string ObterSaudacao() => $"Fala torcedor e torcedora, bem vindo ao canal fute box. ";
 
@@ -141,7 +142,7 @@ namespace Futebox.Services.Roteiros
                         roteiro += $"no estádio {_.estadio}: ";
                     });
                 });
-            roteiro += $"Pra qual time você torce?: deixa aqui nos comentários junto com aquela deedáda no laique. Até a próxima. ";
+            roteiro += $"Pra qual time você torce?: deixa aqui nos comentários junto com aquela dedada no laique. Até a próxima. ";
             return roteiro;
         }
 

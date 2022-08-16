@@ -9,7 +9,7 @@ using Futebox.Models.Enums;
 using System.Threading.Tasks;
 using System.Net;
 using System.IO;
-using Futebox.Services.Roteiros;
+using Futebox.Providers;
 
 namespace Futebox.Services
 {
@@ -21,9 +21,9 @@ namespace Futebox.Services
         IRodadaService _rodadaService;
         IFutebotService _futebotService;
         IAgendamentoService _agendamentoService;
-        RoteiroService<RoteiroGoogle> _roteiro = new RoteiroService<RoteiroGoogle>();
+        IRoteiroProvider _roteiro;
 
-        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IFutebotService futebotService, IAgendamentoService agendamentoService)
+        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IFutebotService futebotService, IAgendamentoService agendamentoService, IRoteiroProvider roteiro)
         {
             _processoRepositorio = processoRepositorio;
             _partidasService = partidasService;
@@ -31,6 +31,7 @@ namespace Futebox.Services
             _rodadaService = rodadaService;
             _futebotService = futebotService;
             _agendamentoService = agendamentoService;
+            _roteiro = roteiro;
         }
 
         public async Task<List<Processo>> ObterProcessos()
@@ -103,6 +104,24 @@ namespace Futebox.Services
             return p;
         }
 
+        public async Task<Processo> CancelarAgendamento(string id)
+        {
+            Processo p = null;
+            Task.WaitAll(new Task[]{
+                Task.Run(() =>
+                {
+                    var p = _processoRepositorio.GetById(id);
+
+                    p.agendado = false;
+
+                    _processoRepositorio.OpenTransaction();
+                    _processoRepositorio.Update(p);
+                    _processoRepositorio.Commit();
+                }),
+                Task.Run(() =>_agendamentoService.Cancelar(id))
+            });
+            return p;
+        }
 
         public async Task GerarImagem(Processo processo)
         {
@@ -126,12 +145,7 @@ namespace Futebox.Services
             await AtualizarRoteiro(processo);
             processo = await AtualizarStatus(processo, StatusProcesso.GerandoAudio);
 
-            RobotResultApi resultado = null;
-
-            if(Settings.IS_IBM)
-                resultado = await _futebotService.GerarAudioIBM(processo, true, true);
-            if(Settings.IS_GOOGLE)
-                resultado = await _futebotService.GerarAudioGoogle(processo, true, true);
+            RobotResultApi resultado = await _futebotService.GerarAudio(processo, true, true);
 
             await AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
@@ -199,7 +213,6 @@ namespace Futebox.Services
             if (resultado.status == HttpStatusCode.InternalServerError) throw new Exception("Erro ao gerar o vídeo!");
             if (resultado.status == HttpStatusCode.BadRequest) throw new Exception("Comando inválido");
         }
-
 
         public async Task<Processo> AtualizarStatus(Processo processo, StatusProcesso status)
         {
@@ -273,7 +286,7 @@ namespace Futebox.Services
         {
             var args = JsonConvert.DeserializeObject<ProcessoPartidaArgs>(processo.args);
             var partida = _partidasService.ObterPartida(args.partida);
-            processo.roteiro = _roteiro.Roteirizador.ObterRoteiroDaPartida(partida);
+            processo.roteiro = _roteiro.ObterRoteiroDaPartida(partida);
             _processoRepositorio.Update(processo);
             return processo;
         }
@@ -282,7 +295,7 @@ namespace Futebox.Services
         {
             var args = JsonConvert.DeserializeObject<ProcessoClassificacaoArgs>(processo.args);
             var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(args.campeonato, true);
-            processo.roteiro = _roteiro.Roteirizador.ObterRoteiroDaClassificacao(classificacao, args);
+            processo.roteiro = _roteiro.ObterRoteiroDaClassificacao(classificacao, args);
             _processoRepositorio.Update(processo);
             return processo;
         }
@@ -291,7 +304,7 @@ namespace Futebox.Services
         {
             var args = JsonConvert.DeserializeObject<ProcessoRodadaArgs>(processo.args);
             var partidas = _rodadaService.ObterPartidasDaRodada(args.campeonato, args.rodada, true);
-            processo.roteiro = _roteiro.Roteirizador.ObterRoteiroDaRodada(partidas, args);
+            processo.roteiro = _roteiro.ObterRoteiroDaRodada(partidas, args);
             _processoRepositorio.Update(processo);
             return processo;
         }

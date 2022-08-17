@@ -45,26 +45,8 @@
         <div class="col-3 text-end sr-only">Vídeo<br />@currentProgress.Item3</div>
         <div class="col-3 text-end sr-only">Rede Social<br />@currentProgress.Item4</div>
     </div>*@
-<div class="row d-flex align-items-center">
-    <div class="col-10">
-        <div class="progress" style="height: 20px;">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: @currentProgress.Item1.Replace(",", ".")" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-    </div>
-    <div class="col-2">
-        <div class="btn-group" role="group">
-            <button class="btn btn-sm btn-outline-primary" onclick="Imagem('@Model.id');">
-                img
-            </button>
-            <button class="btn btn-sm btn-outline-warning" onclick="Audio('@Model.id');">
-                audio
-            </button>
-            <button class="btn btn-sm btn-outline-info" onclick="Video('@Model.id');">
-                video
-            </button>
-            <button class="btn btn-sm btn-outline-info" onclick="Publicar('@Model.id');">
-                upload
-            </button>
-        </div>
-    </div>
+
+<div class="progress" style="height: 5px;">
+    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: @currentProgress.Item1.Replace(",", ".")" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
 </div>
+

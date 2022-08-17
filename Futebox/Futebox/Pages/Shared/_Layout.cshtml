@@ -45,7 +45,7 @@
                             <a class="nav-link text-dark" asp-area="" asp-page="/SocialMedias">YT/IG</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-warning" href="#">@(DateTime.Now.ToString("dd MMMM"))</a>
+                            <a class="nav-link text-warning" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">@(DateTime.Now.ToString("dd MMMM"))</a>
                         </li>
                     </ul>
                 </div>
@@ -62,6 +62,21 @@
         <div aria-live="polite" aria-atomic="true">
             <div class="toast-container top-0 end-0 p-3">
                 <div id="toast-container"></div>
+            </div>
+        </div>
+    </div>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasExampleLabel">Calendar</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div style="zoom:.7">
+                <div id="calendar">
+                    <div id="calendar_header"><i class="icon-chevron-left"></i><h1></h1><i class="icon-chevron-right"></i></div>
+                    <div id="calendar_weekdays"></div>
+                    <div id="calendar_content"></div>
+                </div>
             </div>
         </div>
     </div>

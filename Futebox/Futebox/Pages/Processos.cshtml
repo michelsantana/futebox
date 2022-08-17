@@ -3,13 +3,14 @@
 @{
     ViewData["Title"] = "Processos";
     bool show = false;
+    bool tableView = false;
 }
 <div class="well">
     <button class="btn btn-info" onclick="Jobs()">Jobs</button>
 </div>
 <div class="accordion" id="accord">
     @foreach (var grupo in Model.processos.OrderByDescending(_ => _.Item1.agendamento).Select((_, i) => new { entity = _, index = i })
-  .GroupBy(_ => new { dt = _.entity.Item1.criacao.ToString("yyyyMMdd"), format = _.entity.Item1.criacao.ToString("dd/MM/yyyy") }))
+.GroupBy(_ => new { dt = _.entity.Item1.criacao.ToString("yyyyMMdd"), format = _.entity.Item1.criacao.ToString("dd/MM/yyyy") }))
     {
         { show = grupo.Any(_ => _.index == 0); }
         <div class="accordion-item">
@@ -19,21 +20,37 @@
                 </button>
             </h2>
             <div id="collapse@(grupo.Key.dt)" class="accordion-collapse collapse @(show ? "show" : "")" aria-labelledby="heading@(grupo.Key.dt)" data-bs-parent="#accord">
-                <div class="accordion-body">
-                    <table id='tabela' class="table table-borderless" style="table-layout:fixed;">
-                        <thead>
-                            <tr class="align-middle">
-                                <th width="60%" scope="col">Processo</th>
-                                <th width="40%" scope="col" valign="middle">Configurações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <div class="accordion-body bg-light">
+                    @if (tableView)
+                    {
+                        <table id='tabela' class="table table-borderless" style="table-layout:fixed;">
+                            <thead>
+                                <tr class="align-middle">
+                                    <th width="60%" scope="col">Processo</th>
+                                    <th width="40%" scope="col" valign="middle">Configurações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{var _i = 0;}
+                                @foreach (var processo in grupo.ToList().Select(_ => _.entity))
+                                {
+                                    @Html.Partial("Templates/_processoTableRow", Tuple.Create(Model, processo.Item1, processo.Item2, _i % 2 == 0))
+                                    { _i++; }
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="row">
+                            @{var _i = 0;}
                             @foreach (var processo in grupo.ToList().Select(_ => _.entity))
                             {
-                                @Html.Partial("Templates/_processoTableRow", Tuple.Create(Model, processo.Item1, processo.Item2))
+                                @Html.Partial("Templates/_processoCard", Tuple.Create(Model, processo.Item1, processo.Item2, _i % 2 == 0))
+                                { _i++; }
                             }
-                        </tbody>
-                    </table>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

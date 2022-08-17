@@ -1,4 +1,4 @@
-﻿@model Tuple<Futebox.Pages.ProcessosModel, Futebox.Models.Processo, Futebox.Models.Agenda>
+﻿@model Tuple<Futebox.Pages.ProcessosModel, Futebox.Models.Processo, Futebox.Models.Agenda, bool>
 @{
     var processo = Model.Item2;
     var model = Model.Item1;
@@ -17,8 +17,15 @@
         Models.Agenda.Status.falha,
         Models.Agenda.Status.cancelado
     };
+
+    var dark = Model.Item4;
 }
-<tr data-row-id="@processo.id">
+<tr data-row-id="@processo.id" style="border-bottom: 1px solid #cdcdcd" class="@(dark ? "bg-dark text-light" : "bg-light text-dark")">
+    <td class="p-0" colspan="2">
+        @Html.Partial("Templates/_processoSteps", processo)
+    </td>
+</tr>
+<tr data-row-id="@processo.id" class="@(dark ? "bg-dark text-light" : "bg-light text-dark")">
     <td width="60%" class="pb-0">
         <b>@processo.id</b><br />
         @processo.nome<br />
@@ -72,10 +79,25 @@
                 </button>
             </div>
         </div>
-    </td>
-</tr>
-<tr data-row-id="@processo.id" style="border-bottom: 1px solid #cdcdcd">
-    <td class="pt-0" colspan="2">
-        @Html.Partial("Templates/_processoSteps", processo)
+        <div class="row mt-2 mb-2">
+            <div class="btn-group" role="group">
+                <div class="col-3 text-end">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-outline-primary" onclick="Imagem('@processo.id');">
+                            img
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="Audio('@processo.id');">
+                            audio
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="Video('@processo.id');">
+                            video
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="Publicar('@processo.id');">
+                            upload
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </td>
 </tr>

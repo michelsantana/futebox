@@ -158,8 +158,12 @@ namespace Futebox.Services
                 var idExternoMandante = footstatsPartida.idEquipeMandante.ToString();
                 var idExternoVisitante = footstatsPartida.idEquipeVisitante.ToString();
 
-                var timeMandante = _timeRepositorio.GetSingle(_ => _.origem_ext_id == idExternoMandante);
-                var timeVisitante = _timeRepositorio.GetSingle(_ => _.origem_ext_id == idExternoVisitante);
+                var timesMandantes = _timeRepositorio.GetList(_ => _.origem_ext_id == idExternoMandante);
+                var timesVisitantes = _timeRepositorio.GetList(_ => _.origem_ext_id == idExternoVisitante);
+                if (!timesMandantes.Any() || !timesVisitantes.Any()) return new PartidaVM();
+
+                var timeMandante = timesMandantes.FirstOrDefault();
+                var timeVisitante = timesVisitantes.FirstOrDefault();
                 var dtPartida =
                     new DateTime(footstatsPartida.dataDaPartida?.year ?? 1990, 1, 1)
                     .AddDays((footstatsPartida.dataDaPartida?.dayOfYear ?? 1) - 1)

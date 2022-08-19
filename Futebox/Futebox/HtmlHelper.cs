@@ -21,7 +21,7 @@ namespace Futebox
 
             if (!exists && File.Exists(stylePath)) stylesContents.Add(style, Tuple.Create(DateTime.Now.AddSeconds(20), File.ReadAllText(stylePath)));
             var styleContent = stylesContents[style];
-            if(styleContent.Item1 < DateTime.Now)
+            if (styleContent.Item1 < DateTime.Now)
             {
                 stylesContents.Remove(style);
                 return ScopeStyle(_, scope, style);
@@ -69,7 +69,7 @@ namespace Futebox
                 StatusProcesso.Erro => _.Raw($"<span class='badge bg-warning text-white'>⚠{s}</span>"),
                 StatusProcesso.VideoErro => _.Raw($"<span class='badge bg-warning text-white'>⚠{s}</span>"),
 
-                
+
             };
         }
         public static IHtmlContent StatusBadge(this IHtmlHelper _, Agenda.Status? s)
@@ -89,6 +89,34 @@ namespace Futebox
 
 
             };
+        }
+
+        public static IHtmlContent IconHelper(this IHtmlHelper _, RedeSocialFinalidade s, int sizePx)
+        {
+            return s switch
+            {
+                RedeSocialFinalidade.InstagramVideo => _.Raw($"<img width='{sizePx}px' src='https://icongr.am/simple/instagram.svg?size=64&color=currentColor&colored=true' />"),
+                RedeSocialFinalidade.YoutubeShorts => _.Raw($"<img width='{sizePx}px' src='https://icongr.am/simple/youtubemusic.svg?size=64&color=currentColor&colored=true' />"),
+                RedeSocialFinalidade.YoutubeVideo => _.Raw($"<img width='{sizePx}px' src='https://icongr.am/simple/youtube.svg?size=64&color=currentColor&colored=true' />"),
+                RedeSocialFinalidade.NENHUMA => _.Raw($"<img width='{sizePx}px' src='https://icongr.am/simple/csharp.svg?size=64&color=currentColor&colored=false' />"),
+            };
+        }
+
+        public static IHtmlContent IconHelper(this IHtmlHelper _, string collection, string icon, int size)
+        {
+            return _.Raw($"<img src='https://icongr.am/{collection}/{icon}.svg?size={size}&color=currentColor&colored=false' />");
+        }
+        public static IHtmlContent IconSimpleHelper(this IHtmlHelper _, string collection, string icon, int size)
+        {
+            return IconHelper(_, "simple", icon, size);
+        }
+        public static IHtmlContent IconMaterialHelper(this IHtmlHelper _, string collection, string icon, int size)
+        {
+            return IconHelper(_, "material", icon, size);
+        }
+        public static IHtmlContent IconEntypoHelper(this IHtmlHelper _, string collection, string icon, int size)
+        {
+            return IconHelper(_, "entypo", icon, size);
         }
     }
 }

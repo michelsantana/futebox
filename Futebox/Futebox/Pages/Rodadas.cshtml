@@ -2,6 +2,11 @@
 @model Futebox.Pages.RodadasModel
 @{
     ViewData["Title"] = "Rodadas";
+    var sociaisHabilitadasPagina = new Futebox.Models.Enums.RedeSocialFinalidade[] {
+        Futebox.Models.Enums.RedeSocialFinalidade.InstagramVideo,
+        Futebox.Models.Enums.RedeSocialFinalidade.YoutubeVideo,
+        Futebox.Models.Enums.RedeSocialFinalidade.YoutubeShorts
+    };
 }
 
 <div class="row g-5">
@@ -9,15 +14,10 @@
         <h1 class="display-4">Gerador de Rodadas</h1>
     </div>
 </div>
-<div id="rodada">
-
-</div>
 <div>
     <div class="row g-5">
-        <div class="col-6">
-
-            <div class="mb-3">
-                <label for="ddlCampeonato" class="form-label">Campeonato</label>
+        <div class="col-6 offset-3">
+            <div class="input-group">
                 <select name="ddlCampeonato" class="form-select">
                     <option selected>Selecione</option>
                     @foreach (var camp in Models.CampeonatoUtils.ObterCampeonatosAtivos())
@@ -25,22 +25,14 @@
                         <option value="@((int)camp)">@($"{camp}")</option>
                     }
                 </select>
-            </div>
-            <div class="mb-3">
-                <label for="txtRodada" class="form-label">Numero da rodada</label>
                 <input type="number" class="form-control" name="txtRodada">
+                <button type="button" onclick="Pesquisar()" class="btn btn-primary">🔍 Pesquisar</button>
             </div>
-            <button type="button" onclick="Pesquisar()" class="btn btn-primary">🔍 Pesquisar</button>
+        </div>
+    </div>
+</div>
+<div id="rodada">
 
-        </div>
-        <div class="col-6">
-            
-        </div>
-    </div>
-    <div class="row g-5">
-        <table>
-        </table>
-    </div>
 </div>
 
 
@@ -78,7 +70,6 @@
 
             for (var c of config) {
                 var $config = $(c);
-                var $social = $config.find('[data-social]');
                 var aspect = $config.find('[name=ddlDimensao]').val();
                 var titulo = $config.find('[name=title]').val();
 
@@ -86,11 +77,11 @@
                     campeonato: ~~view.campeonato.val(),
                     rodada: ~~view.rodada.val(),
                     partidas: view.partidas,
-                    social: ~~($social.attr('data-social')),
+                    social: ~~(social),
                     colunas: ~~aspect.split('x')[0],
                     linhas: ~~aspect.split('x')[1],
                     titulo: titulo,
-                    checked: $social.prop('checked'),
+                    checked: true,
                 });
             }
             return data;
@@ -117,8 +108,8 @@
                 .then((result) => { document.getElementById('rodada').innerHTML = result; });
         }
 
-        function GerarProcesso() {
-            var data = view.data().filter(_ => _.checked);
+        function GerarProcesso(social) {
+            var data = view.data(social).filter(_ => _.checked);
             console.log(data);
             view.post(`/api/processo/rodada`, data, (response) => { console.log(response); $.SendToast('ok', 'Processo criado!'); });
         }

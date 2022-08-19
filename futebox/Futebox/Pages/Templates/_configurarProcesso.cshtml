@@ -1,4 +1,4 @@
-﻿@model Tuple<Futebox.Models.Enums.RedeSocialFinalidade[], string>
+﻿@model Futebox.Pages.ConfigurarProcessoModel
 @{
     var cols = Enumerable.Range(1, 5).OrderByDescending(_ => _);
     var lines = Enumerable.Range(1, 5).OrderByDescending(_ => _);
@@ -15,10 +15,10 @@
     var socialIGV = (int)Futebox.Models.Enums.RedeSocialFinalidade.InstagramVideo;
     var socialYTV = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeVideo;
     var socialYTS = (int)Futebox.Models.Enums.RedeSocialFinalidade.YoutubeShorts;
-    var socialHabilitadas = Model.Item1.Select(_ => (int)_);
+    var socialHabilitadas = Model.redeSocials.Select(_ => (int)_);
 
     var sizes = new Dictionary<int, int[]>
-    {
+{
         { socialIGV, new int[] { 1350, 1920 } },
         { socialYTV, new int[] { 1920, 1080 } },
         { socialYTS, new int[] { 1080, 1920 } },
@@ -33,25 +33,40 @@
         <th>Ação</th>
     </tr>
     @foreach (var social in socialHabilitadas)
-    { 
+    {
         <tr data-config="@(social)">
             <td>
                 @Html.SocialBadge(social)
             </td>
-            <td>
-                <select name='ddlDimensao' class='form-select form-select-sm'>
-                    <optgroup label='defaults'>
-                        <option value='4x2' selected="selected">4 colunas x 2 linhas</option>
-                        <option value='2x4'>2 colunas x 4 linhas</option>
-                        <option value='2x3'>2 colunas x 3 linhas</option>
-                        <option value='5x2'>5 colunas x 2 linhas</option>
-                    </optgroup>
-                    @Html.Raw(ddl)
-                </select>
-            </td>
+            @if (Model.modo == ConfigurarProcessoModel.Mode.view)
+            {
+                <td>
+                    <div class="">
+                        <select name='viewName' class='form-select form-select-sm'>
+                            <optgroup label='defaults'>
+                                <option value='_classificacaoSemGrupos' selected="selected">Padrão (class. s/g)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </td>
+            }
+            else
+            {
+                <td>
+                    <select name='ddlDimensao' class='form-select form-select-sm'>
+                        <optgroup label='defaults'>
+                            <option value='4x2' selected="selected">4 colunas x 2 linhas</option>
+                            <option value='2x4'>2 colunas x 4 linhas</option>
+                            <option value='2x3'>2 colunas x 3 linhas</option>
+                            <option value='5x2'>5 colunas x 2 linhas</option>
+                        </optgroup>
+                        @Html.Raw(ddl)
+                    </select>
+                </td>
+            }
             <td>
                 <div class="">
-                    <input type="text" class="form-control form-control-sm" name="title" value="@($"{Model.Item2} - jogos do dia {DateTime.Now.ToString("dd/MM/yy")}")">
+                    <input type="text" class="form-control form-control-sm" name="title" value="@($"{Model.tituloPadrao}")">
                 </div>
             </td>
             <td>

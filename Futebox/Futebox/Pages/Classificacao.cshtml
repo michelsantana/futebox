@@ -8,50 +8,34 @@
     <h1 class="display-4">Gerador de Classificação</h1>
 
 </div>
-<div id="classificacao"></div>
 
-
-<div>
-    <div class="row g-5">
-        <div class="col-6">
-
-            <div class="mb-3">
-                <label for="ddlCampeonato" class="form-label">Campeonato</label>
-                <select name="ddlCampeonato" class="form-select">
-                    <option selected>Selecione</option>
-                    @foreach (var camp in Model.campeonatosAtivos)
+<div class="row g-5">
+    <div class="col-4 offset-4">
+        <div class="input-group">
+            <select name="ddlCampeonato" class="form-select">
+                <option selected>Selecione</option>
+                @foreach (var camp in Model.campeonatosAtivos)
+                {
+                    if (Futebox.Models.CampeonatoUtils.Config[camp].fases?.Count() > 0)
                     {
-                        if (Futebox.Models.CampeonatoUtils.Config[camp].fases?.Count() > 0)
-                        {
-                            <optgroup label="@camp">
-                                @foreach (var fase in Futebox.Models.CampeonatoUtils.Config[camp].fases)
-                                {
-                                    <option value="@($"{(int)camp},{fase}")">@($"{camp} - {fase}")</option>
-                                }
-                            </optgroup>
-                        }
-                        else
-                        {
-                            <option value="@($"{(int)camp},geral")">@($"{camp} - Geral")</option>
-                        }
+                        <optgroup label="@camp">
+                            @foreach (var fase in Futebox.Models.CampeonatoUtils.Config[camp].fases)
+                            {
+                                <option value="@($"{(int)camp},{fase}")">@($"{camp} - {fase}")</option>
+                            }
+                        </optgroup>
                     }
-                </select>
-            </div>
-            @*<div class="mb-3">
-                    <label for="txtRodada" class="form-label">Numero da rodada</label>
-                    <input type="number" class="form-control" name="txtRodada">
-                </div>*@
+                    else
+                    {
+                        <option value="@($"{(int)camp},geral")">@($"{camp} - Geral")</option>
+                    }
+                }
+            </select>
             <button type="button" onclick="Pesquisar()" class="btn btn-primary">🔍 Pesquisar</button>
         </div>
-        <div class="col-6">
-            
-        </div>
-    </div>
-    <div class="row g-5">
-        <table>
-        </table>
     </div>
 </div>
+<div id="classificacao"></div>
 
 @section Scripts{
     <script>
@@ -89,7 +73,6 @@
 
             for (var c of config) {
                 var $config = $(c);
-                var $social = $config.find('[data-social]');
                 var $dataExecucao = $config.find('[name=dataExecucao]');
                 var viewName = $config.find('[name=viewName]').val();
 
@@ -99,9 +82,9 @@
                     temFases: (view.fase != 'geral'),
                     classificacaoPorGrupos: (view.grupos.length > 1),
                     grupos: view.grupos,
-                    social: ~~($social.attr('data-social')),
+                    social: ~~social,
                     viewName: viewName,
-                    checked: $social.prop('checked'),
+                    checked: true,
                     dataExecucao: $dataExecucao.val()
                 });
             }
@@ -125,10 +108,12 @@
             window.open(`/Miniaturas?t=classificacao&q=${JSON.stringify(data[0])}&w=${w}&h=${h}`, '_blank');
         }
 
-        function GerarProcesso() {
-            var data = view.data().filter(_ => _.checked);
+        function GerarProcesso(social) {
+            var data = view.data(social).filter(_ => _.checked);
+            debugger
             console.log(data);
-            view.post(`/api/processo/classificacao`, data, (response) => { console.log(response); $.SendToast('ok', 'Processo criado!') });
+            view.post(`/api/processo/classificacao`, data, (response) => { console.log(response); $.SendToast('ok', 'Processo criado!') })
+                .fail(_ => console.error(_));
         }
 
         function SaveCookie() {

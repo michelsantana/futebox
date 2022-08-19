@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Futebox.Services
 {
-    public class ExecucaoProcessoService : IExecucaoProcessoService
+    public class ExecucaoProcessoService : IExecucaoProcessoService, IServiceTools
     {
         IProcessoService _processoService;
         IAgendamentoService _agendamentoService;
@@ -50,10 +50,10 @@ namespace Futebox.Services
             _agendamentoService = agendamentoService;
         }
 
-        public async Task<RobotResultApi> Executar(string processoId)
+        public async Task<RobotResultApi> Executar(string id)
         {
-            RobotResultApi result = new RobotResultApi($"ExecucaoProcessoService.{processoId}");
-            await _queueService.Executar(async () =>
+            RobotResultApi result = new RobotResultApi($"ExecucaoProcessoService.{id}");
+            await _queueService.Executar(async (args) =>
             {
                 var log = new Action<string>((m) => result.Add(m));
                 log("Iniciando");
@@ -61,6 +61,7 @@ namespace Futebox.Services
                 Processo processo = null;
                 Agenda agenda = null;
                 StringBuilder sbNotificacao = new StringBuilder();
+                var processoId = args[0].ToString();
                 try
                 {
                     result.Add("Buscar processo");
@@ -119,7 +120,7 @@ namespace Futebox.Services
                     Promise.All(() => _agendamentoService.Salvar(agenda));
                     result.Error();
                 }
-            });
+            }, new object[] { id });
             return result;
         }
     }

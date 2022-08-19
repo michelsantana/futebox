@@ -85,12 +85,25 @@ body {
 }
 .fs-sport {
     font-family: 'sport' !important;
-/*    font-family: 'consolas' !important;*/
-
+    color: #EAE509;
+    color: #e5e5e5;
+    /*    font-family: 'consolas' !important;*/
 }
 
 .fs-score {
     font-family: 'score' !important;
+    color: #EAE509;
+    color: #e5e5e5;
+}
+
+#mini-container {
+    background: #7DCE13;
+    text-shadow: 2px 2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, -2px -2px 0 #000, 2px 0px 0 #000, 0px 2px 0 #000, -2px 0px 0 #000, 0px -2px 0 #000;
+}
+
+
+[src*="vs.png"] {
+    filter: drop-shadow(2px 4px 6px white) invert(1);
 }
 
 

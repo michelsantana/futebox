@@ -24,7 +24,7 @@
 <div class="col-4 mt-2 mb-2 @(dark ? "--bg-dark --text-light" : "--bg-light --text-dark")">
     <div data-row-id="@processo.id" class="card shadow ">
         <div class="card-body">
-            <h5 class="card-title">@processo.nome</h5>
+            <h5 class="card-title">@Html.IconHelper(processo.social, 24) @processo.nome</h5>
             <h6 class="card-subtitle mb-2 text-muted">@processo.id</h6>
             <p class="card-text">@processo.tituloVideo</p>
         </div>
@@ -45,36 +45,45 @@
                 </li>
             }
             <li class="list-group-item">
+                @*<label class="col-form-label-lg col-form-label-sm"><b>dd/MM/yyyy HH:mm:ss</b></label>*@
                 <div class="input-group">
-                    <input type="date" style="flex:4;" class="data form-control form-control-sm" value="@(processo.agendamento?.ToString("yyyy-MM-dd"))">
-                    <input type="number" style="flex:1;" min="0" max="23" class="hora form-control form-control-sm" value="@(processo.agendamento?.ToString("HH"))">
-                    <input type="number" style="flex:1;" min="0" max="60" class="min form-control form-control-sm" value="@(processo.agendamento?.ToString("mm"))">
-                    <input type="number" style="flex:1;" min="0" max="60" class="seg form-control form-control-sm" value="@(processo.agendamento?.ToString("ss"))">
-                    <button class="btn btn-sm btn-outline-danger" onclick="AgendarCancelar('@processo.id');">❌</button>
+                    @*<input type="date" style="flex:4;" class="data form-control form-control-sm" value="@(processo.agendamento?.ToString("yyyy-MM-dd"))">
+                        <input type="number" style="flex:1;" min="0" max="23" class="hora form-control form-control-sm" value="@(processo.agendamento?.ToString("HH"))">
+                        <input type="number" style="flex:1;" min="0" max="60" class="min form-control form-control-sm" value="@(processo.agendamento?.ToString("mm"))">
+                        <input type="number" style="flex:1;" min="0" max="60" class="seg form-control form-control-sm" value="@(processo.agendamento?.ToString("ss"))">*@
+                    <input type="datetime-local" step=1 class="data form-control form-control-sm" value="@(processo.agendamento?.ToString("yyyy-MM-ddTHH:mm:ss"))">
+                    <button type='button' class="btn btn-sm btn-outline-light">@(processo.agendado)</button>
+                    <button type='button' class="btn btn-sm btn-outline-danger" onclick="AgendarCancelar('@processo.id');">❌</button>
                 </div>
             </li>
             <li class="list-group-item d-flex justify-content-between">
-                <div class="btn-group">
-                    <button class="btn btn-sm btn-outline-dark" onclick="Imagem('@processo.id');">
-                        🖼
-                    </button>
-                    <button class="btn btn-sm btn-outline-dark" onclick="Audio('@processo.id');">
-                        🔊
-                    </button>
-                    <button class="btn btn-sm btn-outline-dark" onclick="Video('@processo.id');">
-                        🎞
-                    </button>
-                    <button class="btn btn-sm btn-outline-dark" onclick="Publicar('@processo.id');">
-                        🌐
-                    </button>
+                <div class="d-flex flex-column">
+                    <label class="col-form-label-lg col-form-label-sm"><b>Status</b></label>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-outline-dark" onclick="Imagem('@processo.id');">
+                            🖼
+                        </button>
+                        <button class="btn btn-sm btn-outline-dark" onclick="Audio('@processo.id');">
+                            🔊
+                        </button>
+                        <button class="btn btn-sm btn-outline-dark" onclick="Video('@processo.id');">
+                            🎞
+                        </button>
+                        <button class="btn btn-sm btn-outline-dark" onclick="Publicar('@processo.id');">
+                            🌐
+                        </button>
+                    </div>
                 </div>
-                <div class="btn-group">
-                    <button class="btn btn-sm btn-outline-dark" onclick="Pasta('@processo.pasta');">
-                        📂
-                    </button>
-                    <button class="btn btn-sm btn-outline-dark" onclick="Log('@processo.id');">
-                        🧾
-                    </button>
+                <div class="d-flex flex-column">
+                    <label class="col-form-label-lg col-form-label-sm"><b>Tools</b></label>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-outline-dark" onclick="Pasta('@processo.pasta');">
+                            📂
+                        </button>
+                        <button class="btn btn-sm btn-outline-dark" onclick="Log('@processo.id');">
+                            🧾
+                        </button>
+                    </div>
                 </div>
             </li>
         </ul>

@@ -1,12 +1,13 @@
 ﻿#scope {
     padding: 15px;
     border: none;
-    box-shadow: 0px 0px 20px 0px #00000024;
-    background: rgb(202,249,202);
-    background: -moz-radial-gradient(circle, rgba(202,249,202,1) 10%, rgba(139,242,129,1) 43%, rgba(97,227,82,1) 70%);
-    background: -webkit-radial-gradient(circle, rgba(202,249,202,1) 10%, rgba(139,242,129,1) 43%, rgba(97,227,82,1) 70%);
-    background: radial-gradient(circle, rgba(202,249,202,1) 10%, rgba(139,242,129,1) 43%, rgba(97,227,82,1) 70%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#caf9ca",endColorstr="#61e352",GradientType=1);
+    box-shadow: inset 0px 0px 20px 0px #000;
+    border-radius: 20px;
+    background: rgb(91,179,24);
+    background: -moz-linear-gradient(135deg, rgba(91,179,24,1) 45%, rgba(43,122,11,1) 55%);
+    background: -webkit-linear-gradient(135deg, rgba(91,179,24,1) 45%, rgba(43,122,11,1) 55%);
+    background: linear-gradient(135deg, rgba(91,179,24,1) 45%, rgba(43,122,11,1) 55%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#5bb318",endColorstr="#2b7a0b",GradientType=1);
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;

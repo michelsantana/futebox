@@ -53,4 +53,10 @@
         </tr>
     }
 </table>
-@Html.Partial("Templates/_configurarProcesso", Tuple.Create(sociaisHabilitadasPagina, Model.First().campeonato))
+@await Html.PartialAsync("Templates/_configurarProcesso",
+    new Futebox.Pages.ConfigurarProcessoModel()
+    {
+        redeSocials = sociaisHabilitadasPagina,
+        modo = ConfigurarProcessoModel.Mode.aspect,
+        tituloPadrao = $"{Model.First().campeonato} - jogos do dia {DateTime.Now.ToString("dd/MM/yy")}"
+    })

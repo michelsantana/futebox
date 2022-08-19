@@ -16,17 +16,22 @@ namespace Futebox.Services
             semaphore = new SemaphoreSlim(1);
         }
 
-        public async Task Executar(Func<Task> task)
+        public async Task Executar(Func<object[], Task> task, object[] args)
         {
             await semaphore.WaitAsync();
             try
             {
-                await task();
+                await task(args);
             }
             finally
             {
                 semaphore.Release();
             }
+        }
+
+        public async Task Executar(Func<Task> task)
+        {
+            await Executar(async (o) => await task(), null);
         }
     }
 }

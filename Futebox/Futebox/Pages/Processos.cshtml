@@ -89,16 +89,12 @@
             var row = $(`[data-row-id="${processo}"]`);
 
             var data = row.find('.data').val();
-            var hora = row.find('.hora').val();
-            var min = row.find('.min').val();
-            var seg = row.find('.seg').val();
-            var dataSplited = data.split('-');
+            data = data.split('T');
 
-            if (!hora) {
-                $.SendToast(processo, 'Não agendado, falta hora!')
-                return;
-            }
-            $.get(`/api/processo/${processo}/agendar?dia=${dataSplited[2]}&mes=${dataSplited[1]}&ano=${dataSplited[0]}&hr=${hora}&min=${min}&sec=${seg}`).then(_ => {
+            var dataSplited = data[0].split('-');
+            var horaSplited = data[1].split(':');
+
+            $.get(`/api/processo/${processo}/agendar?dia=${dataSplited[2]}&mes=${dataSplited[1]}&ano=${dataSplited[0]}&hr=${horaSplited[0]}&min=${horaSplited[1]}&sec=${horaSplited[2]}`).then(_ => {
                 $.SendToast(processo, 'Processo agendado!')
             }).fail(function () {
                 $.SendToast(s.id, "FALHOU")

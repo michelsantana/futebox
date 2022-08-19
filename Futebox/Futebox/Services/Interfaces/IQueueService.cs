@@ -7,6 +7,7 @@ namespace Futebox.Services.Interfaces
 {
     public interface IQueueService
     {
-        public Task Executar(Func<Task> task);
+        Task Executar(Func<Task> task);
+        Task Executar(Func<object[], Task> task, object[] args);
     }
 }

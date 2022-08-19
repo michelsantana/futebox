@@ -8,35 +8,18 @@ using System.Threading.Tasks;
 
 namespace Futebox.Services
 {
-    public class BrowserService : IBrowserService, IDisposable
+    public class BrowserService : IBrowserService
     {
-        private Browser _browserInstance;
-        protected Browser _browser
-        {
-            get
-            {
-                if (_browserInstance == null) _browserInstance = OpenBrowser().Result;
-                return _browserInstance;
-            }
-            set
-            {
-                _browserInstance = value;
-            }
-        }
+        protected Browser browser { get; set; }
 
         public BrowserService()
         {
             InitialBrowser();
         }
 
-        ~BrowserService()
-        {
-            Dispose();
-        }
-
         private void InitialBrowser()
         {
-            Task.WaitAll(Task.Run(() => _browser));
+            Task.WaitAll(Task.Run(() => OpenBrowser()));
         }
 
         protected async Task ClearInputThenWriteText(Page page, string selector, string text)
@@ -73,10 +56,12 @@ namespace Futebox.Services
             return new ViewPortOptions() { Width = 1080, Height = 1080 };
         }
 
-        protected async Task<Browser> OpenBrowser(bool headless = false)
+        protected async Task OpenBrowser(bool headless = false, bool isRetrying = false)
         {
             var userProfile = Environment.GetEnvironmentVariable("USERPROFILE");
-            var b = await Puppeteer.LaunchAsync(new LaunchOptions
+            if(browser != null)
+                await browser?.CloseAsync();
+            browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 ExecutablePath = $"{userProfile}\\AppData\\Local\\Google\\Chrome SxS\\Application\\chrome.exe",
                 Headless = headless,
@@ -85,21 +70,20 @@ namespace Futebox.Services
                 Args = new string[] {
                     $"--user-data-dir={userProfile}\\AppData\\Local\\Google\\Chrome SxS\\User Data\\",
                     $"--profile-directory=\"Profile 1\"",
+                    //$"--remote-debugging-port=21233",
                 }
             });
-
-            b.Disconnected += (Object sender, EventArgs eargs) =>
+            browser.Disconnected += async (Object sender, EventArgs eargs) =>
             {
-                this.Dispose();
+                await OpenBrowser();
             };
-            return b;
         }
 
         protected async Task TryAttatch()
         {
             try
             {
-                this._browser = await Puppeteer.ConnectAsync(new ConnectOptions
+                this.browser = await Puppeteer.ConnectAsync(new ConnectOptions
                 {
                     BrowserURL = "http://127.0.0.1:21233"
                 });
@@ -107,14 +91,14 @@ namespace Futebox.Services
             catch (Exception ex)
             {
                 EyeLog.Log(ex);
-                this._browser = null;
+                this.browser = null;
             }
         }
 
         protected async Task CloseBrowser()
         {
-            await this._browser?.CloseAsync();
-            this._browser = null;
+            await this.browser?.CloseAsync();
+            this.browser = null;
         }
 
         public string JsFunction(string fn, params string[] args)
@@ -128,7 +112,7 @@ namespace Futebox.Services
 
         public async Task<Page> NewPage()
         {
-            return await _browser.NewPageAsync();
+            return await browser.NewPageAsync();
         }
 
         public async Task RedigitarTextoCampo(string seletor, string texto, Page page)

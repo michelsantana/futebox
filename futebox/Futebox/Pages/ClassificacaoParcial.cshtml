@@ -74,7 +74,6 @@
             for (var c of config) {
                 var $config = $(c);
                 var $dataExecucao = $config.find('[name=dataExecucao]');
-                var $range = $config.find('[name=range]');
                 var viewName = $config.find('[name=viewName]').val();
 
                 data.push({
@@ -86,8 +85,7 @@
                     social: ~~social,
                     viewName: viewName,
                     checked: true,
-                    dataExecucao: new Date($dataExecucao.val() + 'T00:00:00'),
-                    range: $range.val().split('-').map(_ => ~~_),
+                    dataExecucao: $dataExecucao.val()
                 });
             }
             return data;

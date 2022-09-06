@@ -17,17 +17,20 @@ namespace Futebox.Services
         readonly IYoutubeService _youtubeService;
         readonly IInstagramService _instagramService;
         readonly IAudioProvider _audio;
+        readonly INodeServices _node;
 
         public FutebotService(
             IBrowserService browserService,
             IYoutubeService youtubeService,
             IInstagramService instagramService,
-            IAudioProvider audio)
+            IAudioProvider audio,
+            INodeServices node)
         {
             _browserService = browserService;
             _youtubeService = youtubeService;
             _instagramService = instagramService;
             _audio = audio;
+            _node = node;
         }
 
         public RobotResultApi VerificarConfiguracaoYoutubeBrowser()
@@ -91,7 +94,7 @@ namespace Futebox.Services
             return await _audio.GerarAudio(processo, buscarDoCacheDownload, buscarDoCacheArquivos);
         }
 
-        public RobotResultApi GerarVideo(Processo processo)
+        public async Task<RobotResultApi> GerarVideo(Processo processo)
         {
             var result = new RobotResultApi("GerarVideo");
             result.Add("start");
@@ -121,28 +124,26 @@ namespace Futebox.Services
                 var conteudo = "";
                 if (processo.social == Models.Enums.RedeSocialFinalidade.InstagramVideo)
                 {
-                    conteudo += $"ffmpeg -loop 1 -i {arquivoImagem} -i {arquivoAudio} -c:v libx264 -c:a copy -shortest {arquivoVideoTemp}\n";
-                    conteudo += $"ffmpeg -i {arquivoVideoTemp} -c:a aac -b:a 256k -ar 44100 -c:v libx264 -b:v 5M -r 30 -pix_fmt yuv420p -preset faster -tune stillimage {arquivoVideo}";
+                    conteudo += $"ffmpeg -y -loop 1 -i {arquivoImagem} -i {arquivoAudio} -c:v libx264 -c:a copy -shortest {arquivoVideoTemp}\n";
+                    conteudo += $"ffmpeg -y -i {arquivoVideoTemp} -c:a aac -b:a 256k -ar 44100 -c:v libx264 -b:v 5M -r 30 -pix_fmt yuv420p -preset faster -tune stillimage {arquivoVideo}";
                 }
                 else
                 {
-                    conteudo += $"ffmpeg -loop 1 -i {arquivoImagem} -i {arquivoAudio} -c:v libx264 -c:a copy -shortest {arquivoVideo}";
+                    conteudo += $"ffmpeg -y -loop 1 -i {arquivoImagem} -i {arquivoAudio} -c:v libx264 -c:a copy -shortest {arquivoVideo}";
                 }
 
                 File.WriteAllText(arquivoShell, conteudo);
                 result.Add("shell");
 
-                Process proc = new Process();
-                proc.StartInfo.FileName = arquivoShell;
-                proc.StartInfo.WorkingDirectory = processo.pasta;
-                proc.StartInfo.UseShellExecute = true;
-                proc.Start();
-                proc.WaitForExit();
+                var r = await _node.InvokeAsync<NodeServiceResult>($"{Settings.ApplicationRoot}/NodeServices/src/cmd.js", new object[] { arquivoShell });
+                if (!r.status) throw new Exception(string.Join("|", r.steps));
+
                 result.Add("cmd");
 
                 if (!File.Exists(arquivoVideo)) throw new Exception("File not found");
 
                 result.Add("end");
+
                 return result.Ok();
             }
             catch (Exception ex)
@@ -173,81 +174,18 @@ namespace Futebox.Services
             }
         }
 
-        private async Task<RobotResultApi> PublicarIG(Processo processo)
+        public async Task<RobotResultApi> AbrirPasta(Processo processo)
         {
-
-            var result = new RobotResultApi("PublicarVideo");
-            result.Add("start");
-
-            var page = await _browserService.NewPage();
-            result.Add("newpage");
-
-            await page.SetViewportAsync(Viewport(1920, 1080));
-            result.Add("viewport");
-
-            await page.GoToAsync("https://www.instagram.com/", WaitUntilNavigation.Networkidle2);
-            result.Add("goto");
-
-            var loginStatus = await page.EvaluateExpressionAsync(_browserService.JsFunction("IGEstaLogado"));
-            if (!loginStatus.ToObject<bool>()) return result.Unauthorized();
-            result.Add("login");
-
-            await page.ClickAsync("[aria-label=\"Nova publicação\"]");
-            result.Add("upload.1");
-
-            var campoDoUpload = await page.QuerySelectorAsync("[aria-label=\"Criar nova publicação\"] [type=\"file\"]");
-            await campoDoUpload.UploadFileAsync(Path.Combine(processo.pasta, processo.nomeDoArquivoVideo));
-            _browserService.WaitFor(10);
-            result.Add("upload.2");
-
-            await page.EvaluateExpressionAsync(_browserService.JsFunction("IGSelecionarDimensoes"));
-            _browserService.WaitFor(1);
-            result.Add("aspectratio");
-
-            await page.EvaluateExpressionAsync(_browserService.JsFunction("IGClicarEmProximo"));
-            _browserService.WaitFor(1);
-            result.Add("next");
-
-            await page.EvaluateExpressionAsync(_browserService.JsFunction("IGClicarEmProximo"));
-            _browserService.WaitFor(1);
-            result.Add("next");
-
-            await _browserService.RedigitarTextoCampo("textarea[aria-label=\"Escreva uma legenda...\"]", processo.obterDescricao(), page);
-            _browserService.WaitFor(1);
-            result.Add("caption");
-
-            await page.EvaluateExpressionAsync(_browserService.JsFunction("IGAtivarLegendasAutomaticas"));
-            _browserService.WaitFor(1);
-            result.Add("autocaption");
-
-            await page.EvaluateExpressionAsync(_browserService.JsFunction("IGPublicar"));
-            _browserService.WaitFor(4);
-            result.Add("publish");
-
-            await page.CloseAsync();
-            result.Add("close");
-
-            result.Add("end");
-            return result.Ok();
+            return await AbrirPasta(processo.pasta);
         }
 
-        public RobotResultApi AbrirPasta(Processo processo)
-        {
-            return AbrirPasta(processo.pasta);
-        }
-
-        public RobotResultApi AbrirPasta(string pasta)
+        public async Task<RobotResultApi> AbrirPasta(string pasta)
         {
             var result = new RobotResultApi("GerarVideo");
             try
             {
                 result.Add("folder start");
-                Process proc = new Process();
-                proc.StartInfo.FileName = $"explorer.exe {pasta}";
-                proc.StartInfo.WorkingDirectory = pasta;
-                proc.StartInfo.UseShellExecute = true;
-                proc.Start();
-                proc.WaitForExit();
+                var r = await _node.InvokeAsync<NodeServiceResult>($"{Settings.ApplicationRoot}/NodeServices/src/cmd.js", new object[] { $"explorer.exe {pasta.Replace("/", "\\")}" });
                 result.Add("folder opened");
             }
             catch (Exception ex)
@@ -258,4 +196,14 @@ namespace Futebox.Services
             return result.Ok();
         }
     }
+
+    //{
+    // outra forma de executar o cmd
+    //Process proc = new Process();
+    //proc.StartInfo.FileName = arquivoShell;
+    //proc.StartInfo.WorkingDirectory = processo.pasta;
+    //proc.StartInfo.UseShellExecute = true;
+    //proc.Start();
+    //proc.WaitForExit();
+    //}
 }

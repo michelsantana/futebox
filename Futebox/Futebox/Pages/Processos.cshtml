@@ -4,60 +4,52 @@
     ViewData["Title"] = "Processos";
     bool show = false;
     bool tableView = false;
+
+    var arquivados = Model.processos.FindAll(_ => _.Item1.agendamento < DateTime.Today && _.Item1.criacao < DateTime.Today);
+    var hoje = Model.processos.FindAll(_ => _.Item1.agendamento >= DateTime.Today || _.Item1.criacao >= DateTime.Today);
+
+    var agendados = hoje.FindAll(_ => _.Item1.agendado && _.Item1.status == Models.Enums.StatusProcesso.Criado);
+
+    var criados = hoje.FindAll(_ => !_.Item1.agendado && _.Item1.status == Models.Enums.StatusProcesso.Criado);
+
+    var executados = hoje.FindAll(_ =>
+        _.Item1.status != Models.Enums.StatusProcesso.Criado);
+
 }
 <div class="well">
     <button class="btn btn-info" onclick="Jobs()">Jobs</button>
 </div>
-<div class="accordion" id="accord">
-    @foreach (var grupo in Model.processos.OrderByDescending(_ => _.Item1.agendamento).Select((_, i) => new { entity = _, index = i })
-.GroupBy(_ => new { dt = _.entity.Item1.criacao.ToString("yyyyMMdd"), format = _.entity.Item1.criacao.ToString("dd/MM/yyyy") }))
-    {
-        { show = grupo.Any(_ => _.index == 0); }
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="heading@(grupo.Key.dt)">
-                <button class="accordion-button @(!show ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapse@(grupo.Key.dt)" aria-expanded="true" aria-controls="collapse@(grupo.Key.dt)">
-                    @grupo.Key.format
-                </button>
-            </h2>
-            <div id="collapse@(grupo.Key.dt)" class="accordion-collapse collapse @(show ? "show" : "")" aria-labelledby="heading@(grupo.Key.dt)" data-bs-parent="#accord">
-                <div class="accordion-body bg-light">
-                    @if (tableView)
-                    {
-                        <table id='tabela' class="table table-borderless" style="table-layout:fixed;">
-                            <thead>
-                                <tr class="align-middle">
-                                    <th width="60%" scope="col">Processo</th>
-                                    <th width="40%" scope="col" valign="middle">Configurações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @{var _i = 0;}
-                                @foreach (var processo in grupo.ToList().Select(_ => _.entity))
-                                {
-                                    @Html.Partial("Templates/_processoTableRow", Tuple.Create(Model, processo.Item1, processo.Item2, _i % 2 == 0))
-                                    { _i++; }
-                                }
-                            </tbody>
-                        </table>
-                    }
-                    else
-                    {
-                        <div class="row">
-                            @{var _i = 0;}
-                            @foreach (var processo in grupo.ToList().Select(_ => _.entity))
-                            {
-                                @Html.Partial("Templates/_processoCard", Tuple.Create(Model, processo.Item1, processo.Item2, _i % 2 == 0))
-                                { _i++; }
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
+<div class="row">
+    <div class="col">
+        <div class="col">
+            <h4 class="h4">Agendados</h4>
         </div>
-    }
+        @(await Html.PartialAsync("Templates/_processoAccordion", agendados) )
+    </div>
+    <div class="col">
+        <div class="col">
+            <h4 class="h4">Criados</h4>
+        </div>
+        @(await Html.PartialAsync("Templates/_processoAccordion", criados) )
+    </div>
+    <div class="col">
+        <div class="col">
+            <h4 class="h4">Execução</h4>
+        </div>
+        @(await Html.PartialAsync("Templates/_processoAccordion", executados) )
+    </div>
 </div>
-<div id="card"></div>
-
+<hr />
+<div class="row">
+    <div class="col text-center">
+        <h4 class="h4">ARQUIVADOS</h4>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        @(await Html.PartialAsync("Templates/_processoAccordion", arquivados))
+    </div>
+</div>
 <div class="modal" tabindex="-1">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
@@ -78,6 +70,7 @@
 @section Scripts{
     <script>
         function Executar(processo, sub) {
+            if ('@(Settings.DEBUGMODE ? "1":"0")' == '1') alert("DEBUGMODE ATIVO!");
             $.post(`/api/processo/${processo}/executar`, {}, s => {
                 $.SendToast(s.id, "Executando")
             }).fail(function () {
@@ -86,6 +79,7 @@
         }
 
         function Agendar(processo) {
+            if ('@(Settings.DEBUGMODE ? "1":"0")' == '1') alert("DEBUGMODE ATIVO!");
             var row = $(`[data-row-id="${processo}"]`);
 
             var data = row.find('.data').val();

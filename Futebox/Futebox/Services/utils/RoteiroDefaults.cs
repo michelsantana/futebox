@@ -42,12 +42,20 @@ namespace Futebox.Services
             return $"{hora} horas";
         }
 
-        public static string TraduzirDiaDoMes(DateTime dt)
+        public static string TraduzirDiaDoMesAno(DateTime dt)
         {
             var dia = dt.ToString("dd");
             var diaInt = int.Parse(dia);
             if (diaInt == 1) dia = "primeiro";
             return $"{diaInt} de { dt.ToString("MMMM") } de { dt.ToString("yyyy") }";
+        }
+
+        public static string TraduzirDiaDoMes(DateTime dt)
+        {
+            var dia = dt.ToString("dd");
+            var diaInt = int.Parse(dia);
+            if (diaInt == 1) dia = "primeiro";
+            return $"{diaInt} de { dt.ToString("MMMM") }";
         }
 
         public static string ObterHojeAmanhaOntem(DateTime dataPartida, DateTime? dataReferenciaExecucao = null)

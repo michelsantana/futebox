@@ -8,13 +8,14 @@
     var er = "🔴";
     var spinner = "<div class='spinner-border' role='status'><span class='visually-hidden'>Loading...</span></div>";
     var counter = 0m;
-    var step = 7.7m;
+    var step = 8.33m;
+    //var step = 7.7m;
     var progress = new Dictionary<int, Tuple<string, string, string, string>>();
 
 
     progress.Add((int)Futebox.Models.Enums.StatusProcesso.Erro, Tuple.Create($"0000000000000{(counter)}%", $"{s1}{er}", $"{s2}{er}", $"{s3}{er}"));
     progress.Add((int)Futebox.Models.Enums.StatusProcesso.Criado, Tuple.Create($"00000000000{(counter)}%", $"{s1}{nd}", $"{s2}{nd}", $"{s3}{nd}"));
-    progress.Add((int)Futebox.Models.Enums.StatusProcesso.Agendado, Tuple.Create($"000000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{nd}", $"{s3}{nd}"));
+    //progress.Add((int)Futebox.Models.Enums.StatusProcesso.Agendado, Tuple.Create($"000000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{nd}", $"{s3}{nd}"));
     progress.Add((int)Futebox.Models.Enums.StatusProcesso.GerandoImagem, Tuple.Create($"0000{(counter += step)}%", $"{s1}{ok}", $"{s2}{nd}", $"{s3}{nd}"));
     progress.Add((int)Futebox.Models.Enums.StatusProcesso.ImagemErro, Tuple.Create($"0000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{nd}"));
     progress.Add((int)Futebox.Models.Enums.StatusProcesso.ImagemOK, Tuple.Create($"000000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{nd}"));

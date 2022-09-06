@@ -1,0 +1,61 @@
+﻿@model List<Tuple<Futebox.Models.Processo, Futebox.Models.Agenda>>
+
+@{ 
+    bool show = false;
+    bool tableView = false;
+    var rn = new Random();
+    var rnv = rn.Next();
+}
+
+@foreach (var grupo in
+            Model.OrderByDescending(_ => _.Item1.agendamento)
+            .Select((_, i) => new { entity = _, index = i })
+            .GroupBy(_ => new
+            {
+                dt = _.entity.Item1.criacao.ToString("yyyyMMdd"),
+                format = _.entity.Item1.criacao.ToString("dd/MM/yyyy")
+            }))
+{
+    { show = grupo.Any(_ => _.index == 0); }
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading@(grupo.Key.dt+rnv)">
+            <button class="accordion-button @(!show ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapse@(grupo.Key.dt+rnv)" aria-expanded="true" aria-controls="collapse@(grupo.Key.dt+rnv)">
+                @grupo.Key.format
+            </button>
+        </h2>
+        <div id="collapse@(grupo.Key.dt+rnv)" class="accordion-collapse collapse @(show ? "show" : "")" aria-labelledby="heading@(grupo.Key.dt+rnv)" data-bs-parent="#accord">
+            <div class="accordion-body bg-dark">
+                @if (tableView)
+                {
+                    <table id='tabela' class="table table-borderless" style="table-layout:fixed;">
+                        <thead>
+                            <tr class="align-middle">
+                                <th width="60%" scope="col">Processo</th>
+                                <th width="40%" scope="col" valign="middle">Configurações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{var _i = 0;}
+                            @foreach (var processo in grupo.ToList().Select(_ => _.entity))
+                            {
+                                @Html.Partial("Templates/_processoTableRow", Tuple.Create(processo.Item1, processo.Item2, _i % 2 == 0))
+                                { _i++; }
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="row">
+                        @{var _i = 0;}
+                        @foreach (var processo in grupo.ToList().Select(_ => _.entity))
+                        {
+                            @Html.Partial("Templates/_processoCard", Tuple.Create(processo.Item1, processo.Item2, _i % 2 == 0))
+                            { _i++; }
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

@@ -117,7 +117,7 @@ namespace Futebox.Services
 
         public Tuple<string, string> ObterAtributosDoVideoJogosDia(ProcessoJogosDiaArgs args)
         {
-            var titulo = $"Jogos do dia {DateTime.Now.ToString("dd/MM/yy")}";
+            var titulo = $"Jogos do dia {DateTime.Now.ToString("dd/MM/yy")} #shorts";
             titulo = string.IsNullOrEmpty(args.titulo) ? titulo : args.titulo;
 
             var descricao = $"Fala meus parças! Vejam os jogos que teremos hoje!";
@@ -154,7 +154,6 @@ namespace Futebox.Services
         {
             try
             {
-
                 var idExternoMandante = footstatsPartida.idEquipeMandante.ToString();
                 var idExternoVisitante = footstatsPartida.idEquipeVisitante.ToString();
 

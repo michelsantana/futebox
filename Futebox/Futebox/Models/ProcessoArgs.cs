@@ -28,6 +28,7 @@ namespace Futebox.Models
         public int colunas { get; set; }
         public string titulo { get; set; }
         public DateTime? dataExecucao { get; set; }
+
         public ProcessoClassificacaoArgs()
         {
             dataExecucao = dataExecucao ?? DateTime.Now;

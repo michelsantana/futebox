@@ -41,7 +41,7 @@
     public enum StatusProcesso
     {
         Criado = 0,
-        Agendado = 10,
+        //Agendado = 10,
 
         GerandoImagem = 20,
         ImagemErro = 25,

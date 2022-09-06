@@ -1,8 +1,8 @@
-﻿@model Tuple<Futebox.Pages.ProcessosModel, Futebox.Models.Processo, Futebox.Models.Agenda, bool>
+﻿@model Tuple<Futebox.Models.Processo, Futebox.Models.Agenda, bool>
 @{
-    var processo = Model.Item2;
-    var model = Model.Item1;
-    var agenda = Model.Item3;
+    var processo = Model.Item1;
+    //var model = Model.Item1;
+    var agenda = Model.Item2;
 
     var statusErroProcesso = new Models.Enums.StatusProcesso[] {
         Models.Enums.StatusProcesso.AudioErro,
@@ -18,7 +18,7 @@
         Models.Agenda.Status.cancelado
     };
 
-    var dark = Model.Item4;
+    var dark = Model.Item3;
 }
 <tr data-row-id="@processo.id" style="border-bottom: 1px solid #cdcdcd" class="@(dark ? "bg-dark text-light" : "bg-light text-dark")">
     <td class="p-0" colspan="2">

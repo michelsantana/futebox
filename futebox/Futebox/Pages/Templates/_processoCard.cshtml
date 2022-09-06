@@ -1,8 +1,8 @@
-﻿@model Tuple<Futebox.Pages.ProcessosModel, Futebox.Models.Processo, Futebox.Models.Agenda, bool>
+﻿@model Tuple<Futebox.Models.Processo, Futebox.Models.Agenda, bool>
 @{
-    var processo = Model.Item2;
-    var model = Model.Item1;
-    var agenda = Model.Item3;
+    var processo = Model.Item1;
+    //var model = Model.Item1;
+    var agenda = Model.Item2;
 
     var statusErroProcesso = new Models.Enums.StatusProcesso[] {
         Models.Enums.StatusProcesso.AudioErro,
@@ -18,11 +18,16 @@
         Models.Agenda.Status.cancelado
     };
 
-    var dark = Model.Item4;
+    var statusSucesso = new Models.Agenda.Status[] {
+        Models.Agenda.Status.concluido
+    };
+
+    var dark = Model.Item3;
+
 }
 
-<div class="col-4 mt-2 mb-2 @(dark ? "--bg-dark --text-light" : "--bg-light --text-dark")">
-    <div data-row-id="@processo.id" class="card shadow ">
+<div class="col mt-2 mb-2 @(dark ? "--bg-dark --text-light" : "--bg-light --text-dark")">
+    <div data-row-id="@processo.id" class='card shadow'>
         <div class="card-body">
             <h5 class="card-title">@Html.IconHelper(processo.social, 24) @processo.nome</h5>
             <h6 class="card-subtitle mb-2 text-muted">@processo.id</h6>
@@ -31,62 +36,67 @@
         <div class="card-body">
             @Html.Partial("Templates/_processoSteps", processo)
         </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-                <span class="badge bg-dark text-white">@processo.categoria</span>
-                @Html.SocialBadge(processo.social)
-                @Html.StatusBadge(processo.status)
-            </li>
-            @if (!string.IsNullOrEmpty(agenda?.id))
-            {
-                <li class="list-group-item">
-                    <a href="#"><span class="badge bg-black text-white" onclick="Jobs('@processo.id');">@agenda?.processoId</span></a>
-                    @Html.StatusBadge(agenda?.status)
-                </li>
-            }
-            <li class="list-group-item">
-                @*<label class="col-form-label-lg col-form-label-sm"><b>dd/MM/yyyy HH:mm:ss</b></label>*@
-                <div class="input-group">
-                    @*<input type="date" style="flex:4;" class="data form-control form-control-sm" value="@(processo.agendamento?.ToString("yyyy-MM-dd"))">
-                        <input type="number" style="flex:1;" min="0" max="23" class="hora form-control form-control-sm" value="@(processo.agendamento?.ToString("HH"))">
-                        <input type="number" style="flex:1;" min="0" max="60" class="min form-control form-control-sm" value="@(processo.agendamento?.ToString("mm"))">
-                        <input type="number" style="flex:1;" min="0" max="60" class="seg form-control form-control-sm" value="@(processo.agendamento?.ToString("ss"))">*@
-                    <input type="datetime-local" step=1 class="data form-control form-control-sm" value="@(processo.agendamento?.ToString("yyyy-MM-ddTHH:mm:ss"))">
-                    <button type='button' class="btn btn-sm btn-outline-light">@(processo.agendado)</button>
-                    <button type='button' class="btn btn-sm btn-outline-danger" onclick="AgendarCancelar('@processo.id');">❌</button>
+        <div class="card-body">
+
+            <span class="badge bg-black text-white">@processo.categoria</span>
+            @Html.SocialBadge(processo.social)
+            @Html.StatusBadge(processo.status)
+        </div>
+
+        @if (!string.IsNullOrEmpty(agenda?.id))
+        {
+            <div class="card-body">
+
+                <a href="#"><span class="badge bg-black text-white" onclick="Jobs('@processo.id');">@agenda?.processoId</span></a>
+                @Html.StatusBadge(agenda?.status)
+            </div>
+
+        }
+        <div class="card-body">
+
+            @*<label class="col-form-label-lg col-form-label-sm"><b>dd/MM/yyyy HH:mm:ss</b></label>*@
+            <div class="input-group">
+                @*<input type="date" style="flex:4;" class="data form-control form-control-sm" value="@(processo.agendamento?.ToString("yyyy-MM-dd"))">
+                    <input type="number" style="flex:1;" min="0" max="23" class="hora form-control form-control-sm" value="@(processo.agendamento?.ToString("HH"))">
+                    <input type="number" style="flex:1;" min="0" max="60" class="min form-control form-control-sm" value="@(processo.agendamento?.ToString("mm"))">
+                    <input type="number" style="flex:1;" min="0" max="60" class="seg form-control form-control-sm" value="@(processo.agendamento?.ToString("ss"))">*@
+                <input type="datetime-local" step=1 class="data form-control form-control-sm" value="@(processo.agendamento?.ToString("yyyy-MM-ddTHH:mm:ss"))">
+                <button type='button' class="btn btn-sm @(processo.agendado ? "btn-outline-success" : "btn-outline-light") disabled">@(processo.agendado ? Html.material().i("calendar-clock").s(24).c("37e02f").build() : Html.material().i("calendar-clock").s(24).c("ffffff").build())</button>
+                <button type='button' class="btn btn-sm btn-outline-danger" onclick="AgendarCancelar('@processo.id');">@Html.material().i("calendar-remove-outline").s(24).c("f00f00").build()</button>
+            </div>
+        </div>
+
+        <div class="card-body d-flex justify-content-between">
+            <div class="d-flex flex-column">
+                <label class="col-form-label-lg col-form-label-sm"><b>Status</b></label>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-light" onclick="Imagem('@processo.id');">
+                        @(Html.material().i("image").s(24).c("cdcdcd").build())
+                    </button>
+                    <button class="btn btn-sm btn-outline-light" onclick="Audio('@processo.id');">
+                        @Html.material().i("volume-high").s(24).c("cdcdcd").build()
+                    </button>
+                    <button class="btn btn-sm btn-outline-light" onclick="Video('@processo.id');">
+                        @Html.material().i("video-box").s(24).c("cdcdcd").build()
+                    </button>
+                    <button class="btn btn-sm btn-outline-light" onclick="Publicar('@processo.id');">
+                        @Html.material().i("cloud-upload").s(24).c("cdcdcd").build()
+                    </button>
                 </div>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-                <div class="d-flex flex-column">
-                    <label class="col-form-label-lg col-form-label-sm"><b>Status</b></label>
-                    <div class="btn-group">
-                        <button class="btn btn-sm btn-outline-dark" onclick="Imagem('@processo.id');">
-                            🖼
-                        </button>
-                        <button class="btn btn-sm btn-outline-dark" onclick="Audio('@processo.id');">
-                            🔊
-                        </button>
-                        <button class="btn btn-sm btn-outline-dark" onclick="Video('@processo.id');">
-                            🎞
-                        </button>
-                        <button class="btn btn-sm btn-outline-dark" onclick="Publicar('@processo.id');">
-                            🌐
-                        </button>
-                    </div>
+            </div>
+            <div class="d-flex flex-column">
+                <label class="col-form-label-lg col-form-label-sm"><b>Tools</b></label>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-light" onclick="Pasta('@processo.pasta');">
+                        📂
+                    </button>
+                    <button class="btn btn-sm btn-outline-light" onclick="Log('@processo.id');">
+                        🧾
+                    </button>
                 </div>
-                <div class="d-flex flex-column">
-                    <label class="col-form-label-lg col-form-label-sm"><b>Tools</b></label>
-                    <div class="btn-group">
-                        <button class="btn btn-sm btn-outline-dark" onclick="Pasta('@processo.pasta');">
-                            📂
-                        </button>
-                        <button class="btn btn-sm btn-outline-dark" onclick="Log('@processo.id');">
-                            🧾
-                        </button>
-                    </div>
-                </div>
-            </li>
-        </ul>
+            </div>
+        </div>
+
         <div class="card-body d-flex justify-content-between">
             <div class="text-start">
                 <button class="btn btn-sm btn-danger" onclick="return Delete('@processo.id');">

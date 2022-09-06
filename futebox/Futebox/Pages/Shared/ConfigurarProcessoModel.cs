@@ -11,6 +11,10 @@ namespace Futebox.Pages
         public string tituloPadrao { get; set; }
         public Mode modo { get; set; }
 
+        public bool mostrarCampoData { get; set; }
+        public bool mostrarCampoRange { get; set; }
+        public DateTime? dataExecucaoRetroativa { get; set; }
+
         public enum Mode
         {
             view,

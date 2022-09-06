@@ -65,8 +65,8 @@ module.exports = function (
                 const endFile = resultsPath;
                 if (fs.existsSync(endFile)) fs.rmSync(endFile);
 
-                const commandMerge = `ffmpeg -i "concat:${files.join('|')}" -c copy -map 0:0 -f mp3 ${slowFile}`;
-                const commandSpeedup = `ffmpeg -i "${uuidPath}/slow.mp3" -filter:a atempo=1.56 "${endFile}"`;
+                const commandMerge = `ffmpeg -y -i "concat:${files.join('|')}" -c copy -map 0:0 -f mp3 ${slowFile}`;
+                const commandSpeedup = `ffmpeg -y -i "${uuidPath}/slow.mp3" -filter:a atempo=1.56 "${endFile}"`;
 
                 console.log(commandMerge);
                 exec(commandMerge);

@@ -20,6 +20,12 @@
     var vertical = int.Parse(h) > int.Parse(w);
     var grupos = Model.classificacao.ToList();
     grupos.ForEach(_ => _.grupo = vertical ? "SINGLE" : _.grupo);
+
+    var groupBy = grupos.GroupBy(_ => _.grupo);
+    Dictionary<string, List<Futebox.Models.ClassificacaoVM>> byGroup
+        = new Dictionary<string, List<Models.ClassificacaoVM>>();
+
+    var range = Model.args.range ?? new int[] { 0, 99 };
 }
 
 @Html.Partial("Miniaturas/_classificacaoSemGrupos.style", Model)
@@ -46,7 +52,7 @@
                     <td class="s2">GC</td>
                     <td class="s2">SD</td>
                 </tr>
-                @foreach (var time in grupo)
+                @foreach (var time in grupo.Where(_ => _.posicao >= range[0] && _.posicao <= range[1]))
                 {
                     <tr>
                         <td class="s2"><span class="@(ObterDestaque(time.corDestaque))">&nbsp;</span></td>

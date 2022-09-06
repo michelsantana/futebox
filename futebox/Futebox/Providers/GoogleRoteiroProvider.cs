@@ -10,6 +10,7 @@ namespace Futebox.Providers
     public class GoogleRoteiroProvider : IRoteiroProvider
     {
         private string ObterSaudacao() => $"Fala torcedor e torcedora, bem vindo ao canal fute box. ";
+        private string ObterSaudacao2() => $"Fala meus chegados: ";
 
         private static string ObterTrechoEmpate(PartidaVM partida)
         {
@@ -18,7 +19,7 @@ namespace Futebox.Providers
                     $"empataram por {partida.golsMandante} a {partida.golsMandante} no estádio, {partida.estadio}. " +
                     $"Esse foi um jogo do campeonato, {partida.campeonato}: " +
                     $"e iniciou por volta das {RoteiroDefaults.TraduzirHoras(partida.dataPartida)}. " +
-                    $"Pra quem você estava torcendo? deixa aqui nos comentários junto com aquela deedáda no laique.";
+                    $"Pra quem você estava torcendo? deixa aqui nos comentários junto com aquela dedada no laique.";
         }
 
         private static string ObterTrechoVencedor(PartidaVM partida, Time vencedor, Time perdedor)
@@ -30,7 +31,7 @@ namespace Futebox.Providers
                     $"por {golsVencedor} a {golsPerdedor} no estádio {partida.estadio}. " +
                     $"Esse foi um jogo do campeonato, {partida.campeonato}: " +
                     $"e iniciou {RoteiroDefaults.ObterHojeAmanhaOntem(partida.dataPartida)} por volta das {RoteiroDefaults.TraduzirHoras(partida.dataPartida)}. " +
-                    $"Pra quem você estava torcendo? deixa aqui nos comentários junto com aquela deedáda no laique.";
+                    $"Pra quem você estava torcendo? deixa aqui nos comentários junto com aquela dedada no laique.";
         }
 
         private bool IdentificaClassico(Time timeMandante, Time timeVisitante)
@@ -45,9 +46,16 @@ namespace Futebox.Providers
         public string ObterRoteiroDaClassificacao(IEnumerable<ClassificacaoVM> classificacao, ProcessoClassificacaoArgs processoClassificacaoArgs)
         {
 
-            var msg = $"{ObterSaudacao()} "
+            var msg = "";
+
+            if (processoClassificacaoArgs.social == Models.Enums.RedeSocialFinalidade.YoutubeShorts)
+                msg += $"{ObterSaudacao2()} ";
+            else
+                msg += $"{ObterSaudacao()} ";
+
+            msg += $""
                 + $"Veja a classificação do \"{CampeonatoUtils.ObterNomeDoCampeonato(processoClassificacaoArgs.campeonato)}\": "
-                + $"Classificação atualizada {RoteiroDefaults.ObterHojeAmanhaOntem(processoClassificacaoArgs.dataExecucao.Value)}, {RoteiroDefaults.TraduzirDiaDoMes(processoClassificacaoArgs.dataExecucao.Value)}: "
+                + $"Atualizada {RoteiroDefaults.ObterHojeAmanhaOntem(processoClassificacaoArgs.dataExecucao.Value)}, {RoteiroDefaults.TraduzirDiaDoMes(processoClassificacaoArgs.dataExecucao.Value)}: "
                 + $"Bora: ";
 
             var rnd = new Random();
@@ -60,7 +68,6 @@ namespace Futebox.Providers
             if (processoClassificacaoArgs.classificacaoPorGrupos)
             {
                 var grupos = classificacao.Select(_ => _.grupo).Distinct().ToList();
-
                 grupos
                     .FindAll(_ => processoClassificacaoArgs.grupos.Contains(_))
                     .ToList()
@@ -68,7 +75,8 @@ namespace Futebox.Providers
                     {
                         msg += $"No Grupo {g}: ";
                         msg += "";
-                        var classGrupo = classificacao.ToList().FindAll(_ => _.grupo == g);
+                        var classGrupo = classificacao.ToList()
+                            .FindAll(_ => _.grupo == g);
 
                         classGrupo
                     .FindAll(_ => _.posicao >= (range[0]) && _.posicao <= (range[1]))
@@ -149,7 +157,7 @@ namespace Futebox.Providers
         public string ObterRoteiroDoJogosDoDia(IEnumerable<PartidaVM> partidas, ProcessoJogosDiaArgs args)
         {
             var roteiro = ObterSaudacao();
-            roteiro += $"Veja agora a programação dos jogos de {RoteiroDefaults.ObterHojeAmanhaOntem(DateTime.Now)}: ";
+            roteiro += $"Vejam agora os jogos de {RoteiroDefaults.ObterHojeAmanhaOntem(DateTime.Now)}: ";
 
             var grupos = partidas.Select(_ => _.campeonato).Distinct().ToList();
 
@@ -171,10 +179,9 @@ namespace Futebox.Providers
                             roteiro += $"às {RoteiroDefaults.TraduzirHoras(_.dataPartida)}: ";
                             roteiro += $"no estádio {_.estadio}: ";
                         });
-                    roteiro += $"Pra qual time você torce?: deixa aqui nos comentários junto com aquela dedada no laique. Até a próxima. ";
                 });
 
-
+                roteiro += $"Pra qual time você torce?: deixa aqui nos comentários junto com aquela dedada no laique. Até a próxima. ";
             }
             else
             {
@@ -185,7 +192,6 @@ namespace Futebox.Providers
                .ToList().ForEach(gp =>
                {
                    var dia = gp.FirstOrDefault().dataPartida;
-                   roteiro += $"{dia.ToString("D")}: ";
                    gp.ToList().ForEach(_ =>
                    {
                        roteiro += $"{_.timeMandante.ObterNomeWatson()} e {_.timeVisitante.ObterNomeWatson()}: ";
@@ -197,7 +203,6 @@ namespace Futebox.Providers
                    });
                });
                 roteiro += $"Pra qual time você torce?: deixa aqui nos comentários junto com aquela dedada no laique. Até a próxima. ";
-                return roteiro;
             }
 
             return roteiro;

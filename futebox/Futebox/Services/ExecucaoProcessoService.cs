@@ -23,10 +23,10 @@ namespace Futebox.Services
                 return s;
             }
             public static StatusProcesso[] statusNaoExecutaveis
-                = Group(StatusProcesso.Criado, StatusProcesso.PublicandoOK);
+                = Group(/*StatusProcesso.Criado,*/ StatusProcesso.PublicandoOK);
 
             public static StatusProcesso[] statusGerarImagem
-                = Group(StatusProcesso.Agendado, StatusProcesso.ImagemErro);
+                = Group(/*StatusProcesso.Agendado,*/ StatusProcesso.Criado, StatusProcesso.ImagemErro);
 
             public static StatusProcesso[] statusGerarAudio
                 = Group(StatusProcesso.ImagemOK, StatusProcesso.AudioErro);
@@ -65,7 +65,7 @@ namespace Futebox.Services
                 try
                 {
                     result.Add("Buscar processo");
-                    Promise.All(async () => processo = await _processoService.Obter(processoId),
+                    await Promise.All(async () => processo = await _processoService.Obter(processoId),
                         async () =>
                         {
                             agenda = await _agendamentoService.Obter(processoId);
@@ -99,17 +99,21 @@ namespace Futebox.Services
 
                         if (StatusSteps.statusPublicarVideo.Any(_ => _ == processo.status))
                         {
-                            log(EyeLog.Log($"[PUBLICAR][START][{processoId}]"));
-                            await _processoService.PublicarVideo(processo);
-                            log(EyeLog.Log($"[PUBLICAR][COMPLETE][{processoId}]"));
+                            if (!Settings.DEBUGMODE)
+                            {
+                                log(EyeLog.Log($"[PUBLICAR][START][{processoId}]"));
+                                await _processoService.PublicarVideo(processo);
+                                log(EyeLog.Log($"[PUBLICAR][COMPLETE][{processoId}]"));
+                            }
                         }
                     }
 
                     agenda.status = Agenda.Status.concluido;
-                    Promise.All(
+                    await Promise.All(
                         () => _notifyService.Notify(processo.nome),
                         async () => agenda = await _agendamentoService.Salvar(agenda)
                     );
+                    if(Settings.DEBUGMODE) throw new Exception("DEBUGMODE");
                     result.Ok();
                 }
                 catch (Exception ex)
@@ -117,7 +121,7 @@ namespace Futebox.Services
                     log(EyeLog.Log($"[ERROR][{processoId}]"));
                     log(EyeLog.Log($"{ex.Message}"));
                     agenda.status = Agenda.Status.erro;
-                    Promise.All(() => _agendamentoService.Salvar(agenda));
+                    await Promise.All(() => _agendamentoService.Salvar(agenda));
                     result.Error();
                 }
             }, new object[] { id });

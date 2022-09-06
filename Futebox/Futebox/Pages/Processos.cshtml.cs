@@ -31,7 +31,7 @@ namespace Futebox.Pages
         {
             var p = new List<Processo>();
             var a = new List<Agenda>();
-            Promise.All(
+            Task.WaitAll(Promise.All(
                 async () =>
                 {
                     p = (await _processoService.ObterProcessos())?.ToList();
@@ -42,7 +42,7 @@ namespace Futebox.Pages
                     a = (await _agendamentoService.List())?.ToList();
                     a = a.OrderBy(_ => (_.criacao.Ticks) * -1).ToList();
                 }
-            );
+            ));
             processos = p.Select(s => Tuple.Create(s, a.Find(_ => _.processoId == s.id))).ToList();
         }
 

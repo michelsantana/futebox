@@ -30,7 +30,7 @@
     var sociaisHabilitadasPagina = new Futebox.Models.Enums.RedeSocialFinalidade[] {
         Futebox.Models.Enums.RedeSocialFinalidade.InstagramVideo,
         Futebox.Models.Enums.RedeSocialFinalidade.YoutubeVideo,
-        //Futebox.Models.Enums.RedeSocialFinalidade.YoutubeShorts
+        Futebox.Models.Enums.RedeSocialFinalidade.YoutubeShorts
     };
 }
 <hr />
@@ -99,5 +99,7 @@
     new Futebox.Pages.ConfigurarProcessoModel() { 
         redeSocials = sociaisHabilitadasPagina,
         modo = ConfigurarProcessoModel.Mode.view,
-        tituloPadrao = $"Classificação {Model.nomeCampeonato} {DateTime.Now.ToString("yyyy")} - Atualizada {DateTime.Now.ToString("dd/MM/yyyy")}"
+        tituloPadrao = $"Classificação {Model.nomeCampeonato} {DateTime.Now.ToString("yyyy")} - Atualizada {DateTime.Now.ToString("dd/MM/yyyy")}",
+        mostrarCampoData = true,
+        mostrarCampoRange = true
     })

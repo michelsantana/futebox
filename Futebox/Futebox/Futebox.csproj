@@ -7,14 +7,20 @@
 	<ItemGroup>
 	  <Compile Remove="Controllers\PartidasController.cs" />
 	  <Compile Remove="Models\Entity\Subprocesso.cs" />
+	  <Compile Remove="Pages\ClassificacaoParcial.cshtml.cs" />
 	  <Compile Remove="Services\FutebotService.Audio.cs" />
 	  <Compile Remove="Services\Jobs\QueueJob.cs" />
 	  <Compile Remove="Services\OLD.AgendamentoService.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Remove="Pages\ClassificacaoParcial.cshtml" />
 	  <Content Remove="Pages\Miniaturas\_classificacaoTabela.cshtml" />
 	  <Content Remove="Pages\Templates\_partidaCardFoco.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="NodeServices\src\file.io.js" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -44,7 +50,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="NodeServices\" />
 	  <Folder Include="Pages\Partida\" />
 	</ItemGroup>
 

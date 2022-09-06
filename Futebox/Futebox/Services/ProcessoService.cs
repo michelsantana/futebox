@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.IO;
 using Futebox.Providers;
+using Futebox.Services.utils;
 
 namespace Futebox.Services
 {
@@ -99,21 +100,20 @@ namespace Futebox.Services
         public async Task<Processo> AgendarProcesso(string id, DateTime hora)
         {
             Processo p = null;
-            Task.WaitAll(new Task[]{
-                Task.Run(() =>
+            await Promise.All(() =>
                 {
                     var p = _processoRepositorio.GetById(id);
 
                     p.agendamento = hora;
-                    p.status = StatusProcesso.Agendado;
+                    //p.status = StatusProcesso.Agendado;
                     p.agendado = true;
 
                     _processoRepositorio.OpenTransaction();
                     _processoRepositorio.Update(p);
                     _processoRepositorio.Commit();
-                }),
-                Task.Run(() =>_agendamentoService.Agendar(id, hora))
-            });
+                },
+                () => _agendamentoService.Agendar(id, hora)
+            );
             return p;
         }
 
@@ -178,7 +178,7 @@ namespace Futebox.Services
             await AtualizarAtributos(processo);
             processo = await AtualizarStatus(processo, StatusProcesso.GerandoVideo);
 
-            var resultado = _futebotService.GerarVideo(processo);
+            var resultado = await _futebotService.GerarVideo(processo);
             await AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
             if (resultado.status == HttpStatusCode.OK)
@@ -222,7 +222,7 @@ namespace Futebox.Services
 
         public async Task AbrirPasta(Processo processo)
         {
-            var resultado = _futebotService.AbrirPasta(processo);
+            var resultado = await _futebotService.AbrirPasta(processo);
             if (resultado.status == HttpStatusCode.InternalServerError) throw new Exception("Erro ao gerar o vídeo!");
             if (resultado.status == HttpStatusCode.BadRequest) throw new Exception("Comando inválido");
         }

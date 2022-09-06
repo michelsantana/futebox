@@ -11,10 +11,9 @@ namespace Futebox.Services.Interfaces
 
         Task<RobotResultApi> GerarImagem(Processo processo);
         Task<RobotResultApi> GerarAudio(Processo processo, bool buscarDoCacheDownload = false, bool buscarDoCacheArquivos = false);
-        RobotResultApi GerarVideo(Processo processo);
+        Task<RobotResultApi> GerarVideo(Processo processo);
         Task<RobotResultApi> PublicarVideo(Processo processo);
-        RobotResultApi AbrirPasta(Processo processo);
-        RobotResultApi AbrirPasta(string pasta);
-
+        Task<RobotResultApi> AbrirPasta(Processo processo);
+        Task<RobotResultApi> AbrirPasta(string pasta);
     }
 }

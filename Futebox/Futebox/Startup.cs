@@ -82,9 +82,8 @@ namespace Futebox
 
 
             services.AddSingleton(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
-            services.AddQuartz(_ => 
-                _.UseMicrosoftDependencyInjectionScopedJobFactory());
-            services.AddNodeServices();
+            services.AddQuartz(_ => _.UseMicrosoftDependencyInjectionScopedJobFactory());
+            services.AddNodeServices(_ => _.InvocationTimeoutMilliseconds = 60000 * 2);
             ConfigureMigrations(services);
             ConfigureFluentMapper();
             DestroyBrowserInstance();

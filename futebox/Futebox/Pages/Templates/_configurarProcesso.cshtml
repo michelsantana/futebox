@@ -29,6 +29,18 @@
     <tr>
         <th>Social</th>
         <th>Formato</th>
+        @if (Model.mostrarCampoData)
+        {
+            <td>
+                Execução
+            </td>
+        }
+        @if (Model.mostrarCampoRange)
+        {
+            <td>
+                Range
+            </td>
+        }
         <th>Titulo</th>
         <th>Ação</th>
     </tr>
@@ -41,7 +53,7 @@
             @if (Model.modo == ConfigurarProcessoModel.Mode.view)
             {
                 <td>
-                    <div class="">
+                    <div class="form-gro">
                         <select name='viewName' class='form-select form-select-sm'>
                             <optgroup label='defaults'>
                                 <option value='_classificacaoSemGrupos' selected="selected">Padrão (class. s/g)</option>
@@ -49,6 +61,18 @@
                         </select>
                     </div>
                 </td>
+                @if (Model.mostrarCampoData)
+                {
+                    <td>
+                        <input type="date" class="form-control form-control-sm" name="dataExecucao" value="@(DateTime.Now.ToString("yyyy-MM-dd"))">
+                    </td>
+                }
+                @if (Model.mostrarCampoRange)
+                {
+                    <td>
+                        <input type="text" class="form-control form-control-sm" name="range" value="1-99">
+                    </td>
+                }
             }
             else
             {

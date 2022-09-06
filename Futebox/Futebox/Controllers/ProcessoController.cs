@@ -108,7 +108,7 @@ namespace Futebox.Controllers
         [HttpGet("pasta")]
         public async Task<bool> Pasta(string q)
         {
-            return (_futebotService.AbrirPasta(q)).IsOk();
+            return (await _futebotService.AbrirPasta(q)).IsOk();
         }
 
         [HttpGet("{id}/log")]
@@ -127,10 +127,10 @@ namespace Futebox.Controllers
         public async Task<Processo> ImagemProcesso(string id)
         {
             var processo = await ObterProcesso(id);
-            if(processo.agendado)
-                return await _processoService.AtualizarStatus(processo, StatusProcesso.Agendado);
-            else
-                return await _processoService.AtualizarStatus(processo, StatusProcesso.Criado);
+            //if(processo.agendado)
+            //    return await _processoService.AtualizarStatus(processo, StatusProcesso.Agendado);
+            //else
+            return await _processoService.AtualizarStatus(processo, StatusProcesso.Criado);
         }
 
         [HttpGet("{id}/audio")]

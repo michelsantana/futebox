@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Futebox
 {
@@ -51,7 +49,7 @@ namespace Futebox
             return s switch
             {
                 StatusProcesso.Criado => _.Raw($"<span class='badge bg-primary text-white'>{s}</span>"),
-                StatusProcesso.Agendado => _.Raw($"<span class='badge bg-primary text-white'>🗓{s}</span>"),
+                //StatusProcesso.Agendado => _.Raw($"<span class='badge bg-primary text-white'>🗓{s}</span>"),
 
                 StatusProcesso.ImagemOK => _.Raw($"<span class='badge bg-success text-white'>✔{s}</span>"),
                 StatusProcesso.AudioOK => _.Raw($"<span class='badge bg-success text-white'>✔{s}</span>"),
@@ -106,17 +104,78 @@ namespace Futebox
         {
             return _.Raw($"<img src='https://icongr.am/{collection}/{icon}.svg?size={size}&color=currentColor&colored=false' />");
         }
-        public static IHtmlContent IconSimpleHelper(this IHtmlHelper _, string collection, string icon, int size)
+        public static IHtmlContent IconSimpleHelper(this IHtmlHelper _, string icon, int size)
         {
             return IconHelper(_, "simple", icon, size);
         }
-        public static IHtmlContent IconMaterialHelper(this IHtmlHelper _, string collection, string icon, int size)
+        public static IHtmlContent IconMaterialHelper(this IHtmlHelper _, string icon, int size)
         {
             return IconHelper(_, "material", icon, size);
         }
-        public static IHtmlContent IconEntypoHelper(this IHtmlHelper _, string collection, string icon, int size)
+        public static IHtmlContent IconEntypoHelper(this IHtmlHelper _, string icon, int size)
         {
             return IconHelper(_, "entypo", icon, size);
+        }
+
+        public static iconBuilder material(this IHtmlHelper _)
+        {
+            return iconBuilder.material(_);
+        }
+        public static iconBuilder simple(this IHtmlHelper _)
+        {
+            return iconBuilder.simple(_);
+        }
+        public static iconBuilder entypo(this IHtmlHelper _)
+        {
+            return iconBuilder.entypo(_);
+        }
+
+        public class iconBuilder
+        {
+            IHtmlHelper _ { get; set; }
+            string collection { get; set; }
+            string icon { get; set; }
+            int size { get; set; }
+            string color { get; set; }
+
+            public iconBuilder(IHtmlHelper _, string collection)
+            {
+                this._ = _;
+                this.collection = collection;
+            }
+
+            public static iconBuilder material(IHtmlHelper _)
+            {
+                return new iconBuilder(_, "material");
+            }
+            public static iconBuilder simple(IHtmlHelper _)
+            {
+                return new iconBuilder(_, "simple");
+            }
+            public static iconBuilder entypo(IHtmlHelper _)
+            {
+                return new iconBuilder(_, "entypo");
+            }
+
+            public iconBuilder i(string i)
+            {
+                this.icon = i;
+                return this;
+            }
+            public iconBuilder s(int i)
+            {
+                this.size = i;
+                return this;
+            }
+            public iconBuilder c(string i)
+            {
+                this.color = i;
+                return this;
+            }
+            public IHtmlContent build()
+            {
+                return _.Raw($"<img src='https://icongr.am/{this.collection}/{this.icon}.svg?size={this.size}&color={this.color}&colored=true' />");
+            }
         }
     }
 }

@@ -79,13 +79,13 @@ namespace Futebox.Services
         {
             var seletorRodapeJanela = ".button-area.ytcp-uploads-dialog";
             await _page.ClickAsync($"{seletorRodapeJanela} #next-button");
-            _browserService.WaitFor(1);
+            _browserService.WaitFor(3);
         }
 
         public async Task SelecionarPrivacidade()
         {
             if (Settings.DEBUGMODE) await _page.ClickAsync("[name=\"PRIVATE\"]");
-            _browserService.WaitFor(1);
+            _browserService.WaitFor(3);
         }
 
         public async Task ClicarEmPublicar()
@@ -128,10 +128,12 @@ namespace Futebox.Services
 
                 await _browserService.RedigitarTextoCampo(".input-container.title #textbox", processo.obterTitulo(), _page);
                 _browserService.WaitFor(1);
+                await _page.Keyboard.PressAsync("Escape");
                 result.Add("title");
 
                 await _browserService.RedigitarTextoCampo(".input-container.description #textbox", processo.obterDescricao(), _page);
                 _browserService.WaitFor(1);
+                await _page.Keyboard.PressAsync("Escape");
                 result.Add("description");
 
                 await SelecionarPlayList($"{processo.categoria}");

@@ -86,28 +86,28 @@ namespace Futebox
             services.AddNodeServices(_ => _.InvocationTimeoutMilliseconds = 60000 * 2);
             ConfigureMigrations(services);
             ConfigureFluentMapper();
-            DestroyBrowserInstance();
+            //DestroyBrowserInstance();
         }
 
-        private void DestroyBrowserInstance()
-        {
-            ManagementClass mngmtClass = new ManagementClass("Win32_Process");
-            foreach (ManagementObject o in mngmtClass.GetInstances())
-            {
-                if (o["Name"].Equals("chrome.exe") && o["CommandLine"].ToString().Contains("SxS"))
-                {
-                    try
-                    {
-                        Console.WriteLine(o["Name"] + " [" + o["CommandLine"] + "]");
-                        var reason = o.InvokeMethod("Terminate", null);
-                    }
-                    catch (Exception ex)
-                    {
+        //private void DestroyBrowserInstance()
+        //{
+        //    ManagementClass mngmtClass = new ManagementClass("Win32_Process");
+        //    foreach (ManagementObject o in mngmtClass.GetInstances())
+        //    {
+        //        if (o["Name"].Equals("chrome.exe") && o["CommandLine"].ToString().Contains("SxS"))
+        //        {
+        //            try
+        //            {
+        //                Console.WriteLine(o["Name"] + " [" + o["CommandLine"] + "]");
+        //                var reason = o.InvokeMethod("Terminate", null);
+        //            }
+        //            catch (Exception ex)
+        //            {
 
-                    }
-                }
-            }
-        }
+        //            }
+        //        }
+        //    }
+        //}
 
         private void ConfigureMigrations(IServiceCollection services)
         {

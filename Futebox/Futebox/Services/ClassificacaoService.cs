@@ -70,6 +70,7 @@ namespace Futebox.Services
             var data = DateTime.Now.ToString("dd/MM/yyyy");
             var ano = DateTime.Now.ToString("yyyy");
             var titulo = $"CLASSIFICAÇÃO {camp} {ano} - {data} - ATUALIZADA";
+            if (processoClassificacaoArgs.social == RedeSocialFinalidade.YoutubeShorts) titulo += " #shorts";
 
             titulo = string.IsNullOrEmpty(processoClassificacaoArgs.titulo) ? titulo : processoClassificacaoArgs.titulo;
 

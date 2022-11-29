@@ -58,5 +58,6 @@
     {
         redeSocials = sociaisHabilitadasPagina,
         modo = ConfigurarProcessoModel.Mode.aspect,
-        tituloPadrao = $"{Model.First().campeonato} - jogos do dia {DateTime.Now.ToString("dd/MM/yy")}"
+        tituloPadrao = $"{Model.First().campeonato} - jogos do dia {{DATA}}",
+        mostrarCampoDataRelativa = true
     })

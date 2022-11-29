@@ -1,6 +1,8 @@
 ﻿using Futebox.Services.Interfaces;
 using PuppeteerSharp;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -11,6 +13,14 @@ namespace Futebox.Services
     public class BrowserService : IBrowserService
     {
         protected Browser browser { get; set; }
+        public enum TypingKeyword
+        {
+            Escape,
+        }
+        public IEnumerable<TypingKeyword> keywords = new List<TypingKeyword>()
+        {
+            {TypingKeyword.Escape},
+        };
 
         public BrowserService()
         {
@@ -59,7 +69,7 @@ namespace Futebox.Services
         protected async Task OpenBrowser(bool headless = false, bool isRetrying = false)
         {
             var userProfile = Environment.GetEnvironmentVariable("USERPROFILE");
-            if(browser != null)
+            if (browser != null)
                 await browser?.CloseAsync();
             browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
@@ -132,7 +142,17 @@ namespace Futebox.Services
             await page.Keyboard.DownAsync("Backspace");
             WaitForMs(700);
 
+            //var textofinal = new List<string>();
+
+            //var textoPalavras = texto.Split("\n").ToList();
+            //textoPalavras.ForEach(_ =>
+            //{
+            //    var escape = _ == $"[{TypingKeyword.Escape}]";
+            //    if (escape) page.Keyboard.PressAsync("Escape");
+            //});
+
             await page.Keyboard.TypeAsync(texto);
+
             WaitForMs(700);
         }
 

@@ -21,7 +21,8 @@ namespace Futebox.Models
             { Enums.EnumCampeonato.BrasileiraoSerieA2022, new CampeonatoConfig() },
             { Enums.EnumCampeonato.BrasileiraoSerieB2022, new CampeonatoConfig() },
             { Enums.EnumCampeonato.Libertadores2021, new CampeonatoConfig() },
-            { Enums.EnumCampeonato.Paulistao2022, new CampeonatoConfig() { classificacaoPorGrupo = true, fases = new string[] { "Primeira Fase", "Quartas de Final", "Semifinal", "Final" } } }
+            { Enums.EnumCampeonato.Paulistao2022, new CampeonatoConfig() { classificacaoPorGrupo = true, fases = new string[] { "Primeira Fase", "Quartas de Final", "Semifinal", "Final" } } },
+            { Enums.EnumCampeonato.COPA2022, new CampeonatoConfig() { classificacaoPorGrupo = true, fases = new string[] { "Primeira Fase", "Quartas de Final", "Semifinal", "Final" } } },
         };
 
         public static string ObterNomeDoCampeonato(Enums.EnumCampeonato campeonato) =>
@@ -31,6 +32,7 @@ namespace Futebox.Models
             campeonato == Enums.EnumCampeonato.BrasileiraoSerieB2022 ? "Brasileirão Série B" :
             campeonato == Enums.EnumCampeonato.Libertadores2021 ? "Libertadores" :
             campeonato == Enums.EnumCampeonato.Paulistao2022 ? "Paulistão" :
+            campeonato == Enums.EnumCampeonato.COPA2022 ? "Copa do mundo 2022" :
             ""
             ;
 
@@ -41,6 +43,7 @@ namespace Futebox.Models
             campeonato == Enums.EnumCampeonato.BrasileiraoSerieB2022 ? "B" :
             campeonato == Enums.EnumCampeonato.Libertadores2021 ? "" :
             campeonato == Enums.EnumCampeonato.Paulistao2022 ? "" :
+            campeonato == Enums.EnumCampeonato.COPA2022 ? "" :
             "";
 
         public static Enums.EnumCampeonato[] ObterCampeonatosAtivos()
@@ -52,6 +55,7 @@ namespace Futebox.Models
                 //Enums.EnumCampeonato.Paulistao2022,
                 Enums.EnumCampeonato.BrasileiraoSerieA2022,
                 Enums.EnumCampeonato.BrasileiraoSerieB2022,
+                Enums.EnumCampeonato.COPA2022,
             };
         }
     }

@@ -49,14 +49,20 @@ namespace Futebox.Providers
             var msg = "";
 
             if (processoClassificacaoArgs.social == Models.Enums.RedeSocialFinalidade.YoutubeShorts)
-                msg += $"{ObterSaudacao2()} ";
+            {
+                msg += $""
+               + $"Veja a classificação do \"{CampeonatoUtils.ObterNomeDoCampeonato(processoClassificacaoArgs.campeonato)}\": "
+               + $"Atualizada {RoteiroDefaults.ObterHojeAmanhaOntem(processoClassificacaoArgs.dataExecucao.Value)}, {RoteiroDefaults.TraduzirDiaDoMes(processoClassificacaoArgs.dataExecucao.Value)}: "
+               + $"Bora: ";
+            }
             else
+            {
                 msg += $"{ObterSaudacao()} ";
-
-            msg += $""
+                msg += $""
                 + $"Veja a classificação do \"{CampeonatoUtils.ObterNomeDoCampeonato(processoClassificacaoArgs.campeonato)}\": "
                 + $"Atualizada {RoteiroDefaults.ObterHojeAmanhaOntem(processoClassificacaoArgs.dataExecucao.Value)}, {RoteiroDefaults.TraduzirDiaDoMes(processoClassificacaoArgs.dataExecucao.Value)}: "
                 + $"Bora: ";
+            }
 
             var rnd = new Random();
             var indicePedirLike = rnd.Next(7, classificacao.Count() - 2);
@@ -129,8 +135,11 @@ namespace Futebox.Providers
 
         public string ObterRoteiroDaRodada(IEnumerable<PartidaVM> partidas, ProcessoRodadaArgs processoRodadaArgs)
         {
-            var roteiro = ObterSaudacao();
-            roteiro += $"Veja agora a programação dos jogos da {processoRodadaArgs.rodada}ª rodada do {CampeonatoUtils.ObterNomeDoCampeonato(processoRodadaArgs.campeonato)}: ";
+            var roteiro = "";
+            if (processoRodadaArgs.social == Models.Enums.RedeSocialFinalidade.YoutubeShorts)
+                roteiro += ObterSaudacao();
+
+            roteiro += $"Veja a programação dos jogos da {processoRodadaArgs.rodada}ª rodada do {CampeonatoUtils.ObterNomeDoCampeonato(processoRodadaArgs.campeonato)}: ";
 
             partidas
                 .Where(_ => processoRodadaArgs.partidas.Contains(_.idExterno))
@@ -139,7 +148,7 @@ namespace Futebox.Providers
                 .ToList().ForEach(gp =>
                 {
                     var dia = gp.FirstOrDefault().dataPartida;
-                    roteiro += $"{dia.ToString("D")}: ";
+                    roteiro += $"{dia.ToString("dddd")}, {dia.ToString("dd")} de {dia.ToString("MMMM")}: ";
                     gp.ToList().ForEach(_ =>
                     {
                         roteiro += $"{_.timeMandante.ObterNomeWatson()} e {_.timeVisitante.ObterNomeWatson()}: ";
@@ -157,7 +166,9 @@ namespace Futebox.Providers
         public string ObterRoteiroDoJogosDoDia(IEnumerable<PartidaVM> partidas, ProcessoJogosDiaArgs args)
         {
             var roteiro = ObterSaudacao();
-            roteiro += $"Vejam agora os jogos de {RoteiroDefaults.ObterHojeAmanhaOntem(DateTime.Now)}: ";
+            var referencia = DateTime.Now.AddDays(args.dataRelativa ?? 0);
+            roteiro += $"Vejam agora os jogos de {RoteiroDefaults.ObterHojeAmanhaOntem(referencia)}: ";
+            partidas = partidas.Where(_ => args.partidas.Contains(_.idExterno));
 
             var grupos = partidas.Select(_ => _.campeonato).Distinct().ToList();
 
@@ -181,7 +192,7 @@ namespace Futebox.Providers
                         });
                 });
 
-                roteiro += $"Pra qual time você torce?: deixa aqui nos comentários junto com aquela dedada no laique. Até a próxima. ";
+                roteiro += $"Pra quem você torce?: deixa aqui nos comentários junto com aquela dedada no laique. Até a próxima. ";
             }
             else
             {
@@ -202,7 +213,7 @@ namespace Futebox.Providers
                        roteiro += $"no estádio {_.estadio}: ";
                    });
                });
-                roteiro += $"Pra qual time você torce?: deixa aqui nos comentários junto com aquela dedada no laique. Até a próxima. ";
+                roteiro += $"Pra quem você torce?: deixa aqui nos comentários junto com aquela dedada no laique. Até a próxima. ";
             }
 
             return roteiro;

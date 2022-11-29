@@ -41,6 +41,12 @@
                 Range
             </td>
         }
+        @if (Model.mostrarCampoDataRelativa)
+        {
+            <td width="10%">
+                Data relativa (ontem/hoje/amanhã)
+            </td>
+        }
         <th>Titulo</th>
         <th>Ação</th>
     </tr>
@@ -70,7 +76,14 @@
                 @if (Model.mostrarCampoRange)
                 {
                     <td>
-                        <input type="text" class="form-control form-control-sm" name="range" value="1-99">
+                        @if (social == socialYTS)
+                        {
+                            <input type="text" class="form-control form-control-sm" name="range" value="1-5">
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control form-control-sm" name="range" value="1-99">
+                        }
                     </td>
                 }
             }
@@ -88,9 +101,22 @@
                     </select>
                 </td>
             }
+            @if (Model.mostrarCampoDataRelativa)
+            {
+                <td>
+                    <input type="number" class="form-control form-control-sm" name="datarelativa" value="0">
+                </td>
+            }
             <td>
                 <div class="">
-                    <input type="text" class="form-control form-control-sm" name="title" value="@($"{Model.tituloPadrao}")">
+                    @if (social == socialYTS)
+                    {
+                        <input type="text" class="form-control form-control-sm" name="title" value="@($"{Model.tituloPadrao} #shorts")">
+                    }
+                    else
+                    {
+                        <input type="text" class="form-control form-control-sm" name="title" value="@($"{Model.tituloPadrao}")">
+                    }
                 </div>
             </td>
             <td>

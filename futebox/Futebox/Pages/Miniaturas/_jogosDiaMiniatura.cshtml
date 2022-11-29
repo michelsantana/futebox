@@ -110,7 +110,7 @@
 </style>
 <div id="mini-container" class="fs-sport">
     <div id="mini-header" class="fitness">
-        <span class="fitness-target">Jogos de Hoje</span>
+        <span class="fitness-target">Jogos de @(Futebox.Services.RoteiroDefaults.ObterHojeAmanhaOntem(DateTime.Now.AddDays(Model.args.dataRelativa??0)))</span>
     </div>
     <div id="mini-body">
         @*<table id="mini-table">*@
@@ -158,6 +158,6 @@
         @*</table>*@
     </div>
     <div id="mini-footer" class="fitness">
-        <span class="fitness-target">@DateTime.Now.ToString("dd/MM/yyyy")</span>
+        <span class="fitness-target">@DateTime.Now.AddDays(Model.args.dataRelativa ?? 0).ToString("dd/MM/yyyy")</span>
     </div>
 </div>

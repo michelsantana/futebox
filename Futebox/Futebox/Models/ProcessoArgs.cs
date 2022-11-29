@@ -28,6 +28,7 @@ namespace Futebox.Models
         public int colunas { get; set; }
         public string titulo { get; set; }
         public DateTime? dataExecucao { get; set; }
+        public int? dataRelativa { get; set; }
 
         public ProcessoClassificacaoArgs()
         {
@@ -46,6 +47,7 @@ namespace Futebox.Models
         public int linhas { get; set; }
         public int colunas { get; set; }
         public string titulo { get; set; }
+        public int? dataRelativa { get; set; }
     }
 
     public class ProcessoJogosDiaArgs : IProcessoArgs
@@ -57,6 +59,7 @@ namespace Futebox.Models
         public int linhas { get; set; }
         public int colunas { get; set; }
         public string titulo { get; set; }
+        public int? dataRelativa { get; set; }
     }
     
     public class ProcessoPartidaArgs : IProcessoArgs
@@ -65,5 +68,6 @@ namespace Futebox.Models
         public RedeSocialFinalidade social { get; set; }
         public string titulo { get; set; }
         public string viewName { get; set; }
+        public int? dataRelativa { get; set; }
     }
 }

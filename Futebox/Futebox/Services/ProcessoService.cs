@@ -325,7 +325,12 @@ namespace Futebox.Services
         private Processo AtualizarRoteiroJogosDia(Processo processo)
         {
             var args = JsonConvert.DeserializeObject<ProcessoJogosDiaArgs>(processo.args);
-            var partidas = _partidasService.ObterPartidasHoje(true);
+            var partidas = new List<PartidaVM>();
+            foreach (var p in args.partidas)
+            {
+                var partida = _partidasService.ObterPartida(p, true);
+                partidas.Add(partida);
+            }
             processo.roteiro = _roteiro.ObterRoteiroDoJogosDoDia(partidas, args);
             _processoRepositorio.Update(processo);
             return processo;

@@ -46,6 +46,7 @@
                 var $config = $(c);
                 var aspect = $config.find('[name=ddlDimensao]').val();
                 var titulo = $config.find('[name=title]').val();
+                var dataRelativa = $config.find('[name=datarelativa]').val();
 
                 data.push({
                     partidas: view.partidas,
@@ -53,6 +54,7 @@
                     colunas: ~~aspect.split('x')[0],
                     linhas: ~~aspect.split('x')[1],
                     titulo: titulo,
+                    dataRelativa: ~~dataRelativa,
                     checked: true,
                 });
             }
@@ -77,7 +79,7 @@
         function VisualizarMiniatura(s, w, h) {
             var data = view.data(s);
             console.log(data);
-            window.open(`/Miniaturas?t=jogosdia&q=${JSON.stringify(data[0])}&w=${w}&h=${h}`, '_blank');
+            window.open(`/Miniaturas?t=jogosdia&q=${encodeURIComponent(JSON.stringify(data[0]))}&w=${w}&h=${h}`, '_blank');
         }
 
         $('#rodada').click(() => {

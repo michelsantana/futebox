@@ -54,6 +54,8 @@ namespace Futebox.Models
 
         public Processo(ProcessoRodadaArgs rodadaArgs)
         {
+            rodadaArgs.titulo = rodadaArgs.titulo.Replace("{DATA}", DateTime.Now.AddDays(rodadaArgs.dataRelativa ?? 0).ToString("dd/MM/yyyy"));
+
             var json = JsonConvert.SerializeObject(rodadaArgs);
             this.agendado = false;
             this.agendamento = DateTime.Now.AddMinutes(1);
@@ -62,18 +64,21 @@ namespace Futebox.Models
             this.categoria = CategoriaVideo.rodada;
             this.larguraVideo = SocialMediaUtils.Width(rodadaArgs.social);
             this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}/Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(rodadaArgs.social)}&h={SocialMediaUtils.Height(rodadaArgs.social)}";
-            this.nome = !string.IsNullOrEmpty(rodadaArgs.titulo) ? rodadaArgs.titulo : $"{categoria} - {rodadaArgs.rodada} - {rodadaArgs.campeonato}";
             this.nomeDoArquivoAudio = $"{DateTime.Now.ToString("MMddHHmmss")}-{rodadaArgs.social}.mp3";
             this.nomeDoArquivoImagem = $"{rodadaArgs.social}.png";
             this.nomeDoArquivoVideo = $"{rodadaArgs.social}.mp4";
             this.pasta = $"{Settings.ApplicationRoot}/arquivos/{Guid.NewGuid()}";
             this.social = rodadaArgs.social;
             this.status = StatusProcesso.Criado;
-            this.tituloVideo = !string.IsNullOrEmpty(rodadaArgs.titulo) ? tituloVideo : null;
+            this.tituloVideo = !string.IsNullOrEmpty(rodadaArgs.titulo) ? rodadaArgs.titulo : this.tituloVideo;
+            this.tituloVideo = this.tituloVideo.Replace("{DATA}", DateTime.Now.AddDays(rodadaArgs.dataRelativa ?? 0).ToString("dd/MM/yyyy"));
+            this.nome = this.tituloVideo;
         }
 
         public Processo(ProcessoJogosDiaArgs jogosDia)
         {
+            jogosDia.titulo = jogosDia.titulo.Replace("{DATA}", DateTime.Now.AddDays(jogosDia.dataRelativa ?? 0).ToString("dd/MM/yyyy"));
+
             var json = JsonConvert.SerializeObject(jogosDia);
             this.agendado = false;
             this.agendamento = DateTime.Now.AddMinutes(1);
@@ -82,18 +87,21 @@ namespace Futebox.Models
             this.categoria = CategoriaVideo.jogosdia;
             this.larguraVideo = SocialMediaUtils.Width(jogosDia.social);
             this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}/Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(jogosDia.social)}&h={SocialMediaUtils.Height(jogosDia.social)}";
-            this.nome = !string.IsNullOrEmpty(jogosDia.titulo) ? jogosDia.titulo : $"{categoria}";
             this.nomeDoArquivoAudio = $"{DateTime.Now.ToString("MMddHHmmss")}-{jogosDia.social}.mp3";
             this.nomeDoArquivoImagem = $"{jogosDia.social}.png";
             this.nomeDoArquivoVideo = $"{jogosDia.social}.mp4";
             this.pasta = $"{Settings.ApplicationRoot}/arquivos/{Guid.NewGuid()}";
             this.social = jogosDia.social;
             this.status = StatusProcesso.Criado;
-            this.tituloVideo = !string.IsNullOrEmpty(jogosDia.titulo) ? tituloVideo : null;
+            this.tituloVideo = !string.IsNullOrEmpty(jogosDia.titulo) ? jogosDia.titulo : this.tituloVideo;
+            this.tituloVideo = this.tituloVideo.Replace("{DATA}", DateTime.Now.AddDays(jogosDia.dataRelativa??0).ToString("dd/MM/yyyy"));
+            this.nome = this.tituloVideo;
         }
 
         public Processo(ProcessoClassificacaoArgs classificacaoArgs)
         {
+            classificacaoArgs.titulo = classificacaoArgs.titulo.Replace("{DATA}", DateTime.Now.AddDays(classificacaoArgs.dataRelativa ?? 0).ToString("dd/MM/yyyy"));
+
             var json = JsonConvert.SerializeObject(classificacaoArgs);
             this.agendado = false;
             this.agendamento = DateTime.Now.AddMinutes(30);
@@ -102,18 +110,21 @@ namespace Futebox.Models
             this.categoria = CategoriaVideo.classificacao;
             this.larguraVideo = SocialMediaUtils.Width(classificacaoArgs.social);
             this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}/Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(classificacaoArgs.social)}&h={SocialMediaUtils.Height(classificacaoArgs.social)}";
-            this.nome = !string.IsNullOrEmpty(classificacaoArgs.titulo) ? classificacaoArgs.titulo : $"{categoria} - {classificacaoArgs.campeonato}";
             this.nomeDoArquivoAudio = $"{DateTime.Now.ToString("MMddHHmmss")}-{classificacaoArgs.social}.mp3";
             this.nomeDoArquivoImagem = $"{classificacaoArgs.social}.png";
             this.nomeDoArquivoVideo = $"{classificacaoArgs.social}.mp4";
             this.pasta = $"{Settings.ApplicationRoot}/arquivos/{Guid.NewGuid()}";
             this.social = classificacaoArgs.social;
             this.status = StatusProcesso.Criado;
-            this.tituloVideo = !string.IsNullOrEmpty(classificacaoArgs.titulo) ? tituloVideo : null;
+            this.tituloVideo = !string.IsNullOrEmpty(classificacaoArgs.titulo) ? classificacaoArgs.titulo : this.tituloVideo;
+            this.tituloVideo = this.tituloVideo.Replace("{DATA}", DateTime.Now.AddDays(classificacaoArgs.dataRelativa ?? 0).ToString("dd/MM/yyyy"));
+            this.nome = this.tituloVideo;
         }
 
         public Processo(ProcessoPartidaArgs partidaArgs)
         {
+            partidaArgs.titulo = partidaArgs.titulo.Replace("{DATA}", DateTime.Now.AddDays(partidaArgs.dataRelativa ?? 0).ToString("dd/MM/yyyy"));
+            
             var json = JsonConvert.SerializeObject(partidaArgs);
             this.agendado = false;
             this.agendamento = DateTime.Now.AddMinutes(30);
@@ -122,15 +133,15 @@ namespace Futebox.Models
             this.categoria = CategoriaVideo.partida;
             this.larguraVideo = SocialMediaUtils.Width(partidaArgs.social);
             this.linkDaImagemDoVideo = $"{Settings.ApplicationHttpBaseUrl}/Miniaturas?t={categoria}&q={Uri.EscapeDataString(json)}&w={SocialMediaUtils.Width(partidaArgs.social)}&h={SocialMediaUtils.Height(partidaArgs.social)}";
-            this.nome = !string.IsNullOrEmpty(partidaArgs.titulo) ? partidaArgs.titulo : $"{categoria}";
             this.nomeDoArquivoAudio = $"{DateTime.Now.ToString("MMddHHmmss")}-{partidaArgs.social}.mp3";
             this.nomeDoArquivoImagem = $"{partidaArgs.social}.png";
             this.nomeDoArquivoVideo = $"{partidaArgs.social}.mp4";
             this.pasta = $"{Settings.ApplicationRoot}/arquivos/{Guid.NewGuid()}";
             this.social = partidaArgs.social;
             this.status = StatusProcesso.Criado;
-            this.tituloVideo = !string.IsNullOrEmpty(partidaArgs.titulo) ? tituloVideo : null;
+            this.tituloVideo = !string.IsNullOrEmpty(partidaArgs.titulo) ? partidaArgs.titulo : this.tituloVideo;
+            this.tituloVideo = this.tituloVideo.Replace("{DATA}", DateTime.Now.AddDays(partidaArgs.dataRelativa ?? 0).ToString("dd/MM/yyyy"));
+            this.nome = this.tituloVideo;
         }
-
     }
 }

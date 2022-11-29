@@ -55,7 +55,7 @@ namespace Futebox.Services
             var dia = dt.ToString("dd");
             var diaInt = int.Parse(dia);
             if (diaInt == 1) dia = "primeiro";
-            return $"{diaInt} de { dt.ToString("MMMM") }";
+            return $"{dia} de { dt.ToString("MMMM") }";
         }
 
         public static string ObterHojeAmanhaOntem(DateTime dataPartida, DateTime? dataReferenciaExecucao = null)

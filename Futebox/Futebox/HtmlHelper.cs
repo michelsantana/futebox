@@ -94,7 +94,7 @@ namespace Futebox
             return s switch
             {
                 RedeSocialFinalidade.InstagramVideo => _.Raw($"<img width='{sizePx}px' src='https://icongr.am/simple/instagram.svg?size=64&color=currentColor&colored=true' />"),
-                RedeSocialFinalidade.YoutubeShorts => _.Raw($"<img width='{sizePx}px' src='https://icongr.am/simple/youtubemusic.svg?size=64&color=currentColor&colored=true' />"),
+                RedeSocialFinalidade.YoutubeShorts => _.Raw($"<img width='{sizePx}px' src='https://icongr.am/simple/youtubemusic.svg?size=64&color=591212&colored=false' />"),
                 RedeSocialFinalidade.YoutubeVideo => _.Raw($"<img width='{sizePx}px' src='https://icongr.am/simple/youtube.svg?size=64&color=currentColor&colored=true' />"),
                 RedeSocialFinalidade.NENHUMA => _.Raw($"<img width='{sizePx}px' src='https://icongr.am/simple/csharp.svg?size=64&color=currentColor&colored=false' />"),
             };

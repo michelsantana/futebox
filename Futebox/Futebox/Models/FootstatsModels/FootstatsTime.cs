@@ -22,7 +22,7 @@
 
         public class Sde
         {
-            public int equipe_id { get; set; }
+            public int? equipe_id { get; set; }
         }
     }
 }

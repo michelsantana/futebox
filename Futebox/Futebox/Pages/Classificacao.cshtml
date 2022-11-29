@@ -75,6 +75,7 @@
                 var $config = $(c);
                 var $dataExecucao = $config.find('[name=dataExecucao]');
                 var $range = $config.find('[name=range]');
+                var $titulo = $config.find('[name=title]');
                 var viewName = $config.find('[name=viewName]').val();
 
                 data.push({
@@ -83,6 +84,7 @@
                     temFases: (view.fase != 'geral'),
                     classificacaoPorGrupos: (view.grupos.length > 1),
                     grupos: view.grupos,
+                    titulo: $titulo.val(),
                     social: ~~social,
                     viewName: viewName,
                     checked: true,

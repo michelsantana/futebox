@@ -12,6 +12,7 @@ namespace Futebox.Pages
         public Mode modo { get; set; }
 
         public bool mostrarCampoData { get; set; }
+        public bool mostrarCampoDataRelativa { get; set; }
         public bool mostrarCampoRange { get; set; }
         public DateTime? dataExecucaoRetroativa { get; set; }
 

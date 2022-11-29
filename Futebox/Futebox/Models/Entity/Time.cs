@@ -35,7 +35,13 @@ namespace Futebox.Models
         public string logoEspecifico { get; set; }
 
         public string ObterNomeWatson() => string.IsNullOrEmpty(this.nomeAdaptadoWatson) ? this.nome : this.nomeAdaptadoWatson;
-        public string ObterLogoLocal() => string.IsNullOrEmpty(this.logoEspecifico) ? $"./img/escudos/{pais.RemoverEspacos().RemoverAcentos().ToLower()}/-{sigla}.png" : logoEspecifico;
+        public string ObterLogoLocal()
+        {
+            if (selecao)
+                return string.IsNullOrEmpty(this.logoEspecifico) ? $"./img/escudos/selecoes/-{sigla}.png" : logoEspecifico;
+            else 
+                return string.IsNullOrEmpty(this.logoEspecifico) ? $"./img/escudos/{pais.RemoverEspacos().RemoverAcentos().ToLower()}/-{sigla}.png" : logoEspecifico;
+        }
 
         public Time()
         {

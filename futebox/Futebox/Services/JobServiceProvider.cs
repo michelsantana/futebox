@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Futebox.Services.Base
+namespace Futebox.Services
 {
     public abstract class JobServiceProvider : IJob
     {

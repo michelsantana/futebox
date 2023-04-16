@@ -117,7 +117,8 @@
         function VisualizarMiniatura(s, w, h) {
             var data = view.data(s);
             console.log(data);
-            window.open(`/Miniaturas?t=rodada&q=${JSON.stringify(data[0])}&w=${w}&h=${h}`, '_blank');
+            var qs = JSON.stringify(data[0]);
+            window.open(`/Miniaturas?t=rodada&q=${encodeURIComponent(qs)}&w=${w}&h=${h}`, '_blank');
         }
 
         $('#rodada').click(() => {

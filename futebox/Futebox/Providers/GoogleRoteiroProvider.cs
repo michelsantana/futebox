@@ -91,7 +91,7 @@ namespace Futebox.Providers
                     .ForEach(_ =>
                             {
                                 msg += $"{_.posicao}º colocado, {_.time.ObterNomeWatson()}, "
-                                + $"com {_.pontos} pontos, em { _.partidasJogadas} jogos: ";
+                                + $"com {RoteiroDefaults.Pluralizar(_.pontos, "pontos")}, em {RoteiroDefaults.Pluralizar(_.partidasJogadas, "jogos")}: ";
                             });
                     });
                 msg += "Muitíssimo obrigada a todos que assistiram até aqui: Até o próximo vídeo: ";
@@ -106,7 +106,7 @@ namespace Futebox.Providers
                     {
 
                         msg += $"{_.posicao}º colocado, {_.time.ObterNomeWatson()}, "
-                    + $"com {_.pontos} pontos, em { _.partidasJogadas} jogos: ";
+                        + $"com {RoteiroDefaults.Pluralizar(_.pontos, "pontos")}, em {RoteiroDefaults.Pluralizar(_.partidasJogadas, "jogos")}: ";
 
                         if (~~_.posicao == indicePedirLike)
                         {
@@ -136,7 +136,7 @@ namespace Futebox.Providers
         public string ObterRoteiroDaRodada(IEnumerable<PartidaVM> partidas, ProcessoRodadaArgs processoRodadaArgs)
         {
             var roteiro = "";
-            if (processoRodadaArgs.social == Models.Enums.RedeSocialFinalidade.YoutubeShorts)
+            if (processoRodadaArgs.social != Models.Enums.RedeSocialFinalidade.YoutubeShorts)
                 roteiro += ObterSaudacao();
 
             roteiro += $"Veja a programação dos jogos da {processoRodadaArgs.rodada}ª rodada do {CampeonatoUtils.ObterNomeDoCampeonato(processoRodadaArgs.campeonato)}: ";

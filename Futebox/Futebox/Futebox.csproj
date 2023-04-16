@@ -9,6 +9,7 @@
 	  <Compile Remove="Models\Entity\Subprocesso.cs" />
 	  <Compile Remove="Pages\ClassificacaoParcial.cshtml.cs" />
 	  <Compile Remove="Services\FutebotService.Audio.cs" />
+	  <Compile Remove="Services\JobServiceProvider.cs" />
 	  <Compile Remove="Services\Jobs\QueueJob.cs" />
 	  <Compile Remove="Services\OLD.AgendamentoService.cs" />
 	</ItemGroup>

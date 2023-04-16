@@ -10,12 +10,21 @@ using System.Threading.Tasks;
 
 namespace Futebox.Services
 {
-    public class BrowserService : IBrowserService
+    public class BrowserService : IBrowserService 
     {
+
         protected Browser browser { get; set; }
+        protected BrowserState? browserState { get; set; }
+
         public enum TypingKeyword
         {
             Escape,
+        }
+        public enum BrowserState
+        {
+            closed,
+            open,
+            oldInstanceOpen
         }
         public IEnumerable<TypingKeyword> keywords = new List<TypingKeyword>()
         {
@@ -69,20 +78,28 @@ namespace Futebox.Services
         protected async Task OpenBrowser(bool headless = false, bool isRetrying = false)
         {
             var userProfile = Environment.GetEnvironmentVariable("USERPROFILE");
-            if (browser != null)
-                await browser?.CloseAsync();
-            browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            if (browser != null) await browser?.CloseAsync();
+
+            try
             {
-                ExecutablePath = $"{userProfile}\\AppData\\Local\\Google\\Chrome SxS\\Application\\chrome.exe",
-                Headless = headless,
-                UserDataDir = $"{userProfile}\\AppData\\Local\\Google\\Chrome SxS\\User Data",
-                DefaultViewport = GetDefaultViewPort(),
-                Args = new string[] {
+                browser = await Puppeteer.LaunchAsync(new LaunchOptions
+                {
+                    ExecutablePath = $"{userProfile}\\AppData\\Local\\Google\\Chrome SxS\\Application\\chrome.exe",
+                    Headless = headless,
+                    UserDataDir = $"{userProfile}\\AppData\\Local\\Google\\Chrome SxS\\User Data",
+                    DefaultViewport = GetDefaultViewPort(),
+                    Args = new string[] {
                     $"--user-data-dir={userProfile}\\AppData\\Local\\Google\\Chrome SxS\\User Data\\",
                     $"--profile-directory=\"Profile 1\"",
-                    //$"--remote-debugging-port=21233",
+                    $"--remote-debugging-port=21233",
                 }
-            });
+                });
+            } catch (Exception ex)
+            {
+                browser = await Puppeteer.ConnectAsync(new ConnectOptions() {
+                    BrowserURL = "http://127.0.0.1:21233",
+                });
+            }
             browser.Disconnected += async (Object sender, EventArgs eargs) =>
             {
                 await OpenBrowser();
@@ -144,14 +161,19 @@ namespace Futebox.Services
 
             //var textofinal = new List<string>();
 
-            //var textoPalavras = texto.Split("\n").ToList();
-            //textoPalavras.ForEach(_ =>
-            //{
-            //    var escape = _ == $"[{TypingKeyword.Escape}]";
-            //    if (escape) page.Keyboard.PressAsync("Escape");
-            //});
+            var caracteres = texto
+                .ToCharArray()
+                .Select(s => s.ToString())
+                .ToList();
+            caracteres.ForEach(_ =>
+            {
+                var escape = _ == $"\uDDDD";
+                if (escape) page.Keyboard.PressAsync("Escape").Wait();
+                else page.Keyboard.TypeAsync(_).Wait();
+                WaitForMs(75);
+            });
 
-            await page.Keyboard.TypeAsync(texto);
+            // await page.Keyboard.TypeAsync(texto);
 
             WaitForMs(700);
         }

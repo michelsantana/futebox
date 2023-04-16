@@ -9,7 +9,10 @@
         Paulistao2022 = 789,
         BrasileiraoSerieA2022 = 803,
         BrasileiraoSerieB2022 = 804,
-        COPA2022 = 807
+        COPA2022 = 807,
+        Paulistao2023 = 825,
+        BrasileiraoSerieA2023 = 850,
+        BrasileiraoSerieB2023 = 851,
     }
 
     public enum OrigemDado

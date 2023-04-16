@@ -47,12 +47,12 @@ namespace Futebox.Pages
                     IdentificarCoresDestaquePaulistao(partialModel);
                     partial = "Classificacao/_classificacaoListagem";
                     break;
-                case EnumCampeonato.BrasileiraoSerieA2022:
+                case EnumCampeonato.BrasileiraoSerieA2023:
                     partialModel.grupos = false;
                     IdentificarCoresDestaqueBrasileiraoSerieA(partialModel);
                     partial = "Classificacao/_classificacaoListagem";
                     break;
-                case EnumCampeonato.BrasileiraoSerieB2022:
+                case EnumCampeonato.BrasileiraoSerieB2023:
                     partialModel.grupos = false;
                     IdentificarCoresDestaqueBrasileiraoSerieB(partialModel);
                     partial = "Classificacao/_classificacaoListagem";

@@ -77,5 +77,19 @@ namespace Futebox.Services
             }
             return TraduzirDiaDoMes(dataPartida);
         }
+
+        public static string Pluralizar(int valor, string palavra)
+        {
+            switch (palavra)
+            {
+                case "jogo":
+                case "jogos":
+                    return (valor == 0) ? "nenhum jogo" : valor > 1 ? $"{valor} jogos" : $"{valor} jogo";
+                case "ponto":
+                case "pontos":
+                    return (valor == 0) ? "nenhum ponto" : valor > 1 ? $"{valor} pontos" : $"{valor} ponto";
+            }
+            return palavra;
+        }
     }
 }

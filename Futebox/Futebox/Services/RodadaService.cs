@@ -62,13 +62,13 @@ namespace Futebox.Services
                 descricao += "\n";
                 descricao += $"{semAcento} {ano}";
                 descricao += "\n";
-                descricao += $"#[esc]{comAcento.Replace(" ", "")}";
+                descricao += $"#\uDDDD{comAcento.Replace(" ", "")}";
                 descricao += "\n";
-                descricao += $"#[esc]{comAcento.Replace(" ", "")}{ano}";
+                descricao += $"#\uDDDD{comAcento.Replace(" ", "")}{ano}";
                 descricao += "\n";
-                descricao += $"#[esc]{semAcento.Replace(" ", "")}";
+                descricao += $"#\uDDDD{semAcento.Replace(" ", "")}";
                 descricao += "\n";
-                descricao += $"#[esc]{semAcento.Replace(" ", "")}{ano}";
+                descricao += $"#\uDDDD{semAcento.Replace(" ", "")}{ano}";
                 descricao += "\n";
             });
 

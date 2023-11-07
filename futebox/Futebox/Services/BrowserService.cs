@@ -1,6 +1,7 @@
 ﻿using Futebox.Services.Interfaces;
 using PuppeteerSharp;
 using System;
+using System.Windows;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -156,22 +157,40 @@ namespace Futebox.Services
             await page.Keyboard.UpAsync("Control");
             WaitForMs(700);
 
-            await page.Keyboard.DownAsync("Backspace");
+            await page.Keyboard.PressAsync("Backspace");
             WaitForMs(700);
 
             //var textofinal = new List<string>();
 
-            var caracteres = texto
-                .ToCharArray()
-                .Select(s => s.ToString())
-                .ToList();
-            caracteres.ForEach(_ =>
-            {
-                var escape = _ == $"\uDDDD";
-                if (escape) page.Keyboard.PressAsync("Escape").Wait();
-                else page.Keyboard.TypeAsync(_).Wait();
-                WaitForMs(75);
-            });
+            //var caracteres = texto
+            //    .ToCharArray()
+            //    .Select(s => s.ToString())
+            //    .ToList();
+
+            WinClipboard.SetText(texto);
+
+            await page.ClickAsync(seletor);
+            await page.Keyboard.DownAsync("Control");
+            WaitForMs(700);
+
+            await page.Keyboard.PressAsync("V");
+            WaitForMs(700);
+
+            await page.Keyboard.UpAsync("Control");
+            WaitForMs(700);
+
+            //caracteres.ForEach(_ =>
+            //{
+            //    var escape = _ == $"";
+            //    if (escape)
+            //    {
+            //        WaitForMs(300);
+            //        page.Keyboard.PressAsync("Escape").Wait();
+            //        WaitForMs(300);
+            //    }
+            //    else page.Keyboard.TypeAsync(_).Wait();
+            //    WaitForMs(12);
+            //});
 
             // await page.Keyboard.TypeAsync(texto);
 

@@ -3,6 +3,9 @@ using Futebox.Models.Enums;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Futebox.Controllers
 {
@@ -11,99 +14,151 @@ namespace Futebox.Controllers
     public class ProcessoController : ControllerBase
     {
         readonly IProcessoService _processoService;
+        readonly IExecucaoProcessoService _execucaoProcessoService;
         readonly INotifyService _notifyService;
         readonly IAgendamentoService _agendamentoService;
         readonly IFutebotService _futebotService;
 
-        public ProcessoController(IProcessoService processoService, INotifyService notifyService, IAgendamentoService agendamentoService, IFutebotService futebotService)
+        public ProcessoController(IProcessoService processoService, IExecucaoProcessoService execucaoProcessoService, INotifyService notifyService, IAgendamentoService agendamentoService, IFutebotService futebotService)
         {
             _processoService = processoService;
+            _execucaoProcessoService = execucaoProcessoService;
             _agendamentoService = agendamentoService;
             _notifyService = notifyService;
             _futebotService = futebotService;
         }
 
         [HttpGet("{id}/obter")]
-        public Processo ObterProcesso(string id)
+        public async Task<Processo> ObterProcesso(string id)
         {
-            return _processoService.ObterProcesso(id);
+            return await _processoService.Obter(id);
         }
 
-        [HttpGet("{id}/erro")]
-        public Processo AtualizarProcessoErro(string id, string mensagem)
+        [HttpPost("partida")]
+        public async Task<List<Processo>> AddProcessoPartida([FromBody] ProcessoPartidaArgs[] args)
         {
-            var erro = string.IsNullOrEmpty(mensagem) ? "erro" : mensagem;
-            return _processoService.AtualizarProcessoErro(id, erro);
+            if (args == null || args?.Length == 0) throw new Exception();
+            return await _processoService.SalvarProcessoPartida(args);
         }
 
-        [HttpGet("{id}/sucesso")]
-        public Processo AtualizarProcessoSucesso(string id, string arquivo)
+        [HttpPost("classificacao")]
+        public async Task<List<Processo>> AddProcessoClassificacao([FromBody] ProcessoClassificacaoArgs[] args)
         {
-            return _processoService.AtualizarProcessoSucesso(id, arquivo);
+            if (args == null || args?.Length == 0) throw new Exception();
+            return await _processoService.SalvarProcessoClassificacao(args);
+        }
+
+        [HttpPost("rodada")]
+        public async Task<List<Processo>> AddProcessoRodada([FromBody] ProcessoRodadaArgs[] args)
+        {
+            if (args == null || args?.Length == 0) throw new Exception();
+            return await _processoService.SalvarProcessoRodada(args);
+        }
+
+        [HttpPost("jogosdia")]
+        public async Task<List<Processo>> AddProcessoJogosDia([FromBody] ProcessoJogosDiaArgs[] args)
+        {
+            if (args == null || args?.Length == 0) throw new Exception();
+            return await _processoService.SalvarProcessoJogosDia(args);
+        }
+
+        [HttpPost("{id}/executar")]
+        public async Task<RobotResultApi> ExecutarProcesso(string id)
+        {
+            return await _execucaoProcessoService.Executar(id);
+        }
+
+        [HttpGet("{id}/agendar")]
+        public async Task<bool> AgendarProcesso(string id, int dia, int mes, int ano, int hr, int min, int sec)
+        {
+            var dt = new DateTime(ano, mes, dia, hr, min, sec);
+            var p = await _processoService.AgendarProcesso(id, dt);
+            return true;
+        }
+
+        [HttpGet("{id}/agendar-cancelar")]
+        public async Task<bool> AgendarCancelar(string id)
+        {
+            var p = await _processoService.CancelarAgendamento(id);
+            return true;
+        }
+
+        [HttpGet("{id}/job")]
+        public async Task<Agenda> ObterJob(string id)
+        {
+            return await _agendamentoService.Obter(id);
+        }
+
+        [HttpGet("jobs")]
+        public async Task<Object> Jobs()
+        {
+
+            var all = new List<Quartz.IJobDetail>();
+            var running = new List<Quartz.IJobExecutionContext>();
+
+            Task.WaitAll(
+                Task.Run(async () => all = await _agendamentoService.JobList()),
+                Task.Run(async () => running = await _agendamentoService.JobListRunning())
+            );
+
+
+            return new { all = all.Select(_ => _.Key.Name), running = running };
+        }
+
+        [HttpGet("pasta")]
+        public async Task<bool> Pasta(string q)
+        {
+            return (await _futebotService.AbrirPasta(q)).IsOk();
+        }
+
+        [HttpGet("{id}/log")]
+        public async Task<string> Log(string id)
+        {
+            return (await ObterProcesso(id)).log;
         }
 
         [HttpPost("{id}/deletar")]
-        public bool DeletarProcesso(string id)
+        public async Task<bool> DeletarProcesso(string id)
         {
-            return _processoService.Delete(id);
+            return await _processoService.Delete(id);
         }
 
-        [HttpPost("partida/{id}")]
-        public Processo AddProcessoPartida(string id)
+        [HttpGet("{id}/imagem")]
+        public async Task<Processo> ImagemProcesso(string id)
         {
-            return _processoService.SalvarProcessoPartida(int.Parse(id));
+            var processo = await ObterProcesso(id);
+            //if(processo.agendado)
+            //    return await _processoService.AtualizarStatus(processo, StatusProcesso.Agendado);
+            //else
+            return await _processoService.AtualizarStatus(processo, StatusProcesso.Criado);
         }
 
-        [HttpPost("classificacao/{id}")]
-        public Processo AddProcessoClassificacao(string id)
+        [HttpGet("{id}/audio")]
+        public async Task<Processo> AudioProcesso(string id)
         {
-            return _processoService.SalvarProcessoClassificacao((Campeonatos)int.Parse(id));
+            var processo = await ObterProcesso(id);
+            return await _processoService.AtualizarStatus(processo, StatusProcesso.ImagemOK);
         }
 
-        [HttpPost("rodada/{id}/{rodada}")]
-        public Processo AddProcessoRodada(string id, string rodada)
+        [HttpGet("{id}/video")]
+        public async Task<Processo> VideoProcesso(string id)
         {
-            return _processoService.SalvarProcessoRodada((Campeonatos)int.Parse(id), int.Parse(rodada));
+            var processo = await ObterProcesso(id);
+            return await _processoService.AtualizarStatus(processo, StatusProcesso.AudioOK);
         }
 
-        [HttpGet("executar/{id}")]
-        public Processo ExecutarProcesso(string id)
+        [HttpGet("{id}/publicar")]
+        public async Task<Processo> PublicarProcesso(string id)
         {
-            return _processoService.ExecutarProcesso(id);
+            var processo = await ObterProcesso(id);
+            return await _processoService.AtualizarStatus(processo, StatusProcesso.VideoOK);
         }
 
-        [HttpGet("arquivos/{id}")]
-        public bool ArquivosProcesso(string id)
+        [HttpGet("{id}/complete")]
+        public async Task<Processo> CompletarProcessoManual(string id)
         {
-            return _processoService.ArquivosProcesso(id);
+            var processo = await ObterProcesso(id);
+            return await _processoService.AtualizarStatus(processo, StatusProcesso.PublicandoOK);
         }
-
-        [HttpGet("notificar/{id}")]
-        public bool NotificarProcesso(string id)
-        {
-            var p = _processoService.ObterProcesso(id);
-            _notifyService.Notify(p.notificacao);
-            return true;
-        }
-
-        [HttpGet("agendar/{id}")]
-        public bool AgendarNotificacaoProcesso(string id, string porta, int hora, int minuto)
-        {
-            var p = _processoService.AtualizarProcessoAgendamento(
-                id,
-                porta,
-                DateTime.Today.AddHours(hora).AddMinutes(minuto)
-                );
-            _agendamentoService.AgendarExecucao(p.id, p.agendamento ?? DateTime.Now);
-            return true;
-        }
-
-        [HttpGet("publicar/{id}")]
-        public bool PublicarVideoProcesso(string id)
-        {
-            _processoService.PublicarVideo(id);
-            return true;
-        }
-
     }
 }

@@ -24,7 +24,7 @@ namespace Futebox.Controllers
         [HttpGet("ultimarodada/{campeonato}")]
         public IEnumerable<string> RodadaAtual(int campeonato)
         {
-            var partidas = _partidaService.ObterPartidasDoCampeonato((Campeonatos)campeonato);
+            var partidas = _partidaService.ObterPartidasDoCampeonato((Models.Enums.EnumCampeonato)campeonato);
             var hj = Convert.ToInt32(DateTime.Today.ToString("yyyyMMdd"));
             
             var partidasDoMes = partidas

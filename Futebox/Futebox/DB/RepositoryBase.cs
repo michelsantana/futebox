@@ -54,18 +54,66 @@ namespace Futebox.DB
 
         public virtual void Insert(ref TEntity entity)
         {
-            entity.id = GenerateID();
-            entity.criacao = DateTime.Now;
-            _dbContext.Insert(entity, _transaction);
-            entity = GetById(entity.id);
+            try
+            {
+                entity.id = GenerateID();
+                entity.criacao = DateTime.Now;
+                _dbContext.Insert(entity, _transaction);
+                entity = GetById(entity.id);
+            }
+            catch (Exception ex)
+            {
+                EyeLog.Log(ex);
+                throw ex;
+            }
+        }
+
+        public virtual void InsertWithId(string id, ref TEntity entity)
+        {
+            try
+            {
+                entity.id = id;
+                entity.criacao = DateTime.Now;
+                _dbContext.Insert(entity, _transaction);
+                entity = GetById(entity.id);
+            }
+            catch (Exception ex)
+            {
+                EyeLog.Log(ex);
+                throw ex;
+            }
         }
 
         public virtual bool Update(TEntity entity)
         {
-            entity.alteracao = DateTime.Now;
-            _dbContext.DeleteMultiple<TEntity>(_ => _.id == entity.id, _transaction);
-            _dbContext.Insert(entity, _transaction);
-            return true;
+            try
+            {
+                entity.alteracao = DateTime.Now;
+                _dbContext.DeleteMultiple<TEntity>(_ => _.id == entity.id, _transaction);
+                _dbContext.Insert(entity, _transaction);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                EyeLog.Log(ex);
+                throw ex;
+            }
+        }
+
+        public virtual TEntity UpdateReturn(TEntity entity)
+        {
+            try
+            {
+                entity.alteracao = DateTime.Now;
+                _dbContext.DeleteMultiple<TEntity>(_ => _.id == entity.id, _transaction);
+                _dbContext.Insert(entity, _transaction);
+                return entity;
+            }
+            catch (Exception ex)
+            {
+                EyeLog.Log(ex);
+                throw ex;
+            }
         }
 
         public virtual bool Delete(string id)
@@ -80,12 +128,28 @@ namespace Futebox.DB
 
         public virtual IEnumerable<TEntity> GetList(Expression<Func<TEntity, bool>> predicate)
         {
-            return _dbContext.Select(predicate);
+            try
+            {
+                return _dbContext.Select(predicate);
+            }
+            catch (Exception ex)
+            {
+                EyeLog.Log(ex);
+                throw ex;
+            }
         }
 
         public virtual TEntity GetSingle(Expression<Func<TEntity, bool>> predicate)
         {
-            return _dbContext.Select(predicate).First();
+            try
+            {
+                return _dbContext.Select(predicate)?.First();
+            }
+            catch (Exception ex)
+            {
+                EyeLog.Log(ex);
+                return null;
+            }
         }
 
         public virtual void Commit()

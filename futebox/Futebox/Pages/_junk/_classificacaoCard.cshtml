@@ -1,0 +1,60 @@
+﻿@model System.Tuple<IEnumerable<IGrouping<string, Futebox.Models.ClassificacaoVM>>, bool>
+@{
+    
+    Dictionary<string, string> classes = new Dictionary<string, string>()
+{
+        {"azul", "badge bg-info"},
+        {"laranja", "badge bg-warning"},
+        {"verde", "badge bg-success"},
+        {"branco", "badge bg-white"},
+        {"vermelho", "badge bg-danger"},
+    };
+    var ObterDestaque = new Func<string, string>((s) => string.IsNullOrEmpty(s) ? "" : classes.ContainsKey(s) ? classes[s] : classes["branco"]);
+    var group = Model.Item1;
+    var showGroupName = Model.Item2;
+}
+@if (Model != null)
+{
+    @Html.ScopeStyle($"#scope_{group.First().Key}", "classificacao-card.css")
+
+    <div id="scope_@group.First().Key" class="w100 h100">
+        <div class="cabecalho h10 flex-1">
+            <div class="flex-2 h100 text-fit cor text-capitalize fitness"><span class="fitness-target">@(showGroupName ? $"Grupo {group.First().Key }" : "")</span></div>
+            <div class="flex-6 h100 text-fit clube text-center fitness"><span class="fitness-target">Clube</span></div>
+            <div class="flex-1 h100 text-fit pontos text-center fitness"><span class="fitness-target">PTS</span></div>
+            <div class="flex-1 h100 text-fit partidas text-center fitness"><span class="fitness-target">PJ</span></div>
+            <div class="flex-1 h100 text-fit text-center fitness"><span class="fitness-target">VIT</span></div>
+            <div class="flex-1 h100 text-fit text-center fitness"><span class="fitness-target">E</span></div>
+            <div class="flex-1 h100 text-fit text-center fitness"><span class="fitness-target">DER</span></div>
+            <div class="flex-1 h100 text-fit text-center fitness"><span class="fitness-target">GP</span></div>
+            <div class="flex-1 h100 text-fit text-center fitness"><span class="fitness-target">GC</span></div>
+            <div class="flex-1 h100 text-fit text-center fitness"><span class="fitness-target">SD</span></div>
+        </div>
+        @foreach (var time in group.SelectMany(_ => _))
+        {
+            <div class="corpo h90 flex-2">
+                <div class="flex-1 df-ac-jc h80 line text-center">
+                    <span class="@ObterDestaque(time.corDestaque)">&nbsp;</span>
+                </div>
+                <div class="flex-1 df-ac-jc h80 line posicao text-center negrito fitness">
+                    <span class="fitness-target">@(time.posicao)º</span>
+                </div>
+                <div class="flex-6 h80 line clube text-center negrito">
+                    <div class="emblema df-ac-jc h80 line flex-1">
+                        <img width="100%" src='@(time.time.ObterLogoLocal())' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" />
+                    </div>
+                    &nbsp;
+                    <div class="nome flex-6 h80 line text-start fitness"><span class="fitness-target">@time.clube</span></div>
+                </div>
+                <div class="flex-1 h80 line text-fit pontos text-center negrito fitness"><span class="fitness-target">@time.pontos</span></div>
+                <div class="flex-1 h80 line text-fit partidas text-center negrito fitness"><span class="fitness-target">@time.partidasJogadas</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.vitorias</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.empates</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.derrotas</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.golsPro</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.golsContra</span></div>
+                <div class="flex-1 h60 line text-fit text-center fitness"><span class="fitness-target">@time.saldoGols</span></div>
+            </div>
+        }
+    </div>
+}

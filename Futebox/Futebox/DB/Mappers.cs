@@ -1,4 +1,5 @@
 ﻿using Dapper.FluentMap.Dommel.Mapping;
+using Futebox.DB.Migrations;
 using Futebox.Models;
 
 namespace Futebox.DB.Mappers
@@ -7,32 +8,33 @@ namespace Futebox.DB.Mappers
     {
         public TimeMap()
         {
-            ToTable("time");
-            Map(x => x.id).ToColumn("id");
-            Map(x => x.criacao).ToColumn("criacao");
-            Map(x => x.alteracao).ToColumn("alteracao");
+            ToTable(DbSchemaTime.time);
+            Map(x => x.id).ToColumn(DbSchemaTime.id);
+            Map(x => x.criacao).ToColumn(DbSchemaTime.criacao);
+            Map(x => x.alteracao).ToColumn(DbSchemaTime.alteracao);
 
-            Map(x => x.nome).ToColumn("nome");
-            Map(x => x.sigla).ToColumn("sigla");
-            Map(x => x.urlLogo).ToColumn("urlLogo");
-            Map(x => x.origemDado).ToColumn("origemDado");
-            Map(x => x.origem_ext_id).ToColumn("origem_ext_id");
-            Map(x => x.origem_ext_equipe_id).ToColumn("origem_ext_equipe_id");
-            Map(x => x.nomeAdaptadoWatson).ToColumn("nomeAdaptadoWatson");
-            Map(x => x.logoBin).ToColumn("logoBin");
+            Map(x => x.nome).ToColumn(DbSchemaTime.nome);
+            Map(x => x.sigla).ToColumn(DbSchemaTime.sigla);
+            Map(x => x.urlLogo).ToColumn(DbSchemaTime.urlLogo);
+            Map(x => x.origemDado).ToColumn(DbSchemaTime.origemDado);
+            Map(x => x.origem_ext_id).ToColumn(DbSchemaTime.origem_ext_id);
+            Map(x => x.origem_ext_equipe_id).ToColumn(DbSchemaTime.origem_ext_equipe_id);
+            Map(x => x.nomeAdaptadoWatson).ToColumn(DbSchemaTime.nomeAdaptadoWatson);
+            Map(x => x.logoBin).ToColumn(DbSchemaTime.logoBin);
 
-            Map(x => x.selecao).ToColumn("selecao");
-            Map(x => x.torcedorNoSingular).ToColumn("torcedorNoSingular");
-            Map(x => x.torcedorNoPlural).ToColumn("torcedorNoPlural");
-            Map(x => x.timeFantasia).ToColumn("timeFantasia");
-            Map(x => x.cidade).ToColumn("cidade");
-            Map(x => x.estado).ToColumn("estado");
-            Map(x => x.pais).ToColumn("pais");
-            Map(x => x.grupo).ToColumn("grupo");
-            Map(x => x.isTimeGrande).ToColumn("isTimeGrande");
-            Map(x => x.hasScout).ToColumn("hasScout");
-            Map(x => x.idTecnico).ToColumn("idTecnico");
-            Map(x => x.tecnico).ToColumn("tecnico");
+            Map(x => x.selecao).ToColumn(DbSchemaTime.selecao);
+            Map(x => x.torcedorNoSingular).ToColumn(DbSchemaTime.torcedorNoSingular);
+            Map(x => x.torcedorNoPlural).ToColumn(DbSchemaTime.torcedorNoPlural);
+            Map(x => x.timeFantasia).ToColumn(DbSchemaTime.timeFantasia);
+            Map(x => x.cidade).ToColumn(DbSchemaTime.cidade);
+            Map(x => x.estado).ToColumn(DbSchemaTime.estado);
+            Map(x => x.pais).ToColumn(DbSchemaTime.pais);
+            Map(x => x.grupo).ToColumn(DbSchemaTime.grupo);
+            Map(x => x.isTimeGrande).ToColumn(DbSchemaTime.isTimeGrande);
+            Map(x => x.hasScout).ToColumn(DbSchemaTime.hasScout);
+            Map(x => x.idTecnico).ToColumn(DbSchemaTime.idTecnico);
+            Map(x => x.tecnico).ToColumn(DbSchemaTime.tecnico);
+            Map(x => x.logoEspecifico).ToColumn(DbSchemaTime.logoEspecifico);
         }
     }
 
@@ -40,32 +42,136 @@ namespace Futebox.DB.Mappers
     {
         public ProcessoMap()
         {
-            ToTable("videoprocesso");
-            Map(x => x.id).ToColumn("id");
-            Map(x => x.criacao).ToColumn("criacao");
-            Map(x => x.alteracao).ToColumn("alteracao");
+            ToTable(DbSchemaProcesso.processo);
+            Map(x => x.id).ToColumn(DbSchemaProcesso.id);
+            Map(x => x.criacao).ToColumn(DbSchemaProcesso.criacao);
+            Map(x => x.alteracao).ToColumn(DbSchemaProcesso.alteracao);
+            Map(x => x.nome).ToColumn(DbSchemaProcesso.nome);
+            Map(x => x.categoria).ToColumn(DbSchemaProcesso.categoria);
+            Map(x => x.status).ToColumn(DbSchemaProcesso.status);
+            Map(x => x.log).ToColumn(DbSchemaProcesso.log);
+            Map(x => x.agendamento).ToColumn(DbSchemaProcesso.agendamento);
+            Map(x => x.agendado).ToColumn(DbSchemaProcesso.agendado);
+            Map(x => x.pasta).ToColumn(DbSchemaProcesso.pasta);
+            Map(x => x.args).ToColumn(DbSchemaProcesso.args);
+            Map(x => x.linkDaImagemDoVideo).ToColumn(DbSchemaProcesso.linkDaImagemDoVideo);
+            Map(x => x.larguraVideo).ToColumn(DbSchemaProcesso.larguraVideo);
+            Map(x => x.alturaVideo).ToColumn(DbSchemaProcesso.alturaVideo);
+            Map(x => x.nomeDoArquivoAudio).ToColumn(DbSchemaProcesso.nomeDoArquivoAudio);
+            Map(x => x.nomeDoArquivoImagem).ToColumn(DbSchemaProcesso.nomeDoArquivoImagem);
+            Map(x => x.nomeDoArquivoVideo).ToColumn(DbSchemaProcesso.nomeDoArquivoVideo);
+            Map(x => x.roteiro).ToColumn(DbSchemaProcesso.roteiro);
+            Map(x => x.tituloVideo).ToColumn(DbSchemaProcesso.tituloVideo);
+            Map(x => x.descricaoVideo).ToColumn(DbSchemaProcesso.descricaoVideo);
+            Map(x => x.social).ToColumn(DbSchemaProcesso.social);
+        }
+    }
 
-            Map(x => x.nome).ToColumn("nome");
-            Map(x => x.linkThumb).ToColumn("linkThumb");
-            Map(x => x.link).ToColumn("link");
-            Map(x => x.tipoLink).ToColumn("tipoLink");
-            Map(x => x.imgLargura).ToColumn("imgLargura");
-            Map(x => x.imgAltura).ToColumn("imgAltura");
-            Map(x => x.roteiro).ToColumn("roteiro");
-            Map(x => x.attrTitulo).ToColumn("attrTitulo");
-            Map(x => x.attrDescricao).ToColumn("attrDescricao");
-            Map(x => x.status).ToColumn("status");
-            Map(x => x.statusMensagem).ToColumn("statusMensagem");
-            Map(x => x.processado).ToColumn("processado");
-            Map(x => x.args).ToColumn("args");
+    public class AgendaMap : DommelEntityMap<Agenda>
+    {
+        public AgendaMap()
+        {
+            ToTable(DbSchemaAgenda.agenda);
+            Map(x => x.id).ToColumn(DbSchemaAgenda.id);
+            Map(x => x.processoId).ToColumn(DbSchemaAgenda.processoId);
+            Map(x => x.criacao).ToColumn(DbSchemaAgenda.criacao);
+            Map(x => x.alteracao).ToColumn(DbSchemaAgenda.alteracao);
+            Map(x => x.descricao).ToColumn(DbSchemaAgenda.descricao);
+            Map(x => x.status).ToColumn(DbSchemaAgenda.status);
+            Map(x => x.agendamento).ToColumn(DbSchemaAgenda.agendamento);
+        }
+    }
 
-            Map(x => x.notificacao).ToColumn("notificacao");
-            Map(x => x.agendamento).ToColumn("agendamento");
-            Map(x => x.agendado).ToColumn("agendado");
-
-            Map(x => x.portaExecucao).ToColumn("portaExecucao");
-            Map(x => x.arquivoVideo).ToColumn("arquivoVideo");
-
+    public class CampeonatoMap : DommelEntityMap<Campeonato>
+    {
+        public CampeonatoMap()
+        {
+            ToTable(DbSchemaCampeonato.campeonato);
+            Map(x => x.id).ToColumn(DbSchemaCampeonato.id);
+            Map(x => x.criacao).ToColumn(DbSchemaCampeonato.criacao);
+            Map(x => x.alteracao).ToColumn(DbSchemaCampeonato.alteracao);
+            Map(x => x.origem_ext_id).ToColumn(DbSchemaCampeonato.origem_ext_id);
+            Map(x => x.ativo).ToColumn(DbSchemaCampeonato.ativo);
+            Map(x => x.pais).ToColumn(DbSchemaCampeonato.pais);
+            Map(x => x.nome).ToColumn(DbSchemaCampeonato.nome);
+            Map(x => x.urlLogo).ToColumn(DbSchemaCampeonato.urlLogo);
+            Map(x => x.sdeSlug).ToColumn(DbSchemaCampeonato.sdeSlug);
+            Map(x => x.temporada).ToColumn(DbSchemaCampeonato.temporada);
+            Map(x => x.categoria).ToColumn(DbSchemaCampeonato.categoria);
+            Map(x => x.temClassificacao).ToColumn(DbSchemaCampeonato.temClassificacao);
+            Map(x => x.temClassificacaoPorGrupo).ToColumn(DbSchemaCampeonato.temClassificacaoPorGrupo);
+            Map(x => x.tipoDeColeta).ToColumn(DbSchemaCampeonato.tipoDeColeta);
+            Map(x => x.faseAtual).ToColumn(DbSchemaCampeonato.faseAtual);
+            Map(x => x.quantidadeDeEquipes).ToColumn(DbSchemaCampeonato.quantidadeDeEquipes);
+            Map(x => x.rodadaAtual).ToColumn(DbSchemaCampeonato.rodadaAtual);
+            Map(x => x.quantidadeDeRodadas).ToColumn(DbSchemaCampeonato.quantidadeDeRodadas);
+            Map(x => x.nomeDaTaca).ToColumn(DbSchemaCampeonato.nomeDaTaca);
+            Map(x => x.apelido).ToColumn(DbSchemaCampeonato.apelido);
         }
     }
 }
+
+
+
+
+/*
+     public class YoutubeSubProcessoMap<T> : DommelEntityMap<T> where T : YoutubeSubProcessoBase
+    {
+        public YoutubeSubProcessoMap()
+        {
+            ToTable(DbSchemaSubProcesso.subprocesso);
+            Map(x => x.id).ToColumn(DbSchemaSubProcesso.id);
+            Map(x => x.criacao).ToColumn(DbSchemaSubProcesso.criacao);
+            Map(x => x.alteracao).ToColumn(DbSchemaSubProcesso.alteracao);
+
+            Map(x => x.alturaVideo).ToColumn(DbSchemaSubProcesso.alturaVideo);
+            Map(x => x.categoriaVideo).ToColumn(DbSchemaSubProcesso.categoriaVideo);
+            Map(x => x.descricaoVideo).ToColumn(DbSchemaSubProcesso.descricaoVideo);
+            Map(x => x.larguraVideo).ToColumn(DbSchemaSubProcesso.larguraVideo);
+            Map(x => x.linkDaImagemDoVideo).ToColumn(DbSchemaSubProcesso.linkDaImagemDoVideo);
+            Map(x => x.linkPostagem).ToColumn(DbSchemaSubProcesso.linkPostagem);
+
+            Map(x => x.nomeDoArquivoAudio).ToColumn(DbSchemaSubProcesso.nomeDoArquivoAudio);
+            Map(x => x.nomeDoArquivoImagem).ToColumn(DbSchemaSubProcesso.nomeDoArquivoImagem);
+            Map(x => x.nomeDoArquivoVideo).ToColumn(DbSchemaSubProcesso.nomeDoArquivoVideo);
+
+            Map(x => x.pastaDoArquivo).ToColumn(DbSchemaSubProcesso.pastaDoArquivo);
+            Map(x => x.playlist).ToColumn(DbSchemaSubProcesso.playlist);
+            Map(x => x.processoId).ToColumn(DbSchemaSubProcesso.processoId);
+            Map(x => x.redeSocial).ToColumn(DbSchemaSubProcesso.redeSocial);
+            Map(x => x.roteiro).ToColumn(DbSchemaSubProcesso.roteiro);
+            Map(x => x.status).ToColumn(DbSchemaSubProcesso.status);
+            Map(x => x.tituloVideo).ToColumn(DbSchemaSubProcesso.tituloVideo);
+            Map(x => x.args).ToColumn(DbSchemaSubProcesso.args);
+        }
+    }
+
+    public class InstagramSubProcessoMap<T> : DommelEntityMap<T> where T : InstagramSubProcessoBase
+    {
+        public InstagramSubProcessoMap()
+        {
+            ToTable(DbSchemaSubProcesso.subprocesso);
+            Map(x => x.id).ToColumn(DbSchemaSubProcesso.id);
+            Map(x => x.criacao).ToColumn(DbSchemaSubProcesso.criacao);
+            Map(x => x.alteracao).ToColumn(DbSchemaSubProcesso.alteracao);
+
+            Map(x => x.alturaVideo).ToColumn(DbSchemaSubProcesso.alturaVideo);
+            Map(x => x.categoriaVideo).ToColumn(DbSchemaSubProcesso.categoriaVideo);
+            Map(x => x.larguraVideo).ToColumn(DbSchemaSubProcesso.larguraVideo);
+            Map(x => x.legendaPostagem).ToColumn(DbSchemaSubProcesso.legendaPostagem);
+            Map(x => x.linkDaImagemDoVideo).ToColumn(DbSchemaSubProcesso.linkDaImagemDoVideo);
+            Map(x => x.linkPostagem).ToColumn(DbSchemaSubProcesso.linkPostagem);
+
+            Map(x => x.nomeDoArquivoAudio).ToColumn(DbSchemaSubProcesso.nomeDoArquivoAudio);
+            Map(x => x.nomeDoArquivoImagem).ToColumn(DbSchemaSubProcesso.nomeDoArquivoImagem);
+            Map(x => x.nomeDoArquivoVideo).ToColumn(DbSchemaSubProcesso.nomeDoArquivoVideo);
+
+            Map(x => x.pastaDoArquivo).ToColumn(DbSchemaSubProcesso.pastaDoArquivo);
+            Map(x => x.processoId).ToColumn(DbSchemaSubProcesso.processoId);
+            Map(x => x.redeSocial).ToColumn(DbSchemaSubProcesso.redeSocial);
+            Map(x => x.roteiro).ToColumn(DbSchemaSubProcesso.roteiro);
+            Map(x => x.status).ToColumn(DbSchemaSubProcesso.status);
+            Map(x => x.args).ToColumn(DbSchemaSubProcesso.args);
+        }
+    }
+ */

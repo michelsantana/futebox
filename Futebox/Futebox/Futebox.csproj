@@ -5,6 +5,26 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Controllers\PartidasController.cs" />
+	  <Compile Remove="Models\Entity\Subprocesso.cs" />
+	  <Compile Remove="Pages\ClassificacaoParcial.cshtml.cs" />
+	  <Compile Remove="Services\FutebotService.Audio.cs" />
+	  <Compile Remove="Services\JobServiceProvider.cs" />
+	  <Compile Remove="Services\Jobs\QueueJob.cs" />
+	  <Compile Remove="Services\OLD.AgendamentoService.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="Pages\ClassificacaoParcial.cshtml" />
+	  <Content Remove="Pages\Miniaturas\_classificacaoTabela.cshtml" />
+	  <Content Remove="Pages\Templates\_partidaCardFoco.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="NodeServices\src\file.io.js" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.0.90" />
 		<PackageReference Include="Dapper.FluentMap" Version="2.0.0" />
 		<PackageReference Include="Dapper.FluentMap.Dommel" Version="2.0.0" />
@@ -19,11 +39,19 @@
 		<PackageReference Include="Google.Apis.Core" Version="1.55.0" />
 		<PackageReference Include="Google.Apis.Oauth2.v2" Version="1.55.0.1869" />
 		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.55.0.2449" />
+		<PackageReference Include="Microsoft.AspNetCore.NodeServices" Version="3.1.22" />
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.19" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="PuppeteerSharp" Version="6.1.0" />
 		<PackageReference Include="Quartz" Version="3.3.3" />
+		<PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.3.3" />
 		<PackageReference Include="RabbitMQ.Client" Version="6.2.2" />
+		<PackageReference Include="System.Management" Version="6.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Pages\Partida\" />
 	</ItemGroup>
 
 </Project>

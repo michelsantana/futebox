@@ -4,20 +4,21 @@ using Xunit;
 
 namespace Futebox.Teste
 {
+    [Collection(nameof(InjectorCollection))]
     public class TimeRepositorioTeste
     {
-        DatabaseConfig dbConfig;
+        private readonly InjectorFixture _db;
 
-        public TimeRepositorioTeste()
+        public TimeRepositorioTeste(InjectorFixture db)
         {
-            dbConfig = new DatabaseConfig("Data Source=D:/Notebook/Workspace/pessoal/FuteBox/core/Futebox/Futebox/DB/futebox.sqlite");
+            RegisterMappings.Register();
+            _db = db;
         }
 
         [Fact]
         public void DeveSalvarUmNovoTime()
         {
-            RegisterMappings.Register();
-            TimeRepositorio repository = new TimeRepositorio(dbConfig);
+            TimeRepositorio repository = new TimeRepositorio(_db.GerarConfiguracaoDoBancoDeDados());
 
             var time = new Time()
             {
@@ -33,8 +34,7 @@ namespace Futebox.Teste
         [Fact]
         public void DeveRemoverUmTimeSalvo()
         {
-            RegisterMappings.Register();
-            TimeRepositorio repository = new TimeRepositorio(dbConfig);
+            TimeRepositorio repository = new TimeRepositorio(_db.GerarConfiguracaoDoBancoDeDados());
 
             var time = new Time()
             {

@@ -19,7 +19,7 @@ namespace Futebox.DB
 
         public override string GenerateID()
         {
-            return DateTime.Now.ToString("yyyyMMddHHmmss");
+            return DateTime.Now.ToString("yyyyMMddHHmmssff");
         }
     }
 }

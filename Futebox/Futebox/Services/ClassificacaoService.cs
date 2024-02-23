@@ -1,11 +1,10 @@
 ﻿using Futebox.Interfaces.DB;
 using Futebox.Models;
+using Futebox.Models.Enums;
 using Futebox.Services.Interfaces;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Futebox.Models.Enums;
 
 namespace Futebox.Services
 {
@@ -14,61 +13,66 @@ namespace Futebox.Services
         readonly ICacheHandler _cache;
         readonly ITimeRepositorio _timeRepositorio;
         readonly IFootstatsService _footstatsService;
-        readonly ILogger<IClassificacaoService> _logger;
 
-        public ClassificacaoService(ICacheHandler cache, ITimeRepositorio timeRepositorio, IFootstatsService footstatsService, ILogger<IClassificacaoService> logger)
+        public ClassificacaoService(ICacheHandler cache, ITimeRepositorio timeRepositorio, IFootstatsService footstatsService)
         {
             _cache = cache;
-            _logger = logger;
             _timeRepositorio = timeRepositorio;
             _footstatsService = footstatsService;
         }
 
-        public IEnumerable<ClassificacaoVM> ObterClassificacaoPorCampeonato(Campeonatos campeonato, bool clearCache = false)
+        public IEnumerable<ClassificacaoVM> ObterClassificacaoPorCampeonato(EnumCampeonato campeonato, bool usarCache = true)
         {
             var cacheName = $"{nameof(FootstatsClassificacao)}{campeonato}";
             var resultado = _cache.ObterConteudo<List<FootstatsClassificacao>>(cacheName);
-            if (resultado == null || resultado.Count == 0 || clearCache)
+            if (resultado == null || resultado.Count == 0 || !usarCache)
             {
                 resultado = _footstatsService.ObterClassificacaoServico(campeonato);
                 _cache.DefinirConteudo(cacheName, resultado, 3);
             }
-            return resultado.Select(_ => ConverterEmClassificacaoVM(_));
+
+            //if (CampeonatoUtils.Config[campeonato].classificacaoPorGrupo && CampeonatoUtils.Config[campeonato].grupoFicticio)
+            //{
+            //    resultado.Take(resultado.Count / 2).ToList().ForEach(_ => _.grupo = "FAKE1");
+            //    resultado.Skip(resultado.Count / 2).ToList().ForEach(_ => _.grupo = "FAKE2");
+            //}
+
+            return resultado
+                .Select(_ => ConverterEmClassificacaoVM(_));
         }
 
-        public string ObterRoteiroDaClassificacao(IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
+        public IEnumerable<ClassificacaoVM> ObterClassificacaoPorCampeonatoFase(EnumCampeonato campeonato, string fase, bool usarCache = true)
         {
-
-            var msg = $"{RoteiroDefaults.ObterSaudacao()} "
-                + $"Veja agora a classificação do \"{CampeonatoUtils.ObterNomeDoCampeonato(campeonato)}\": "
-                + $"Lembrando que essa, é a classificação no dia de hoje, {RoteiroDefaults.TraduzirDiaDoMes(DateTime.Now)}: "
-                + $"Bora: "
-                + "Ô ";
-
-            var rnd = new Random();
-            var indicePedirLike = rnd.Next(7, classificacao.Count() - 2);
-
-            classificacao.ToList().ForEach(_ =>
+            var cacheName = $"{nameof(FootstatsClassificacao)}{campeonato}";
+            var resultado = _cache.ObterConteudo<List<FootstatsClassificacao>>(cacheName);
+            if (resultado == null || resultado.Count == 0 || !usarCache)
             {
+                resultado = _footstatsService.ObterClassificacaoServico(campeonato);
+                _cache.DefinirConteudo(cacheName, resultado, 3);
+            }
 
-                msg += $"{_.posicao}º colocado é, {_.time.ObterNomeWatson()}, "
-                + $"com {_.pontos} pontos, em { _.partidasJogadas} jogos: ";
+            if (CampeonatoUtils.Config[campeonato].fases?.Count() > 1)
+                resultado = resultado.GroupBy(_ => _.fase).First(_ => _.Key == fase).ToList();
 
-                if (~~_.posicao == indicePedirLike)
-                {
-                    msg += "Meus parças: Já deixa aquela deedáda no laique e se inscrévi no canal: Continuando: Ô ";
-                }
-            });
-            msg += "Muitíssimo obrigada a todos que assistiram até aqui: Até o próximo vídeo: ";
-            return msg;
+            //if (CampeonatoUtils.Config[campeonato].classificacaoPorGrupo && CampeonatoUtils.Config[campeonato].grupoFicticio)
+            //{
+            //    resultado.Take(resultado.Count / 2).ToList().ForEach(_ => _.grupo = "FAKE1");
+            //    resultado.Skip(resultado.Count / 2).ToList().ForEach(_ => _.grupo = "FAKE2");
+            //}
+
+            return resultado
+                .Select(_ => ConverterEmClassificacaoVM(_));
         }
 
-        public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
+        public Tuple<string, string> ObterAtributosDoVideo(IEnumerable<ClassificacaoVM> classificacao, ProcessoClassificacaoArgs processoClassificacaoArgs)
         {
-            var camp = CampeonatoUtils.ObterNomeDoCampeonato(campeonato);
+            var camp = CampeonatoUtils.ObterNomeDoCampeonato(processoClassificacaoArgs.campeonato);
             var data = DateTime.Now.ToString("dd/MM/yyyy");
             var ano = DateTime.Now.ToString("yyyy");
             var titulo = $"CLASSIFICAÇÃO {camp} {ano} - {data} - ATUALIZADA";
+            if (processoClassificacaoArgs.social == RedeSocialFinalidade.YoutubeShorts) titulo += " #shorts";
+
+            titulo = string.IsNullOrEmpty(processoClassificacaoArgs.titulo) ? titulo : processoClassificacaoArgs.titulo;
 
             var descricao = "";
 
@@ -77,13 +81,14 @@ namespace Futebox.Services
                 $"TABELA {camp}",
                 $"TABELA CLASSIFICAÇÃO",
                 $"CLASSIFICAÇÃO {camp}",
-                $"CAMPEONATO {camp}"
+                $"CAMPEONATO {camp}",
+                $"FUTEBOL",
             };
 
             palavraschave.ToList().ForEach(_ =>
             {
                 var comAcento = _;
-                var semAcento = RoteiroDefaults.RemoverAcentos(comAcento);
+                var semAcento = comAcento?.RemoverAcentos2();
 
                 descricao += comAcento;
                 descricao += "\n";
@@ -93,16 +98,16 @@ namespace Futebox.Services
                 descricao += "\n";
                 descricao += $"{semAcento} {ano}";
                 descricao += "\n";
-                descricao += $"#{comAcento.Replace(" ", "")}";
-                descricao += "\n";
-                descricao += $"#{comAcento.Replace(" ", "")}{ano}";
-                descricao += "\n";
+            });
+
+            palavraschave.ToList().ForEach(_ =>
+            {
+                var semAcento = _?.RemoverAcentos2();
                 descricao += $"#{semAcento.Replace(" ", "")}";
                 descricao += "\n";
                 descricao += $"#{semAcento.Replace(" ", "")}{ano}";
                 descricao += "\n";
             });
-
             return Tuple.Create(titulo, descricao);
         }
 
@@ -124,7 +129,8 @@ namespace Futebox.Services
                 saldoGols = classificacao.saldoDeGols,
                 vitorias = classificacao.vitorias,
                 time = time,
-                grupo = classificacao.grupo
+                grupo = classificacao.grupo,
+                fase = classificacao.fase
             };
             return retorno;
         }

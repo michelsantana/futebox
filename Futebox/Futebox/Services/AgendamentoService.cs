@@ -1,140 +1,132 @@
-﻿using Futebox.Models;
+﻿using Futebox.Interfaces.DB;
+using Futebox.Models;
 using Futebox.Services.Interfaces;
+using Futebox.Services.Jobs;
 using Quartz;
-using Quartz.Impl;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Futebox.Services
 {
     public class AgendamentoService : IAgendamentoService
     {
+        ISchedulerService _schedule;
+        IAgendaRepositorio _agendaRepositorio;
 
-        IProcessoService _processoService;
-        INotifyService _notifyService;
-        SchedulerService _schedule;
-
-        [DisallowConcurrentExecution]
-        public class NotificarJob : IJob
+        public AgendamentoService(ISchedulerService schedule, IAgendaRepositorio agendaRepositorio)
         {
-            public Task Execute(IJobExecutionContext context)
-            {
-                var jobkey = context.JobDetail.Key;
-                Console.WriteLine($"[NOTIFY][START][{jobkey.Name}]");
-                Processo processo = null;
-                try
-                {
-                    var service = (INotifyService)context.MergedJobDataMap["service"];
-                    processo = (Processo)context.MergedJobDataMap["processo"];
-
-                    service.Notify(processo.notificacao);
-
-                    Console.WriteLine($"[NOTIFY][COMPLETE][{jobkey.Name}]");
-                    return Task.FromResult(processo);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[NOTIFY][ERROR][{jobkey.Name}]");
-                    Console.WriteLine($"{ex.Message}");
-                }
-                finally
-                {
-                    Task.WaitAll(context.Scheduler.DeleteJob(jobkey));
-                }
-                return Task.FromResult(processo);
-            }
-        }
-
-        [DisallowConcurrentExecution]
-        public class ExecutarProcessoJob : IJob
-        {
-            public Task Execute(IJobExecutionContext context)
-            {
-                var jobkey = context.JobDetail.Key;
-                Console.WriteLine($"[EXECUTOR][START][{jobkey.Name}]");
-                Processo processo = null;
-                try
-                {
-                    processo = (Processo)context.MergedJobDataMap["processo"];
-                    var service = (IProcessoService)context.MergedJobDataMap["service"];
-                    processo = service.AtualizarRoteiro(processo);
-                    service.ExecutarProcesso(processo.id);
-
-                    Console.WriteLine($"[EXECUTOR][COMPLETE][{jobkey.Name}]");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[EXECUTOR][ERROR][{jobkey.Name}]");
-                    Console.WriteLine($"{ex.Message}");
-                }
-                finally
-                {
-                    Task.WaitAll(context.Scheduler.DeleteJob(jobkey));
-                }
-                return Task.FromResult(processo);
-            }
-        }
-
-        [DisallowConcurrentExecution]
-        public class PublicarVideoJob : IJob
-        {
-            public Task Execute(IJobExecutionContext context)
-            {
-                var jobkey = context.JobDetail.Key;
-                Console.WriteLine($"[PUBLISH][START][{jobkey.Name}]");
-                Processo processo = null;
-                try
-                {
-                    processo = (Processo)context.MergedJobDataMap["processo"];
-                    var service = (IProcessoService)context.MergedJobDataMap["service"];
-                    processo = service.PublicarVideo(processo.id);
-
-                    Console.WriteLine($"[PUBLISH][COMPLETE][{jobkey.Name}]");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[PUBLISH][ERROR][{jobkey.Name}]");
-                    Console.WriteLine($"{ex.Message}");
-                }
-                finally
-                {
-                    Task.WaitAll(context.Scheduler.DeleteJob(jobkey));
-                }
-                return Task.FromResult(processo);
-            }
-        }
-
-        public AgendamentoService(IProcessoService processoService, INotifyService notifyService, SchedulerService schedule)
-        {
-            _processoService = processoService;
-            _notifyService = notifyService;
             _schedule = schedule;
+            _agendaRepositorio = agendaRepositorio;
         }
 
-        public void AgendarExecucao(string processoId, DateTime date)
+        public async Task<Agenda> Obter(string processoId)
         {
-            var jobPublishId = JobKey.Create($"publicacao-processo-{processoId}", "geral");
-            var jobNotifyId = JobKey.Create($"notificacao-processo-{processoId}", "geral");
-            var jobExecuteId = JobKey.Create($"execucao-processo-{processoId}", "geral");
-
-            //AddJob<PublicarVideoJob>(processoId, jobNotifyId, _processoService, date);
-
-            AddJob<ExecutarProcessoJob>(processoId, jobExecuteId, _processoService, date);
-            AddJob<PublicarVideoJob>(processoId, jobPublishId, _processoService, date.AddMinutes(5));
-            AddJob<NotificarJob>(processoId, jobNotifyId, _notifyService, date.AddMinutes(6));
+            try
+            {
+                var agendaSalva = _agendaRepositorio.GetSingle(_ => _.processoId == processoId);
+                if (string.IsNullOrEmpty(agendaSalva?.id)) return null;
+                return agendaSalva;
+            }
+            catch (Exception ex)
+            {
+                EyeLog.Log(ex);
+                return null;
+            }
         }
 
-        private void AddJob<T>(string processoId, JobKey jobId, object service, DateTime date) where T : IJob
+        public async Task<Agenda> Criar(string processoId, string descricao = null)
         {
-            var processo = _processoService.ObterProcesso(processoId);
+            try
+            {
+                var agenda = new Agenda()
+                {
+                    processoId = processoId,
+                    agendamento = null,
+                    descricao = descricao,
+                    status = Agenda.Status.criado
+                };
+                return await Salvar(agenda, true);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<Agenda> Salvar(Agenda agenda, bool forceCreation = false)
+        {
+            var agendaSalva = _agendaRepositorio.GetSingle(_ => _.processoId == agenda.processoId);
+
+            if (string.IsNullOrEmpty(agendaSalva?.id))
+            {
+                if (forceCreation)
+                    _agendaRepositorio.Insert(ref agenda);
+                else throw new Exception("agenda não encontrada");
+            }
+            else agenda = _agendaRepositorio.UpdateReturn(agenda);
+            return agenda;
+        }
+
+        public async Task<Agenda> Agendar(string processoId, DateTime data)
+        {
+            var agendaSalva = _agendaRepositorio.GetSingle(_ => _.processoId == processoId);
+            if (string.IsNullOrEmpty(agendaSalva?.id)) throw new Exception("Agenda não criada");
+
+            _agendaRepositorio.OpenTransaction();
+            agendaSalva.agendamento = data;
+            agendaSalva.status = Agenda.Status.agendado;
+            agendaSalva = _agendaRepositorio.UpdateReturn(agendaSalva);
+            _agendaRepositorio.Commit();
+            AddJob<HttpJob>(agendaSalva.processoId, data);
+
+            return agendaSalva;
+        }
+
+        public async Task<Agenda> Cancelar(string processoId)
+        {
+            var agendaSalva = _agendaRepositorio.GetSingle(_ => _.processoId == processoId);
+            if (string.IsNullOrEmpty(agendaSalva.id)) throw new Exception("Agenda não criada");
+
+            _agendaRepositorio.OpenTransaction();
+            agendaSalva.agendamento = null;
+            agendaSalva.status = Agenda.Status.cancelado;
+            agendaSalva = _agendaRepositorio.UpdateReturn(agendaSalva);
+            _agendaRepositorio.Commit();
+            _schedule.RemoveJob(agendaSalva.processoId);
+
+            return agendaSalva;
+        }
+
+        public async Task<List<Agenda>> List()
+        {
+            return _agendaRepositorio.GetAll()?.ToList();
+        }
+
+        public IJobDetail Info(string jobKey)
+        {
+            return _schedule.Info(jobKey);
+        }
+
+        public async Task<List<IJobDetail>> JobList()
+        {
+            return await _schedule.List();
+        }
+
+        public async Task<List<IJobExecutionContext>> JobListRunning()
+        {
+            return await _schedule.ListRunning();
+        }
+
+        private void AddJob<T>(string processoId, DateTime date) where T : IJob
+        {
+            var jobId = new JobKey(processoId);
             IDictionary<string, object> dict = new Dictionary<string, object>();
-            dict.Add("processo", processo);
-            dict.Add("service", service);
+            dict.Add("processo", processoId);
             dict.Add("jobid", jobId);
 
-            Console.WriteLine($"Agendando processo - {processoId}");
+            EyeLog.Log($"Agendando processo - {processoId}");
 
             IJobDetail job = JobBuilder.Create<T>()
                 .WithIdentity(jobId)
@@ -148,6 +140,16 @@ namespace Futebox.Services
                 .Build();
 
             _schedule.AddJob(job, trigger);
+        }
+
+        public async Task InitializeAllJobs()
+        {
+            var found = _agendaRepositorio.GetList(_ => _.status == Agenda.Status.agendado);
+            found.ToList().ForEach(_ =>
+            {
+                if (_.agendamento.HasValue)
+                    AddJob<HttpJob>(_.processoId, _.agendamento.Value);
+            });
         }
     }
 }

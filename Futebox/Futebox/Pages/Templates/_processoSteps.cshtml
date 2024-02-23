@@ -1,0 +1,53 @@
+﻿@model Futebox.Models.Processo
+@{
+    var s1 = "📅";
+    var s2 = "🎞";
+    var s3 = "☁";
+    var nd = "⚪";
+    var ok = "🟢";
+    var er = "🔴";
+    var spinner = "<div class='spinner-border' role='status'><span class='visually-hidden'>Loading...</span></div>";
+    var counter = 0m;
+    var step = 8.33m;
+    //var step = 7.7m;
+    var progress = new Dictionary<int, Tuple<string, string, string, string>>();
+
+
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.Erro, Tuple.Create($"0000000000000{(counter)}%", $"{s1}{er}", $"{s2}{er}", $"{s3}{er}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.Criado, Tuple.Create($"00000000000{(counter)}%", $"{s1}{nd}", $"{s2}{nd}", $"{s3}{nd}"));
+    //progress.Add((int)Futebox.Models.Enums.StatusProcesso.Agendado, Tuple.Create($"000000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{nd}", $"{s3}{nd}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.GerandoImagem, Tuple.Create($"0000{(counter += step)}%", $"{s1}{ok}", $"{s2}{nd}", $"{s3}{nd}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.ImagemErro, Tuple.Create($"0000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{nd}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.ImagemOK, Tuple.Create($"000000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{nd}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.GerandoAudio, Tuple.Create($"00000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{nd}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.AudioErro, Tuple.Create($"00000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.AudioOK, Tuple.Create($"0000000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.GerandoVideo, Tuple.Create($"00000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.VideoErro, Tuple.Create($"00000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.VideoOK, Tuple.Create($"0000000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.Publicando, Tuple.Create($"0000000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.PublicandoErro, Tuple.Create($"000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    progress.Add((int)Futebox.Models.Enums.StatusProcesso.PublicandoOK, Tuple.Create($"00000{(counter += step)}%", $"{s1}{ok}", $"{s2}{ok}", $"{s3}{ok}"));
+    ;
+
+    var currentProgress = progress[(int)Model.status];
+
+    var statusErro = new Models.Enums.StatusProcesso[] {
+        Models.Enums.StatusProcesso.AudioErro,
+        Models.Enums.StatusProcesso.ImagemErro,
+        Models.Enums.StatusProcesso.VideoErro,
+        Models.Enums.StatusProcesso.PublicandoErro,
+        Models.Enums.StatusProcesso.Erro
+    };
+}
+
+@*<div class="row">
+        <div class="col-3 text-end sr-only">Agendado<br />@currentProgress.Item2</div>
+        <div class="col-3 text-end sr-only">Vídeo<br />@currentProgress.Item3</div>
+        <div class="col-3 text-end sr-only">Rede Social<br />@currentProgress.Item4</div>
+    </div>*@
+
+<div class="progress" style="height: 5px;">
+    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: @currentProgress.Item1.Replace(",", ".")" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+

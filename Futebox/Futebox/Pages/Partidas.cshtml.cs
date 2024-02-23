@@ -4,6 +4,7 @@ using Futebox.Pages.Shared;
 using Futebox.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,7 +30,7 @@ namespace Futebox.Pages
             qsPageViewMode = viewMode;
             qsPartidaId = partidaId;
 
-            partidas = _calendarioService.ObterPartidasHoje(viewMode == PageViewModes.print)?.ToList();
+            partidas = _calendarioService.ObterPartidasPeriodo(UsarCache(viewMode))?.ToList();
         }
 
         public PartialViewResult OnGetFocoPartida(string partidaId, PageViewModes viewMode)
@@ -37,10 +38,17 @@ namespace Futebox.Pages
             qsPartidaId = partidaId;
             qsPageViewMode = viewMode;
 
-            partidas = _calendarioService.ObterPartidasHoje()?.ToList();
-            partida = partidas.Find(_ => _.idExterno.ToString() == partidaId);
+            //partidas = _calendarioService.ObterPartida(Convert.ToInt32(partidaId))?.ToList();
+            partida = _calendarioService.ObterPartida(Convert.ToInt32(partidaId), UsarCache(viewMode));
 
-            return Partial("Templates/_partidaFoco", this);
+            if(viewMode == PageViewModes.igv)
+                return Partial("Templates/_partidaFocoIG", this);
+            if(viewMode == PageViewModes.yts)
+                return Partial("Templates/_partidaFocoYT", this);
+            if (viewMode == PageViewModes.ytv)
+                return Partial("Templates/_partidaFocoYT", this);
+
+            return Partial("Templates/_partidaFocoYT", this);
         }
 
     }

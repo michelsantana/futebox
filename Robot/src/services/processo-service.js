@@ -1,20 +1,36 @@
-const axios = require("axios").default;
+const axios = require('axios').default;
+const Processo = require('./../model/processo');
+const SubProcesso = require('./../model/subprocesso');
 
-module.exports = function (datasourceUrl) {
-  this.ObterProcesso = async () => {
-    return (await axios.get(`${datasourceUrl}/obter`)).data;
-  };
-
-  this.AtualizarProcessoErro = async (erro) => {
-    return (await axios.get(`${datasourceUrl}/erro?mensagem=${erro}`)).data;
-  };
-
-  this.AtualizarProcessoSucesso = async (arquivo) => {
-    return (await axios.get(`${datasourceUrl}/sucesso?arquivo=${encodeURIComponent(arquivo)}`)).data;
-  };
-
-  this.AtualizarLogProcesso = async (message) =>{
-    return (await axios.post(`${datasourceUrl}/log`, { log: message })).data;
+module.exports = class ProcessoServiceConstructor {
+  api = '';
+  constructor(api) {
+    this.api = api;
   }
-  return this;
+
+  /** @type {Processo} */
+  async ObterProcesso() {
+    return new Processo((await axios.get(`${this.api}/obter`)).data.processo);
+  }
+
+  /** @type {SubProcesso} */
+  async ObterSubProcesso() {
+    return new SubProcesso((await axios.get(`${this.api}/obter`)).data.subprocesso);
+  }
+
+  async AtualizarProcessoVideoCompleto(arquivo) {
+    return new Processo((await axios.get(`${this.api}/videocompleto`).data));
+  }
+
+  async AtualizarProcessoVideoErro() {
+    return new Processo((await axios.get(`${this.api}/videoerro`)).data);
+  }
+
+  async AtualizarProcessoPublicado(link) {
+    return new Processo((await axios.get(`${this.api}/publicado?&link=${encodeURIComponent(link)}`)).data);
+  }
+
+  async AtualizarProcessoPublicacaoErro() {
+    return new Processo((await axios.get(`${this.api}/publicacaoerro`)).data);
+  }
 };

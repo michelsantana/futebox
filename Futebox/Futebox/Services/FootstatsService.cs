@@ -42,7 +42,7 @@ namespace Futebox.Services
             return retorno;
         }
 
-        public List<FootstatsClassificacao> ObterClassificacaoServico(Campeonatos campeonato)
+        public List<FootstatsClassificacao> ObterClassificacaoServico(Models.Enums.EnumCampeonato campeonato)
         {
             var retorno = new List<FootstatsClassificacao>();
 
@@ -53,6 +53,40 @@ namespace Futebox.Services
             {
                 var jsonRetornadoApi = respostaDaApi.Content?.ReadAsStringAsync()?.Result;
                 var deserializado = DeserializarJson<FootstatsClassificacao>(jsonRetornadoApi);
+                if (deserializado != null) retorno.AddRange(deserializado);
+            }
+
+            return retorno;
+        }
+
+        public FootstatsPartida ObterPartida(int partida)
+        {
+            var retorno = new FootstatsPartida();
+
+            var rota = $"3.1/partidas/{partida}";
+            var respostaDaApi = _http.Get($"{BaseURL}/{rota}", MontarHeaderToken());
+
+            if (respostaDaApi.IsSuccessStatusCode)
+            {
+                var jsonRetornadoApi = respostaDaApi.Content?.ReadAsStringAsync()?.Result;
+                var deserializado = DeserializarSingleJson<FootstatsPartida>(jsonRetornadoApi);
+                if (deserializado != null) retorno = deserializado;
+            }
+
+            return retorno;
+        }
+
+        public List<FootstatsPartida> ObterPartidasPeriodo()
+        {
+            var retorno = new List<FootstatsPartida>();
+
+            var rota = $"3.1/partidas/periodo";
+            var respostaDaApi = _http.Get($"{BaseURL}/{rota}", MontarHeaderToken());
+
+            if (respostaDaApi.IsSuccessStatusCode)
+            {
+                var jsonRetornadoApi = respostaDaApi.Content?.ReadAsStringAsync()?.Result;
+                var deserializado = DeserializarJson<FootstatsPartida>(jsonRetornadoApi);
                 if (deserializado != null) retorno.AddRange(deserializado);
             }
 
@@ -76,7 +110,7 @@ namespace Futebox.Services
             return retorno;
         }
 
-        public List<FootstatsPartida> ObterPartidasDaRodada(Campeonatos campeonato, int rodada)
+        public List<FootstatsPartida> ObterPartidasDaRodada(Models.Enums.EnumCampeonato campeonato, int rodada)
         {
             var retorno = new List<FootstatsPartida>();
 
@@ -92,7 +126,7 @@ namespace Futebox.Services
             return retorno;
         }
 
-        public List<FootstatsPartida> ObterPartidasDoCampeonato(Campeonatos campeonato)
+        public List<FootstatsPartida> ObterPartidasDoCampeonato(Models.Enums.EnumCampeonato campeonato)
         {
             var retorno = new List<FootstatsPartida>();
 
@@ -129,5 +163,19 @@ namespace Futebox.Services
             }
         }
 
+        private T DeserializarSingleJson<T>(string json)
+        {
+            try
+            {
+                var node = JObject.Parse(json).SelectToken("data").ToString();
+                var listaFootstatsTime = JsonConvert.DeserializeObject<T>(node);
+                return listaFootstatsTime;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Erro ao deserializar o conteúdo", ex);
+                return default(T);
+            }
+        }
     }
 }

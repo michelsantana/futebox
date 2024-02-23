@@ -4,10 +4,13 @@ using Futebox.Services.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Futebox.Models.Enums;
 using System.Threading.Tasks;
+using System.Net;
+using System.IO;
+using Futebox.Providers;
+using Futebox.Services.utils;
 
 namespace Futebox.Services
 {
@@ -17,249 +20,286 @@ namespace Futebox.Services
         IPartidasService _partidasService;
         IClassificacaoService _classificacaoService;
         IRodadaService _rodadaService;
-        IYoutubeService _youtubeService;
+        IFutebotService _futebotService;
+        IAgendamentoService _agendamentoService;
+        IRoteiroProvider _roteiro;
 
-        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IYoutubeService youtubeService)
+        public ProcessoService(IProcessoRepositorio processoRepositorio, IPartidasService partidasService, IClassificacaoService classificacaoService, IRodadaService rodadaService, IFutebotService futebotService, IAgendamentoService agendamentoService, IRoteiroProvider roteiro)
         {
             _processoRepositorio = processoRepositorio;
             _partidasService = partidasService;
             _classificacaoService = classificacaoService;
             _rodadaService = rodadaService;
-            _youtubeService = youtubeService;
+            _futebotService = futebotService;
+            _agendamentoService = agendamentoService;
+            _roteiro = roteiro;
         }
 
-        public List<Processo> ObterProcessos()
+        public async Task<List<Processo>> ObterProcessos()
         {
             return _processoRepositorio.GetAll()?.ToList();
         }
 
-        public Processo ObterProcesso(string id)
+        public async Task<Processo> Obter(string id)
         {
             return _processoRepositorio.GetSingle(_ => _.id == id);
         }
 
-        public Processo SalvarProcessoPartida(int idPartida)
+        public async Task<List<Processo>> SalvarProcessoPartida(ProcessoPartidaArgs[] args)
         {
-            var partidas = _partidasService.ObterPartidasHoje(true);
-            return SalvarProcessoPartida(partidas.First(_ => _.idExterno == idPartida));
-        }
-        private Processo SalvarProcessoPartida(PartidaVM partida)
-        {
-            var roteiro = _partidasService.ObterRoteiroDaPartida(partida);
-            var atributos = _partidasService.ObterAtributosDoVideo(partida);
-            var processo = new Processo()
+            var result = new List<Processo>();
+            foreach (var arg in args)
             {
-                idExterno = partida.idExterno.ToString(),
-                tipo = TipoProcesso.partida,
-                nome = $"{atributos.Item1}",
-                link = $"{Settings.ApplicationHttpBaseUrl}partidas?partidaId={partida.idExterno}&viewMode=print",
-                linkThumb = $"{Settings.ApplicationHttpBaseUrl}partidas?partidaId={partida.idExterno}&viewMode=thumb",
-                tipoLink = TipoLink.print,
-                imgAltura = 1920,
-                imgLargura = 1080,
-                args = JsonConvert.SerializeObject(new ProcessoPartidaArgs(partida.idExterno)),
-                roteiro = roteiro,
-                status = StatusProcesso.Pendente,
-                processado = false,
-                attrTitulo = atributos.Item1,
-                attrDescricao = $"{atributos.Item2}\n{ObterDescricaoDefault()}",
-
-                agendado = false,
-                agendamento = partida.dataPartida.AddHours(2).AddMinutes(10),
-                notificacao =
-                $"processo: partida" +
-                $"\nnome: {atributos.Item1}",
-            };
-            _processoRepositorio.Insert(ref processo);
-            return processo;
+                var processo = new Processo(arg);
+                _processoRepositorio.Insert(ref processo);
+                _agendamentoService.Criar(processo.id);
+                result.Add(processo);
+            }
+            return result;
         }
 
-        public Processo SalvarProcessoClassificacao(Campeonatos campeonato)
+        public async Task<List<Processo>> SalvarProcessoClassificacao(ProcessoClassificacaoArgs[] args)
         {
-            var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(campeonato, true);
-            return SalvarProcessoClassificacao(classificacao, campeonato);
-        }
-        private Processo SalvarProcessoClassificacao(IEnumerable<ClassificacaoVM> classificacao, Campeonatos campeonato)
-        {
-            var roteiro = _classificacaoService.ObterRoteiroDaClassificacao(classificacao, campeonato);
-            var atributos = _classificacaoService.ObterAtributosDoVideo(classificacao, campeonato);
-            var processo = new Processo()
+            var result = new List<Processo>();
+            foreach (var arg in args)
             {
-                idExterno = DateTime.Now.ToString("yyyyMMddhhmmss"),
-                tipo = TipoProcesso.classificacao,
-                nome = $"{atributos.Item1}",
-                link = $"{Settings.ApplicationHttpBaseUrl}classificacao?campeonato={(int)campeonato}&viewMode=print",
-                //linkThumb = $"{Settings.ApplicationHttpBaseUrl}classificacao?foco={(int)campeonato}&viewMode=thumb",
-                tipoLink = TipoLink.print,
-                imgAltura = 1080,
-                imgLargura = 1920,
-                args = JsonConvert.SerializeObject(new ProcessoClassificacaoArgs(campeonato)),
-                roteiro = roteiro,
-                status = StatusProcesso.Pendente,
-                processado = false,
-                attrTitulo = atributos.Item1,
-                attrDescricao = $"{atributos.Item2}\n{ObterDescricaoDefault()}",
-
-                agendado = false,
-                agendamento = DateTime.Today.AddHours(23).AddMinutes(30),
-                notificacao =
-                $"processo: classificacao" +
-                $"\nnome: {atributos.Item1}",
-            };
-            _processoRepositorio.Insert(ref processo);
-            return processo;
+                var processo = new Processo(arg);
+                _processoRepositorio.Insert(ref processo);
+                Task.WaitAll(new Task[] { _agendamentoService.Criar(processo.id) });
+                result.Add(processo);
+            }
+            return result;
         }
 
-        public Processo SalvarProcessoRodada(Campeonatos campeonato, int rodada)
+        public async Task<List<Processo>> SalvarProcessoRodada(ProcessoRodadaArgs[] args)
         {
-            var partidas = _rodadaService.ObterPartidasDaRodada(campeonato, rodada);
-            return SalvarProcessoRodada(partidas, campeonato, rodada);
-
-        }
-        public Processo SalvarProcessoRodada(IEnumerable<PartidaVM> partidas, Campeonatos campeonato, int rodada)
-        {
-            var roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, campeonato, rodada);
-            var atributos = _rodadaService.ObterAtributosDoVideo(partidas, campeonato, rodada);
-            var processo = new Processo()
+            var result = new List<Processo>();
+            foreach (var arg in args)
             {
-                idExterno = DateTime.Now.ToString("yyyyMMddhhmmss"),
-                tipo = TipoProcesso.rodada,
-                nome = $"{atributos.Item1}",
-                link = $"{Settings.ApplicationHttpBaseUrl}rodadas?campeonato={(int)campeonato}&rodada={rodada}&viewMode=print",
-                //linkThumb = $"{Settings.ApplicationHttpBaseUrl}rodadas?foco={(int)campeonato}&rodada={rodada}&viewMode=thumb",
-                tipoLink = TipoLink.print,
-                imgAltura = 1080,
-                imgLargura = 1920,
-                args = JsonConvert.SerializeObject(new ProcessoRodadaArgs(campeonato, rodada)),
-                roteiro = roteiro,
-                status = StatusProcesso.Pendente,
-                processado = false,
-                attrTitulo = atributos.Item1,
-                attrDescricao = $"{atributos.Item2}\n{ObterDescricaoDefault()}",
-
-                agendado = false,
-                agendamento = DateTime.Now.AddMinutes(30),
-                notificacao =
-                $"processo: rodada" +
-                $"\nnome: {atributos.Item1}",
-            };
-            _processoRepositorio.Insert(ref processo);
-            return processo;
+                var processo = new Processo(arg);
+                _processoRepositorio.Insert(ref processo);
+                _agendamentoService.Criar(processo.id);
+                result.Add(processo);
+            }
+            return result;
         }
 
-        public Processo ExecutarProcesso(string processo)
+        public async Task<List<Processo>> SalvarProcessoJogosDia(ProcessoJogosDiaArgs[] args)
         {
-            string commandArgs = $"command=executar";
-            string idArgs = $"id={processo}";
-            string datasourceArgs = $"datasource={Settings.ApplicationHttpBaseUrl}api/processo/{processo}";
-
-            AtualizarRoteiro(processo);
-
-            ExecutarCMD(commandArgs, idArgs, datasourceArgs);
-            return _processoRepositorio.GetById(processo);
+            var result = new List<Processo>();
+            foreach (var arg in args)
+            {
+                var processo = new Processo(arg);
+                _processoRepositorio.Insert(ref processo);
+                _agendamentoService.Criar(processo.id);
+                result.Add(processo);
+            }
+            return result;
         }
 
-        public bool ArquivosProcesso(string processo)
+        public async Task<Processo> AgendarProcesso(string id, DateTime hora)
         {
-            return ExecutarCMD($"command=pasta", $"id={processo}");
-        }
+            Processo p = null;
+            await Promise.All(() =>
+                {
+                    var p = _processoRepositorio.GetById(id);
 
-        public Processo PublicarVideo(string processo)
-        {
-            string commandArgs = $"command=publicar";
-            string idArgs = $"id={processo}";
-            string datasourceArgs = $"datasource={Settings.ApplicationHttpBaseUrl}api/processo/{processo}";
-            ExecutarCMD(commandArgs, idArgs, datasourceArgs);
-            return _processoRepositorio.GetById(processo);
-        }
+                    p.agendamento = hora;
+                    //p.status = StatusProcesso.Agendado;
+                    p.agendado = true;
 
-        public Processo AtualizarProcessoAgendamento(string id, string porta, DateTime hora)
-        {
-            var p = _processoRepositorio.GetById(id);
-            p.agendamento = hora;
-            p.agendado = true;
-            p.portaExecucao = porta;
-            _processoRepositorio.OpenTransaction();
-            _processoRepositorio.Update(p);
-            _processoRepositorio.Commit();
+                    _processoRepositorio.OpenTransaction();
+                    _processoRepositorio.Update(p);
+                    _processoRepositorio.Commit();
+                },
+                () => _agendamentoService.Agendar(id, hora)
+            );
             return p;
         }
 
-        public Processo AtualizarProcessoSucesso(string id, string arquivo)
+        public async Task<Processo> CancelarAgendamento(string id)
         {
-            var p = _processoRepositorio.GetById(id);
-            p.alteracao = DateTime.Now;
-            p.processado = true;
-            p.status = StatusProcesso.Sucesso;
-            p.arquivoVideo = arquivo;
+            Processo p = null;
+            Task.WaitAll(new Task[]{
+                Task.Run(() =>
+                {
+                    var p = _processoRepositorio.GetById(id);
 
-            _processoRepositorio.OpenTransaction();
-            _processoRepositorio.Update(p);
-            _processoRepositorio.Commit();
+                    p.agendado = false;
 
+                    _processoRepositorio.OpenTransaction();
+                    _processoRepositorio.Update(p);
+                    _processoRepositorio.Commit();
+                }),
+                Task.Run(() =>_agendamentoService.Cancelar(id))
+            });
             return p;
         }
 
-        public Processo AtualizarProcessoErro(string id, string erro)
+        public async Task GerarImagem(Processo processo)
         {
-            var p = _processoRepositorio.GetById(id);
-            p.alteracao = DateTime.Now;
-            p.processado = true;
-            p.status = StatusProcesso.Erro;
-            p.statusMensagem = erro;
+            processo = await AtualizarStatus(processo, StatusProcesso.GerandoImagem);
+            var resultado = await _futebotService.GerarImagem(processo);
+            await AtualizarProcessoLog(processo, resultado.stack.ToArray());
 
-            _processoRepositorio.OpenTransaction();
-            _processoRepositorio.Update(p);
-            _processoRepositorio.Commit();
-
-            return p;
-        }
-
-        public Processo AtualizarRoteiro(Processo processo)
-        {
-            switch (processo.tipo)
+            if (resultado.status == HttpStatusCode.OK)
             {
-                case TipoProcesso.partida:
+                processo = await AtualizarStatus(processo, StatusProcesso.ImagemOK);
+            }
+            if (resultado.status == HttpStatusCode.InternalServerError)
+            {
+                await AtualizarStatus(processo, StatusProcesso.ImagemErro);
+                throw new Exception("GerarImagem"); ;
+            }
+        }
+
+        public async Task GerarAudio(Processo processo)
+        {
+            await AtualizarRoteiro(processo);
+            processo = await AtualizarStatus(processo, StatusProcesso.GerandoAudio);
+
+            RobotResultApi resultado = await _futebotService.GerarAudio(processo, true, true);
+
+            await AtualizarProcessoLog(processo, resultado.stack.ToArray());
+
+            if (resultado.status == HttpStatusCode.OK)
+            {
+                processo = await AtualizarStatus(processo, StatusProcesso.AudioOK);
+            }
+            if (resultado.status == HttpStatusCode.InternalServerError)
+            {
+                await AtualizarStatus(processo, StatusProcesso.AudioErro);
+                throw new Exception("GerarAudio"); ;
+            }
+        }
+
+        public async Task GerarVideo(Processo processo)
+        {
+            await AtualizarAtributos(processo);
+            processo = await AtualizarStatus(processo, StatusProcesso.GerandoVideo);
+
+            var resultado = await _futebotService.GerarVideo(processo);
+            await AtualizarProcessoLog(processo, resultado.stack.ToArray());
+
+            if (resultado.status == HttpStatusCode.OK)
+            {
+                processo = await AtualizarStatus(processo, StatusProcesso.VideoOK);
+            }
+            if (resultado.status == HttpStatusCode.InternalServerError)
+            {
+                await AtualizarStatus(processo, StatusProcesso.VideoErro);
+                throw new Exception("GerarVideo"); ;
+            }
+        }
+
+        public async Task PublicarVideo(Processo processo)
+        {
+            //AtualizarRoteiro(processo);
+            processo = await AtualizarStatus(processo, StatusProcesso.Publicando);
+            var resultado = await _futebotService.PublicarVideo(processo);
+            await AtualizarProcessoLog(processo, resultado.stack.ToArray());
+
+            if (resultado.status == HttpStatusCode.OK)
+            {
+                processo = await AtualizarStatus(processo, StatusProcesso.PublicandoOK);
+            }
+            if (resultado.status == HttpStatusCode.InternalServerError)
+            {
+                await AtualizarStatus(processo, StatusProcesso.PublicandoErro);
+                throw new Exception("PublicarVideo"); ;
+            }
+            if (resultado.status == HttpStatusCode.BadRequest)
+            {
+                await AtualizarStatus(processo, StatusProcesso.Erro);
+                throw new Exception("PublicarVideo"); ;
+            }
+            if (resultado.status == HttpStatusCode.Unauthorized)
+            {
+                await AtualizarStatus(processo, StatusProcesso.Erro);
+                throw new Exception("PublicarVideo"); ;
+            }
+        }
+
+        public async Task AbrirPasta(Processo processo)
+        {
+            var resultado = await _futebotService.AbrirPasta(processo);
+            if (resultado.status == HttpStatusCode.InternalServerError) throw new Exception("Erro ao gerar o vídeo!");
+            if (resultado.status == HttpStatusCode.BadRequest) throw new Exception("Comando inválido");
+        }
+
+        public async Task<Processo> AtualizarStatus(Processo processo, StatusProcesso status)
+        {
+            //var p = _processoRepositorio.GetById(id);
+            if (!Directory.Exists(processo.pasta)) Directory.CreateDirectory(processo.pasta);
+
+            processo.alteracao = DateTime.Now;
+            processo.status = status;
+            return _processoRepositorio.UpdateReturn(processo);
+        }
+
+        public async Task AtualizarProcessoLog(Processo processo, string[] lines)
+        {
+            processo.alteracao = DateTime.Now;
+            processo.log = $"{processo.log}\n[UPDATE:{processo.alteracao}]\n{string.Join("\n", lines)}";
+
+            _processoRepositorio.Update(processo);
+        }
+
+        private async Task<Processo> AtualizarRoteiro(Processo processo)
+        {
+            switch (processo.categoria)
+            {
+                case CategoriaVideo.partida:
                     return AtualizarRoteiroPartida(processo);
-                case TipoProcesso.classificacao:
+                case CategoriaVideo.classificacao:
                     return AtualizarRoteiroClassificacao(processo);
-                case TipoProcesso.rodada:
+                case CategoriaVideo.rodada:
                     return AtualizarRoteiroRodada(processo);
+                case CategoriaVideo.jogosdia:
+                    return AtualizarRoteiroJogosDia(processo);
             }
             return processo;
         }
 
-        public bool Delete(string id)
+        private async Task<Processo> AtualizarAtributos(Processo processo)
+        {
+            Tuple<string, string> atributos = null;
+            switch (processo.categoria)
+            {
+                case CategoriaVideo.partida:
+                    var partida = _partidasService.ObterPartida(processo.ToArgs<ProcessoPartidaArgs>().partida);
+                    atributos = _partidasService.ObterAtributosDoVideo(partida, processo.ToArgs<ProcessoPartidaArgs>());
+                    break;
+                case CategoriaVideo.classificacao:
+                    var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(processo.ToArgs<ProcessoClassificacaoArgs>().campeonato);
+                    atributos = _classificacaoService.ObterAtributosDoVideo(classificacao, processo.ToArgs<ProcessoClassificacaoArgs>());
+                    break;
+                case CategoriaVideo.rodada:
+                    atributos = _rodadaService.ObterAtributosDoVideo(processo.ToArgs<ProcessoRodadaArgs>());
+                    break;
+                case CategoriaVideo.jogosdia:
+                    atributos = _partidasService.ObterAtributosDoVideoJogosDia(processo.ToArgs<ProcessoJogosDiaArgs>());
+                    break;
+            }
+
+            processo.alteracao = DateTime.Now;
+            processo.tituloVideo = atributos.Item1;
+            processo.descricaoVideo = atributos.Item2;
+            _processoRepositorio.Update(processo);
+            return processo;
+        }
+
+        public async Task<bool> Delete(string id)
         {
             _processoRepositorio.Delete(id);
             return true;
         }
 
-        private bool ExecutarCMD(params object[] args)
-        {
-            string botFolder = $"{Settings.ApplicationsRoot}/Robot";
-            string botBatch = @"integration.bat";
-            string argsBuild(object[] arg) => string.Join(" ", arg.Select(_ => $"\"{_}\""));
-
-            string strCmdText = $"{botFolder}/{botBatch}";
-            ProcessStartInfo processInfo = new ProcessStartInfo(strCmdText, $"{botFolder} {argsBuild(args)}");
-            processInfo.UseShellExecute = true;
-            Process batchProcess = new Process();
-            batchProcess.StartInfo = processInfo;
-            batchProcess.Start();
-            batchProcess.WaitForExit();
-            return true;
-        }
-
-        private Processo AtualizarRoteiro(string processo)
-        {
-            return AtualizarRoteiro(ObterProcesso(processo));
-        }
-
         private Processo AtualizarRoteiroPartida(Processo processo)
         {
             var args = JsonConvert.DeserializeObject<ProcessoPartidaArgs>(processo.args);
-            processo.roteiro = _partidasService.ObterRoteiroDaPartida(args.partidaId);
+            var partida = _partidasService.ObterPartida(args.partida);
+            processo.roteiro = _roteiro.ObterRoteiroDaPartida(partida);
             _processoRepositorio.Update(processo);
             return processo;
         }
@@ -268,7 +308,7 @@ namespace Futebox.Services
         {
             var args = JsonConvert.DeserializeObject<ProcessoClassificacaoArgs>(processo.args);
             var classificacao = _classificacaoService.ObterClassificacaoPorCampeonato(args.campeonato, true);
-            processo.roteiro = _classificacaoService.ObterRoteiroDaClassificacao(classificacao, args.campeonato);
+            processo.roteiro = _roteiro.ObterRoteiroDaClassificacao(classificacao, args);
             _processoRepositorio.Update(processo);
             return processo;
         }
@@ -277,25 +317,23 @@ namespace Futebox.Services
         {
             var args = JsonConvert.DeserializeObject<ProcessoRodadaArgs>(processo.args);
             var partidas = _rodadaService.ObterPartidasDaRodada(args.campeonato, args.rodada, true);
-            processo.roteiro = _rodadaService.ObterRoteiroDaRodada(partidas, args.campeonato, args.rodada);
+            processo.roteiro = _roteiro.ObterRoteiroDaRodada(partidas, args);
             _processoRepositorio.Update(processo);
             return processo;
         }
 
-        private string ObterDescricaoDefault()
+        private Processo AtualizarRoteiroJogosDia(Processo processo)
         {
-            var arr = new string[] { "BRASILEIRÃO", "BRASILEIRÃO 2021",
-            "BRASILEIRAO", "BRASILEIRAO 2021", "#BRASILEIRAO", "#BRASILEIRAO2021",
-            "TABELA BRASILEIRÃO", "TABELA BRASILEIRÃO 2021", "TABELA BRASILEIRAO",
-            "TABELA BRASILEIRAO 2021", "#TABELABRASILEIRAO", "#TABELABRASILEIRAO2021",
-            "TABELA CLASSIFICAÇÃO", "TABELA CLASSIFICAÇÃO 2021", "TABELA CLASSIFICACAO",
-            "TABELA CLASSIFICACAO 2021", "#TABELACLASSIFICACAO", "#TABELACLASSIFICACAO2021",
-            "CLASSIFICAÇÃO DO BRASILEIRÃO","CLASSIFICAÇÃO DO BRASILEIRÃO 2021", "CLASSIFICACAO DO BRASILEIRAO",
-            "CLASSIFICACAO DO BRASILEIRAO 2021","#CLASSIFICACAODOBRASILEIRAO", "#CLASSIFICACAODOBRASILEIRAO2021",
-            "CAMPEONATO BRASILEIRO", "CAMPEONATO BRASILEIRO 2021", "CAMPEONATO BRASILEIRO",
-            "CAMPEONATO BRASILEIRO 2021","#CAMPEONATOBRASILEIRO", "#CAMPEONATOBRASILEIRO2021" };
-            return string.Join("\n", arr);
+            var args = JsonConvert.DeserializeObject<ProcessoJogosDiaArgs>(processo.args);
+            var partidas = new List<PartidaVM>();
+            foreach (var p in args.partidas)
+            {
+                var partida = _partidasService.ObterPartida(p, true);
+                partidas.Add(partida);
+            }
+            processo.roteiro = _roteiro.ObterRoteiroDoJogosDoDia(partidas, args);
+            _processoRepositorio.Update(processo);
+            return processo;
         }
-
     }
 }

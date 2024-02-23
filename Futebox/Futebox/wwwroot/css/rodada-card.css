@@ -1,0 +1,135 @@
+﻿/*#scope {
+}
+
+    #scope.card {
+        border: none;
+        box-shadow: 0px 0px 20px 0px #00000024;
+        background: rgb(202,249,202);
+        background: -moz-radial-gradient(circle, rgba(202,249,202,1) 10%, rgba(139,242,129,1) 43%, rgba(97,227,82,1) 70%);
+        background: -webkit-radial-gradient(circle, rgba(202,249,202,1) 10%, rgba(139,242,129,1) 43%, rgba(97,227,82,1) 70%);
+        background: radial-gradient(circle, rgba(202,249,202,1) 10%, rgba(139,242,129,1) 43%, rgba(97,227,82,1) 70%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#caf9ca",endColorstr="#61e352",GradientType=1);
+    }
+
+    #scope.card {
+        width: 440px;
+        height: 360px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #scope .card-header {
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        background: transparent;
+        border: none;
+    }
+
+    #scope .card-body {
+        background: transparent;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+        flex-direction: row;
+    }
+
+    #scope.card img {
+        max-width: 150px;
+    }
+
+    #scope.card .vs img {
+        max-width: 100px;
+    }
+
+    #scope .card-footer {
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        background: transparent;
+        border: none;
+    }
+
+
+
+    #scope table td {
+        padding: 5px 25px;
+    }
+*/
+
+#scope {
+    padding: 15px;
+    border: none;
+    box-shadow: inset 0px 0px 20px 0px #000;
+    border-radius: 20px;
+    background: rgb(91,179,24);
+    background: -moz-linear-gradient(135deg, rgba(91,179,24,1) 45%, rgba(43,122,11,1) 55%);
+    background: -webkit-linear-gradient(135deg, rgba(91,179,24,1) 45%, rgba(43,122,11,1) 55%);
+    background: linear-gradient(135deg, rgba(91,179,24,1) 45%, rgba(43,122,11,1) 55%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#5bb318",endColorstr="#2b7a0b",GradientType=1);
+}
+
+#scope.w100, #scope .w100 {
+    width: 100%;
+}
+
+#scope.h100, #scope .h100 {
+    height: 100%;
+}
+
+#scope .w20 {
+    width: 20%;
+}
+
+#scope .w40 {
+    width: 40%;
+}
+
+#scope .w50 {
+    width: 50%;
+}
+
+
+
+#scope .h10 {
+    height: 10%;
+}
+
+    #scope .h3-3 {
+        height: 3.3%;
+    }
+
+#scope .h80 {
+    height: 80%;
+}
+
+
+#scope .df1 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+}
+
+#scope .df2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+    #scope .scope-title1 {
+        text-align: center;
+    }
+    #scope .scope-title2 {
+        text-align: center;
+    }
+    #scope .scope-title3 {
+        text-align: center;
+    }
+
+    #scope .scope-footer {
+        text-align: center;
+    }

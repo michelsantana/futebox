@@ -9,11 +9,13 @@ namespace Futebox.Services.Interfaces
 {
     public interface IPartidasService
     {
-        IEnumerable<PartidaVM> ObterPartidasHoje(bool skipCache = false);
-        IEnumerable<PartidaVM> ObterPartidasDoCampeonato(Campeonatos campeonato, bool clearCache = false);
-        string ObterRoteiroDaPartida(PartidaVM partida);
-        string ObterRoteiroDaPartida(int idPartida);
-        Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida);
+        PartidaVM ObterPartida(int idPartida, bool usarCache = true);
+        IEnumerable<PartidaVM> ObterPartidasPeriodo(bool usarCache = true);
+        IEnumerable<PartidaVM> ObterPartidasHoje(bool usarCache = true);
+        IEnumerable<PartidaVM> ObterPartidasDoCampeonato(EnumCampeonato campeonato, bool usarCache = true);
+        IEnumerable<PartidaVM> ObterPartidasAntigas(string cacheFile);
+        Tuple<string, string> ObterAtributosDoVideo(PartidaVM partida, ProcessoPartidaArgs args);
+        Tuple<string, string> ObterAtributosDoVideoJogosDia(ProcessoJogosDiaArgs args);
         PartidaVM ConverterEmPartidaVM(FootstatsPartida footstatsPartida);
     }
 }

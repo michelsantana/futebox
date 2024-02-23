@@ -10,9 +10,11 @@ namespace Futebox.Services.Interfaces
     public interface IFootstatsService
     {
         List<FootstatsTime> ObterTimesServico();
-        List<FootstatsClassificacao> ObterClassificacaoServico(Campeonatos campeonato);
+        List<FootstatsClassificacao> ObterClassificacaoServico(Models.Enums.EnumCampeonato campeonato);
+        FootstatsPartida ObterPartida(int partida);
+        List<FootstatsPartida> ObterPartidasPeriodo();
         List<FootstatsPartida> ObterPartidasHoje();
-        List<FootstatsPartida> ObterPartidasDaRodada(Campeonatos campeonato, int rodada);
-        List<FootstatsPartida> ObterPartidasDoCampeonato(Campeonatos campeonato);
+        List<FootstatsPartida> ObterPartidasDaRodada(Models.Enums.EnumCampeonato campeonato, int rodada);
+        List<FootstatsPartida> ObterPartidasDoCampeonato(Models.Enums.EnumCampeonato campeonato);
     }
 }

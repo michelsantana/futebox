@@ -1,0 +1,23 @@
+﻿@model Futebox.Models.PartidaVM
+@if (Model != null)
+{
+    @Html.ScopeStyle($"#scope_{Model.idExterno}", "partida-card.css")
+
+    <div id="scope_@Model.idExterno" class="w100 h100">
+        <div class="w100 h100">
+            <div class="w100 h40 df-col">
+                <div class="h80 w40 df2"><img style="display:block;" width="95%" height="95%" src="@Model.timeMandante.ObterLogoLocal()" /></div>
+                <div class="h20 w100 df2 fitness"><span class='fitness-target'>@(Model.timeMandante.sigla)</span></div>
+            </div>
+            <div class="w100 h20 df-row">
+                <div class="h100 w40 df2 fitness"><span class="fitness-target">@Model.golsMandante</span></div>
+                <div class="h100 w20 df2"><img style="display:block;" width="95%" height="95%" src="~/img/vs.png" /></div>
+                <div class="h100 w40 df2 fitness"><span class="fitness-target">@Model.golsVisitante</span></div>
+            </div>
+            <div class="w100 h40 df-col">
+                <div class="h20 w100 df2 fitness"><span class='fitness-target'>@(Model.timeVisitante.sigla)</span></div>
+                <div class="h80 w40 df2"><img style="display:block;" width="95%" height="95%" src="@Model.timeVisitante.ObterLogoLocal()" /></div>
+            </div>
+        </div>
+    </div>
+}

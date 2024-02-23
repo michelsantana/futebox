@@ -2,83 +2,143 @@
 @model Futebox.Pages.RodadasModel
 @{
     ViewData["Title"] = "Rodadas";
+    var sociaisHabilitadasPagina = new Futebox.Models.Enums.RedeSocialFinalidade[] {
+        Futebox.Models.Enums.RedeSocialFinalidade.InstagramVideo,
+        Futebox.Models.Enums.RedeSocialFinalidade.YoutubeVideo,
+        Futebox.Models.Enums.RedeSocialFinalidade.YoutubeShorts
+    };
 }
 
 <div class="row g-5">
-
     <div class="text-center">
         <h1 class="display-4">Gerador de Rodadas</h1>
     </div>
 </div>
-
+<div>
+    <div class="row g-5">
+        <div class="col-6 offset-3">
+            <div class="input-group">
+                <select name="ddlCampeonato" class="form-select">
+                    <option selected>Selecione</option>
+                    @foreach (var camp in Models.CampeonatoUtils.ObterCampeonatosAtivos())
+                    {
+                        <option value="@((int)camp)">@($"{camp}")</option>
+                    }
+                </select>
+                <input type="number" class="form-control" name="txtRodada">
+                <button type="button" onclick="Pesquisar()" class="btn btn-primary">🔍 Pesquisar</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="rodada">
 
 </div>
 
-<div>
 
-    <div class="row g-5">
-        @foreach (var camp in Models.CampeonatoUtils.ObterCampeonatosAtivos())
-        {
-            <div class="co d-flex flex-column">
-                <h1>@($"{camp}")</h1>
-                <div>
-                    @*<ul id="@($"ul-{(int)camp}")"></ul>*@
-                    @*<input id="@($"rodada-{(int)camp}")" type="number" />*@
-                    <div class="input-group">
-
-                        <select id="@($"rodada-{(int)camp}")" class="form-select">
-                            <option>Nenhum</option>
-                        </select>
-                        <button class="btn btn-outline-primary" onclick="Ver('@((int)camp)')">👁</button>
-                        <button class="btn btn-outline-primary" onclick="GerarVideo('@((int)camp)')">⚙</button>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-</div>
-
-@section Scripts{
+@section Scripts {
     <script>
 
-        function Ver(camp) {
-            var rodada = $(`#rodada-${camp}`).val();
-            Focar(camp, rodada);
-        }
+        var view = {
+            campeonato: null,
+            rodada: null,
+            partidas: [],
+            social: [],
+            colunas: 0,
+            linhas: 0,
 
-        function Focar(camp, r) {
-            fetch(`/rodadas?handler=Rodada&campeonato=${camp}&rodada=${r}`)
-                .then((response) => {
-                    return response.text();
-                })
-                .then((result) => {
-                    document.getElementById('rodada').innerHTML = result;
+            data: () => { },
+            post: (url, data, success) => $.ajax({
+                type: 'POST',
+                url: url,
+                data: JSON.stringify(data),
+                success: success,
+                contentType: "application/json; charset=utf-8"
+            })
+        };
+
+        view.__defineGetter__('campeonato', () => $('[name=ddlCampeonato]'));
+        view.__defineGetter__('rodada', () => $('[name=txtRodada]'));
+        view.__defineGetter__('partidas', () => Array.from($('[data-id]:checked')).map(_ => ~~(_.attributes["data-id"].value)));
+
+        view.data = (social) => {
+            var config = $('[data-config]');
+
+            if (social) config = $(`[data-config="${social}"]`);
+
+            var data = [];
+
+            for (var c of config) {
+                var $config = $(c);
+                var aspect = $config.find('[name=ddlDimensao]').val();
+                var titulo = $config.find('[name=title]').val();
+
+                data.push({
+                    campeonato: ~~view.campeonato.val(),
+                    rodada: ~~view.rodada.val(),
+                    partidas: view.partidas,
+                    social: ~~(social),
+                    colunas: ~~aspect.split('x')[0],
+                    linhas: ~~aspect.split('x')[1],
+                    titulo: titulo,
+                    checked: true,
                 });
+            }
+            return data;
+        };
+
+        $(document).ready(() => RestoreCookie());
+
+        $(document).on('change', '#chk-all', function (evt) {
+            $('[data-id]').each((i, e) => $(e).prop('checked', $('#chk-all').prop('checked')));
+        });
+
+        $(document).on('change', '[data-social]', function (evt) {
+
+        });
+
+        $(document).on('click', '#btnProcesso', function () { GerarProcesso(); });
+
+        function Pesquisar() {
+            var campeonato = view.campeonato.val();
+            var rodada = view.rodada.val();
+            SaveCookie();
+            fetch(`/rodadas?handler=Rodada&campeonato=${campeonato}&rodada=${rodada}`)
+                .then((response) => { return response.text(); })
+                .then((result) => { document.getElementById('rodada').innerHTML = result; });
         }
 
-        function GerarVideo(camp) {
-            var rodada = $(`#rodada-${camp}`).val();
-            $.post(`/api/processo/rodada/${camp}/${rodada}`, (response) => {
-                $.SendToast(response.id, 'Processo criado!');
-            });
+        function GerarProcesso(social) {
+            var data = view.data(social).filter(_ => _.checked);
+            console.log(data);
+            view.post(`/api/processo/rodada`, data, (response) => { console.log(response); $.SendToast('ok', 'Processo criado!'); });
+        }
+
+        function VisualizarMiniatura(s, w, h) {
+            var data = view.data(s);
+            console.log(data);
+            var qs = JSON.stringify(data[0]);
+            window.open(`/Miniaturas?t=rodada&q=${encodeURIComponent(qs)}&w=${w}&h=${h}`, '_blank');
         }
 
         $('#rodada').click(() => {
             $('#rodada').toggleClass('focus');
         });
 
+        function SaveCookie() {
+            localStorage.setItem('rodada', JSON.stringify({ args: [view.campeonato.val(), view.rodada.val()] }))
+        }
+
+        function RestoreCookie() {
+            var v = JSON.parse(localStorage.getItem('rodada') || '{ "args":[] }');
+            if (v.args && v.args.length == 2) {
+                view.campeonato.val(v.args[0]);
+                view.rodada.val(v.args[1]);
+            }
+        }
 
 
     </script>
-    @if ((Model.campeonatoFoco.HasValue && Model.rodadaFoco.HasValue))
-    {
-        <script>
-            Focar('@((int)Model.campeonatoFoco)', '@((int)Model.rodadaFoco)');
-            $('#rodada').addClass('focus');
-            $('#txtRodada').val('@((int)Model.rodadaFoco)')
-        </script>
-    }
     @foreach (var camp in Models.CampeonatoUtils.ObterCampeonatosAtivos())
     {
         <script>
@@ -92,7 +152,7 @@
                     }
                     //$(`#rodada-${camp}`).val();
                 });
-            })
+            });
         </script>
     }
 }

@@ -1,44 +1,103 @@
-﻿@model Tuple<Futebox.Pages.ProcessosModel, int, Futebox.Models.Processo>
+﻿@model Tuple<Futebox.Models.Processo, Futebox.Models.Agenda, bool>
 @{
-    var processo = Model.Item3;
-    var indexStr = $"00000000{Model.Item2}";
-    var index = processo.portaExecucao ?? $"219{indexStr.Substring(indexStr.Length - 2)}";
-    var model = Model.Item1;
+    var processo = Model.Item1;
+    //var model = Model.Item1;
+    var agenda = Model.Item2;
+
+    var statusErroProcesso = new Models.Enums.StatusProcesso[] {
+        Models.Enums.StatusProcesso.AudioErro,
+        Models.Enums.StatusProcesso.ImagemErro,
+        Models.Enums.StatusProcesso.VideoErro,
+        Models.Enums.StatusProcesso.PublicandoErro,
+        Models.Enums.StatusProcesso.Erro
+    };
+
+    var statusErroAgenda = new Models.Agenda.Status[] {
+        Models.Agenda.Status.erro,
+        Models.Agenda.Status.falha,
+        Models.Agenda.Status.cancelado
+    };
+
+    var dark = Model.Item3;
 }
-<tr data-row-id="@processo.id" class="align-middle">
-    <td>
-        <span class="badge @(model.cores[(int)processo.status])">&nbsp;</span>
+<tr data-row-id="@processo.id" style="border-bottom: 1px solid #cdcdcd" class="@(dark ? "bg-dark text-light" : "bg-light text-dark")">
+    <td class="p-0" colspan="2">
+        @Html.Partial("Templates/_processoSteps", processo)
     </td>
-    <td>
+</tr>
+<tr data-row-id="@processo.id" class="@(dark ? "bg-dark text-light" : "bg-light text-dark")">
+    <td width="60%" class="pb-0">
         <b>@processo.id</b><br />
         @processo.nome<br />
-        @processo.tipo
+        <span class="badge bg-dark text-white">@processo.categoria</span>
+        @Html.SocialBadge(processo.social)
+
+        @Html.StatusBadge(processo.status)
+
+        <br />
+        <br />
+        <b>Job:&nbsp;</b><span class="badge bg-black text-white">@agenda?.processoId</span>
+
+        @Html.StatusBadge(agenda?.status)
     </td>
-    <td>@(processo.agendado ? "sim" : "não")</td>
-    <td>
-        <div class="input-group">
-            <input type="time" class="hora form-control form-control-sm" value="@(processo.agendamento?.ToString("HH:mm"))">
-            <input type="text" class="porta form-control form-control-sm" value="@(index)">
-            <button class="btn btn-sm btn-outline-info" onclick="Agendar('@processo.id');">⌚</button>
-        </div>
-    </td>
-    <td>
-        <div class="d-flex justify-content-between">
-            <button class="btn btn-sm btn-outline-info" onclick="Play('@processo.id');">▶</button>
-            @*<button class="btn btn-sm btn-outline-danger" onclick="Delete('@processo.id');">❌</button>*@
-            @*<button class="btn btn-sm btn-outline-dark" onclick="Abrir('@processo.id');">📂</button>*@
-            <button class="btn btn-sm btn-outline-dark" onclick="Publicar('@processo.id');">☁</button>
-            <div class="dropdown">
-                <button class="btn btn-sm btn-outline-dark dropdown-toggle" type="button" id="ddl@(processo.id)" data-bs-toggle="dropdown" aria-expanded="false">
-                    🛠
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="ddl@(processo.id)">
-                    <li><button class="dropdown-item" onclick="Abrir('@processo.id');">📂&nbsp;Abrir pasta do vídeo</button></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><button class="dropdown-item" onclick="Delete('@processo.id');">❌&nbsp;Excluir processo</button></li>
-                </ul>
+    <td width="40%" valign="middle" class="pb-0">
+        <div class="row">
+            <div class="input-group">
+                <input type="date" style="flex:4;" class="data form-control form-control-sm" value="@(processo.agendamento?.ToString("yyyy-MM-dd"))">
+                <input type="number" style="flex:1;" min="0" max="23" class="hora form-control form-control-sm" value="@(processo.agendamento?.ToString("HH"))">
+                <input type="number" style="flex:1;" min="0" max="60" class="min form-control form-control-sm" value="@(processo.agendamento?.ToString("mm"))">
+                <input type="number" style="flex:1;" min="0" max="60" class="seg form-control form-control-sm" value="@(processo.agendamento?.ToString("ss"))">
             </div>
         </div>
-        @*<button class="btn btn-sm btn-outline-dark" onclick="Notificar('@processo.id');">TESTAR</button>*@
+        <div class="row mt-2 mb-2">
+            <div class="btn-group" role="group">
+                <button class="btn btn-sm btn-outline-success" onclick="Executar('@processo.id', true);">🚀&nbsp;Executar</button>
+
+                <button class="btn btn-sm btn-outline-info" onclick="Agendar('@processo.id');">📅&nbsp;Agendar</button>
+
+                <button class="btn btn-sm btn-outline-danger" onclick="AgendarCancelar('@processo.id');">❌&nbsp;Cancelar agendamento</button>
+            </div>
+        </div>
+        <div class="row mt-2 mb-2">
+            <div class="btn-group" role="group">
+                <button class="btn btn-sm btn-outline-info" onclick="Jobs('@processo.id');">
+                    @*<object style="cursor:pointer;height: 2rem;" data="~/img/icones/log.svg"></object>*@
+                    🗓&nbsp;Jobs
+                </button>
+
+                <button class="btn btn-sm btn-outline-dark" onclick="Pasta('@processo.pasta');">
+                    @*<object style="cursor:pointer;height: 2rem;" data="~/img/icones/log.svg"></object>*@
+                    📂&nbsp;Pasta
+                </button>
+                <button class="btn btn-sm btn-outline-dark" onclick="Log('@processo.id');">
+                    @*<object style="cursor:pointer;height: 2rem;" data="~/img/icones/log.svg"></object>*@
+                    🧾&nbsp;Log
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="return Delete('@processo.id');">
+                    @*<object style="cursor:pointer;height: 2rem;" data="~/img/icones/excluir.svg"></object>*@
+                    ❌&nbsp;Excluir
+                </button>
+            </div>
+        </div>
+        <div class="row mt-2 mb-2">
+            <div class="btn-group" role="group">
+                <div class="col-3 text-end">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-outline-primary" onclick="Imagem('@processo.id');">
+                            img
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="Audio('@processo.id');">
+                            audio
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="Video('@processo.id');">
+                            video
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="Publicar('@processo.id');">
+                            upload
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </td>
 </tr>

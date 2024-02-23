@@ -1,0 +1,85 @@
+﻿@model Futebox.Pages.MiniaturasModel.ClassificacaoHandlerModel
+@{
+    var mostrarGrupo = false;
+    var ObterDestaque = new Func<string, string>((s) => s switch
+    {
+        "azul" => "badge bg-info",
+        "laranja" => "badge bg-warning",
+        "verde" => "badge bg-success",
+        "branco" => "badge bg-white",
+        "vermelho" => "badge bg-danger",
+        _ => ""
+    });
+}
+@{
+    var w = $"{Model.width}";
+    var h = $"{Model.height}";
+    w = string.IsNullOrEmpty(w) ? "1920" : w;
+    h = string.IsNullOrEmpty(h) ? "1080" : h;
+
+    var vertical = int.Parse(h) > int.Parse(w);
+    var grupos = Model.classificacao.ToList();
+    grupos.ForEach(_ => _.grupo = vertical ? "SINGLE" : _.grupo);
+
+    var groupBy = grupos.GroupBy(_ => _.grupo);
+    Dictionary<string, List<Futebox.Models.ClassificacaoVM>> byGroup
+        = new Dictionary<string, List<Models.ClassificacaoVM>>();
+
+    var range = Model.args.range ?? new int[] { 0, 99 };
+}
+
+@Html.Partial("Miniaturas/_classificacaoSemGrupos.style", Model)
+
+<div id="mini-container" class="fs-sport">
+    <div id="mini-header" class="fitness">
+        <span class="fitness-target">@($"{Models.CampeonatoUtils.ObterNomeDoCampeonato(Model.args.campeonato)}")</span>
+    </div>
+    <div id="mini-body">
+        @foreach (var grupo in grupos.GroupBy(_ => _.grupo))
+        {
+
+            <table>
+                <tr>
+                    <td class="s2">@(mostrarGrupo ? $"Grupo {grupo.Key}" : "")</td>
+                    <td class="s1"></td>
+                    <td class="s1"></td>
+                    <td class="s1">PTS</td>
+                    <td class="s1">PJ</td>
+                    <td class="s1">VIT</td>
+                    <td class="s2">E</td>
+                    <td class="s2">DER</td>
+                    <td class="s2">GP</td>
+                    <td class="s2">GC</td>
+                    <td class="s2">SD</td>
+                </tr>
+                @foreach (var time in grupo.Where(_ => _.posicao >= range[0] && _.posicao <= range[1]))
+                {
+                    <tr>
+                        <td class="s2"><span class="@(ObterDestaque(time.corDestaque))">&nbsp;</span></td>
+                        <td class="s1">@(time.posicao)º @(time.time.sigla)</td>
+                        <td width="75px">
+                            <img width="75px" src='@(time.time.ObterLogoLocal())' onerror="if (this.src != 'error.jpg') this.src = 'data:image/png;base64, @time.brasao';" />
+                        </td>
+                        <td class="s1">@time.pontos</td>
+                        <td class="s1">@time.partidasJogadas</td>
+                        <td class="s1">@time.vitorias</td>
+                        <td class="s2">@time.empates</td>
+                        <td class="s2">@time.derrotas</td>
+                        <td class="s2">@time.golsPro</td>
+                        <td class="s2">@time.golsContra</td>
+                        <td class="s2">@time.saldoGols</td>
+
+                    </tr>
+                }
+            </table>
+        }
+
+    </div>
+    <div id="mini-footer">
+        <div class="bloco">
+            <div class="legenda">
+                @Html.Raw(Model.legenda)
+            </div>
+        </div>
+    </div>
+</div>

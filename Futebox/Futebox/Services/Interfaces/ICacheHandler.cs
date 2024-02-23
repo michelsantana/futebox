@@ -9,6 +9,7 @@ namespace Futebox.Services.Interfaces
     {
         string ObterPastaCache();
         T ObterConteudo<T>(string cacheName) where T : class;
+        T ObterConteudoExpirado<T>(string cacheName) where T : class;
         bool DefinirConteudo<T>(string cacheName, T dados, int validadeHoras = 8) where T : class;
     }
 }

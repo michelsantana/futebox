@@ -1,59 +1,73 @@
 ﻿using Futebox.Models.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace Futebox.Models
 {
-    public class ProcessoClassificacaoArgs
+    public interface IProcessoArgs
     {
-        public Campeonatos campeonato { get; set; }
-        public ProcessoClassificacaoArgs(Campeonatos c)
-        {
-            campeonato = c;
-        }
-        public ProcessoClassificacaoArgs(int c)
-        {
-            campeonato = (Campeonatos)c;
-        }
+
+    }
+
+    public class ProcessoClassificacaoArgs : IProcessoArgs
+    {
+        public Enums.EnumCampeonato campeonato { get; set; }
+        public string fase { get; set; }
+
+        public RedeSocialFinalidade social { get; set; }
+        
+        public string[] grupos { get; set; }
+        public int[] range { get; set; }
+
+        public bool temFases { get; set; }
+        public bool classificacaoPorGrupos { get; set; }
+
+        public string viewName { get; set; }
+
+        public int linhas { get; set; }
+        public int colunas { get; set; }
+        public string titulo { get; set; }
+        public DateTime? dataExecucao { get; set; }
+        public int? dataRelativa { get; set; }
+
         public ProcessoClassificacaoArgs()
         {
-
+            dataExecucao = dataExecucao ?? DateTime.Now;
         }
     }
 
-    public class ProcessoRodadaArgs
+    public class ProcessoRodadaArgs : IProcessoArgs
     {
-        public Campeonatos campeonato { get; set; }
+        public EnumCampeonato campeonato { get; set; }
         public int rodada { get; set; }
-        public ProcessoRodadaArgs(Campeonatos c, int r)
-        {
-            campeonato = c;
-            rodada = r;
-        }
-        public ProcessoRodadaArgs(int c, int r)
-        {
-            campeonato = (Campeonatos)c;
-            rodada = r;
-        }
-        public ProcessoRodadaArgs()
-        {
+        public int[] partidas { get; set; }
+        public RedeSocialFinalidade social { get; set; }
 
-        }
+        public string viewName { get; set; }
+        public int linhas { get; set; }
+        public int colunas { get; set; }
+        public string titulo { get; set; }
+        public int? dataRelativa { get; set; }
     }
 
-    public class ProcessoPartidaArgs
+    public class ProcessoJogosDiaArgs : IProcessoArgs
     {
-        public int partidaId { get; set; }
-        public ProcessoPartidaArgs(string pid)
-        {
-            this.partidaId = int.Parse(pid);
+        public int[] partidas { get; set; }
+        public RedeSocialFinalidade social { get; set; }
 
-        }
-        public ProcessoPartidaArgs(int pid)
-        {
-            this.partidaId = pid;
-        }
-        public ProcessoPartidaArgs()
-        {
-
-        }
+        public string viewName { get; set; }
+        public int linhas { get; set; }
+        public int colunas { get; set; }
+        public string titulo { get; set; }
+        public int? dataRelativa { get; set; }
+    }
+    
+    public class ProcessoPartidaArgs : IProcessoArgs
+    {
+        public int partida { get; set; }
+        public RedeSocialFinalidade social { get; set; }
+        public string titulo { get; set; }
+        public string viewName { get; set; }
+        public int? dataRelativa { get; set; }
     }
 }

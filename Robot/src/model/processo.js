@@ -1,33 +1,26 @@
-const enumTipo = {
-  [0]: "partida",
-  [1]: "classificacao",
-  [2]: "rodada",
-};
+module.exports = class Processo {
+  nome = null;
+  categoria = null;
+  status = null;
+  statusMensagem = null;
+  notificacao = null;
+  agendamento = null;
+  agendado = null;
+  partidaId = null;
+  campeonatoId = null;
+  rodadaId = null;
+  
 
-const enumTipoLink = {
-  [0]: "print",
-  [1]: "image",
-};
-
-module.exports = function Processo(processo) {
-  this.tipo = enumTipo[processo.tipo];
-  this.idExterno = processo.idExterno;
-  this.nome = processo.nome;
-  this.link = processo.link;
-  this.tipoLink = enumTipoLink[processo.tipoLink];
-  this.imgLargura = processo.imgLargura;
-  this.imgAltura = processo.imgAltura;
-  this.roteiro = processo.roteiro;
-  this.attrTitulo = processo.attrTitulo;
-  this.attrDescricao = processo.attrDescricao;
-  this.status = processo.status;
-  this.processado = processo.processado;
-  this.json = processo.json;
-  this.linkThumb = processo.linkThumb;
-  this.criacao = processo.criacao;
-  this.notificacao = processo.notificacao;
-  this.arquivoVideo = processo.arquivoVideo;
-  this.portaExecucao = processo.portaExecucao;
-
-  return this;
+  constructor(processo) {
+    this.nome = processo.nome;
+    this.categoria = processo.categoria;
+    this.status = processo.status;
+    this.statusMensagem = processo.statusMensagem;
+    this.notificacao = processo.notificacao;
+    this.agendamento = processo.agendamento;
+    this.agendado = processo.agendado;
+    this.partidaId = processo.partidaId;
+    this.campeonatoId = processo.campeonatoId;
+    this.rodadaId = processo.rodadaId;
+  }
 };

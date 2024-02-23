@@ -1,0 +1,59 @@
+﻿@page
+@model Futebox.Pages.MiniaturasModel
+@{
+    ViewData["Title"] = $"{Model.tipo} Thumb";
+}
+@switch (Model.tipo)
+{
+    case Models.Enums.CategoriaVideo.rodada:
+        @Html.Partial("Miniaturas/_rodadaMiniatura", Model.rodada)
+        break;
+    case Models.Enums.CategoriaVideo.jogosdia:
+        @Html.Partial("Miniaturas/_jogosDiaMiniatura", Model.jogosDia)
+        break;
+    case Models.Enums.CategoriaVideo.classificacao:
+        @Html.Partial($"Miniaturas/{Model.classificacao.args.viewName}", Model.classificacao)
+        break;
+    case Models.Enums.CategoriaVideo.partida:
+        @Html.Partial("Miniaturas/_partidaMiniatura", Model.partida)
+        break;
+    default: break;
+}
+
+
+@section Scripts{
+    <script>
+        function Equality() {
+            $('#mini-container img').each((i, e) => {
+                var w = $(e).width();
+                var h = $(e).height();
+                var g = w < h ? w : h;
+                $(e).width(g);
+                $(e).height(g);
+            })
+        }
+
+        $(document).ready(() => {
+            Equality();
+            if (
+                window.location.href.toLowerCase().indexOf('t=partida') > -1 ||
+                window.location.href.toLowerCase().indexOf('t=jogosdia') > -1
+            ) {
+                $('.text-fit-lg').each((i, e) => $(e).fitText(0.8));
+                $('.text-fit-sm').each((i, e) => $(e).fitText(2.6));
+
+                setTimeout(() => TextFitness.v2('.fitness'), 890);
+
+                $('.mini-col').each((i, e) => {
+                    if ($(e).find('div').length == 0)
+                        $(e).remove();
+                });
+
+                $('.mini-row').each((i, e) => {
+                    if ($(e).find('.mini-col').length == 0)
+                        $(e).remove();
+                });
+            }
+        })
+    </script>
+}

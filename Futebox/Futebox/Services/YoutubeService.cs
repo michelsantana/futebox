@@ -1,122 +1,166 @@
 ﻿using Futebox.Models;
 using Futebox.Services.Interfaces;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Services;
-using Google.Apis.Upload;
-using Google.Apis.YouTube.v3;
-using Google.Apis.YouTube.v3.Data;
+using PuppeteerSharp;
 using System;
 using System.IO;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Futebox.Services
 {
     public class YoutubeService : IYoutubeService
     {
-        static UserCredential _credential;
 
-        public YoutubeService()
+        readonly IBrowserService _browserService;
+        private Page _page;
+
+        public YoutubeService(IBrowserService browserService)
         {
+            _browserService = browserService;
         }
 
-        public bool IsLogged()
+        private ViewPortOptions Viewport(int largura, int altura)
         {
-            return !(_credential == null);
-        }
-
-        private UserCredential LoadCredential()
-        {
-            if (_credential == null)
-                using (var stream = new FileStream($"{Settings.BackendRoot}/client_secrets.json", FileMode.Open, FileAccess.Read))
-                {
-                    _credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                        GoogleClientSecrets.Load(stream).Secrets,
-                        // This OAuth 2.0 access scope allows an application to upload files to the
-                        // authenticated user's YouTube channel, but doesn't allow other types of access.
-                        new[] { YouTubeService.Scope.YoutubeUpload },
-                        "user",
-                        CancellationToken.None
-                    ).Result;
-                }
-            return _credential;
-        }
-
-        public async void DoLogin()
-        {
-            if (_credential == null) LoadCredential();
-            await _credential.RefreshTokenAsync(CancellationToken.None);
-        }
-
-        public async void DoLogout()
-        {
-            if (_credential == null) LoadCredential();
-            await _credential.RevokeTokenAsync(CancellationToken.None);
-        }
-
-        public Task Upload(Processo processo)
-        {
-            if (!IsLogged())
+            return new ViewPortOptions()
             {
-                DoLogin();
-                return Task.FromResult(true);
+                Width = largura,
+                Height = altura
+            };
+        }
+
+        public async Task Abrir()
+        {
+            _page = await _browserService.NewPage();
+            await _page.SetViewportAsync(Viewport(1080, 720));
+            await _page.GoToAsync("https://studio.youtube.com/channel/UCWs2h6plWKR8xCZM3ljNGRw", WaitUntilNavigation.Networkidle2);
+            _browserService.WaitFor(1);
+        }
+
+        public async Task<bool> EstaLogado()
+        {
+            var loginStatus = await _page.EvaluateExpressionAsync(_browserService.JsFunction("YTEstaLogado"));
+            _browserService.WaitFor(1);
+            if (!loginStatus.ToObject<bool>()) return false;
+            return true;
+        }
+
+        public async Task AbrirUpload()
+        {
+            await _page.ClickAsync("#create-icon");
+            _browserService.WaitFor(1);
+
+            await _page.ClickAsync("#text-item-0");
+            _browserService.WaitFor(1);
+        }
+
+        public async Task EfetuarUploadArquivo(string arquivo)
+        {
+            if (!File.Exists(arquivo)) throw new Exception("File not found");
+
+            var campoDoUpload = await _page.QuerySelectorAsync("[type=\"file\"]");
+            await campoDoUpload.UploadFileAsync(arquivo);
+            _browserService.WaitFor(10);
+        }
+
+        public async Task SelecionarPlayList(string categoria)
+        {
+            return;
+            await _page.ClickAsync(".dropdown.style-scope.ytcp-video-metadata-playlists");
+            _browserService.WaitFor(1);
+
+            var clickId = await _page.EvaluateExpressionAsync(_browserService.JsFunction("YTSelecionarPlaylist", $"{categoria}"));
+            await _page.ClickAsync($"{clickId.ToObject<string>()}");
+            _browserService.WaitFor(1);
+
+            await _page.ClickAsync(".done-button.action-button.style-scope.ytcp-playlist-dialog");
+            _browserService.WaitFor(1);
+        }
+
+        public async Task ClicarEmProximo()
+        {
+            var seletorRodapeJanela = ".button-area.ytcp-uploads-dialog";
+            await _page.ClickAsync($"{seletorRodapeJanela} #next-button");
+            _browserService.WaitFor(3);
+        }
+
+        public async Task SelecionarPrivacidade()
+        {
+            if (Settings.DEBUGMODE) await _page.ClickAsync("[name=\"PRIVATE\"]");
+            _browserService.WaitFor(3);
+        }
+
+        public async Task ClicarEmPublicar()
+        {
+            var seletorRodapeJanela = ".button-area.ytcp-uploads-dialog";
+            await _page.ClickAsync($"{seletorRodapeJanela} #done-button");
+            _browserService.WaitFor(10);
+        }
+
+        public async Task Fechar()
+        {
+            await _page.CloseAsync();
+            _page = null;
+        }
+
+        public Page GetPage()
+        {
+            return _page;
+        }
+
+        public async Task<RobotResultApi> Upload(Processo processo)
+        {
+            var result = new RobotResultApi("PublicarVideo");
+            result.Add("start");
+
+            try
+            {
+                await Abrir();
+                result.Add("newpage");
+
+                var estaLogado = await EstaLogado();
+                if (!estaLogado) return result.Unauthorized();
+                result.Add("login");
+
+                await AbrirUpload();
+                result.Add("upload.1");
+
+                await EfetuarUploadArquivo(Path.Combine(processo.pasta, processo.nomeDoArquivoVideo));
+                result.Add("upload.2");
+
+                await _browserService.RedigitarTextoCampo(".input-container.title #textbox", processo.obterTitulo(), _page);
+                _browserService.WaitFor(1);
+                await _page.Keyboard.PressAsync("Escape");
+                result.Add("title");
+
+                await _browserService.RedigitarTextoCampo(".input-container.description #textbox", processo.obterDescricao(), _page);
+                _browserService.WaitFor(1);
+                await _page.Keyboard.PressAsync("Escape");
+                result.Add("description");
+
+                await SelecionarPlayList($"{processo.categoria}");
+                result.Add("playlist.1");
+
+                await ClicarEmProximo();
+                await ClicarEmProximo();
+                await ClicarEmProximo();
+                result.Add("next");
+
+                await SelecionarPrivacidade();
+                result.Add("visibility");
+
+                await ClicarEmPublicar();
+                result.Add("publish");
+
+                await Fechar();
+                result.Add("close");
+
+                return result.Ok();
             }
-
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            catch (Exception ex)
             {
-                HttpClientInitializer = _credential,
-                ApplicationName = Assembly.GetExecutingAssembly().GetName().Name
-            });
-
-            var video = new Video();
-            video.Snippet = new VideoSnippet();
-            video.Snippet.Title = processo.attrTitulo;
-            video.Snippet.Description = processo.attrDescricao;
-            video.Snippet.Tags = new string[] { "futebol", "football", "classificação", "classificacao", "brasileirao", "rodada", "serie a", "serie b", "campeonato", "campeonato brasileiro", "brasileirão" };
-            video.Snippet.CategoryId = "17";
-            video.Status = new VideoStatus();
-            video.Status.PrivacyStatus = "private"; // or "private" or "public"
-            var filePath = processo.arquivoVideo; // Replace with path to actual movie file.
-
-
-            //var video = new Video();
-            //video.Snippet = new VideoSnippet();
-            //video.Snippet.Title = "Default Video Title";
-            //video.Snippet.Description = "Default Video Description";
-            //video.Snippet.Tags = new string[] { "tag1", "tag2" };
-            //video.Snippet.CategoryId = "22"; // See https://developers.google.com/youtube/v3/docs/videoCategories/list
-            //video.Status = new VideoStatus();
-            //video.Status.PrivacyStatus = "unlisted"; // or "private" or "public"
-            //var filePath = @"D:\Notebook\Workspace\pessoal\FuteBox\git\futebox\Robot\archive\Upload\a.mp4"; // Replace with path to actual movie file.
-
-            using (var fileStream = new FileStream(filePath, FileMode.Open))
-            {
-                var videosInsertRequest = youtubeService.Videos.Insert(video, "snippet,status", fileStream, "video/*");
-                videosInsertRequest.ProgressChanged += videosInsertRequest_ProgressChanged;
-                videosInsertRequest.ResponseReceived += videosInsertRequest_ResponseReceived;
-
-                return videosInsertRequest.UploadAsync();
+                await Fechar();
+                result.Add(EyeLog.Log(ex));
+                return result.Error();
             }
-        }
-
-        void videosInsertRequest_ProgressChanged(Google.Apis.Upload.IUploadProgress progress)
-        {
-            switch (progress.Status)
-            {
-                case UploadStatus.Uploading:
-                    Console.WriteLine("{0} bytes sent.", progress.BytesSent);
-                    break;
-
-                case UploadStatus.Failed:
-                    Console.WriteLine("An error prevented the upload from completing.\n{0}", progress.Exception);
-                    break;
-            }
-        }
-
-        void videosInsertRequest_ResponseReceived(Video video)
-        {
-            Console.WriteLine("Video id '{0}' was successfully uploaded.", video.Id);
         }
     }
 }

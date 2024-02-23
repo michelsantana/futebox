@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Futebox.Teste
 {
-    [Collection(nameof(DataBaseCollection))]
+    [Collection(nameof(InjectorCollection))]
     public class FootstatsTeste
     { 
         [Fact]
@@ -22,6 +22,7 @@ namespace Futebox.Teste
             var mocker = new AutoMocker();
             var _service = mocker.CreateInstance<FootstatsService>();
             var httpMock = mocker.GetMock<IHttpHandler>();
+            var campeonatosAtivos = CampeonatoUtils.ObterCampeonatosAtivos();
 
             var response = new HttpResponseMessage
             {
@@ -35,7 +36,7 @@ namespace Futebox.Teste
             var result = _service.ObterTimesServico();
 
             // Assert
-            httpMock.Verify(_ => _.Get(It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()), Times.Exactly(2));
+            httpMock.Verify(_ => _.Get(It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()), Times.Exactly(campeonatosAtivos.Length));
             Assert.NotEmpty(result);
         }
 
@@ -52,6 +53,7 @@ namespace Futebox.Teste
             var mocker = new AutoMocker();
             var _service = mocker.CreateInstance<FootstatsService>();
             var httpMock = mocker.GetMock<IHttpHandler>();
+            var campeonatosAtivos = CampeonatoUtils.ObterCampeonatosAtivos();
 
             var response = new HttpResponseMessage
             {
@@ -65,7 +67,7 @@ namespace Futebox.Teste
             var result = _service.ObterTimesServico();
 
             // Assert
-            httpMock.Verify(_ => _.Get(It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()), Times.Exactly(2));
+            httpMock.Verify(_ => _.Get(It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()), Times.Exactly(campeonatosAtivos.Length));
             Assert.NotNull(result);
             Assert.Equal(quantidadeRegistrosEsperados, result.Count);
         }

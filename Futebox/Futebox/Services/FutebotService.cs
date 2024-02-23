@@ -129,7 +129,8 @@ namespace Futebox.Services
                 }
                 else
                 {
-                    conteudo += $"ffmpeg -y -loop 1 -i {arquivoImagem} -i {arquivoAudio} -c:v libx264 -c:a copy -shortest {arquivoVideo}";
+                    conteudo += $"ffmpeg -y -loop 1 -i {arquivoImagem} -i {arquivoAudio} -c:v libx264 -c:a copy -shortest {arquivoVideoTemp}\n";
+                    conteudo += $"ffmpeg -y -i {arquivoVideoTemp} -c:a aac -b:a 256k -ar 44100 -c:v libx264 -b:v 5M -r 30 -pix_fmt yuv420p -preset faster -tune stillimage {arquivoVideo}";
                 }
 
                 File.WriteAllText(arquivoShell, conteudo);
